@@ -99,16 +99,7 @@ def build_table(prefix):
     for i in range(rows):
         col1, col2 = st.columns([1,1])
 
-       benefit = col1.selectbox(
-    "",
-    [""] + benefit_list + ["OTHER"],
-    key=f"{prefix}_b_{i}"
-)
-
-manual_mode = False
-
-if benefit == "OTHER":
-    benefit = col1.selectbox(
+        benefit = col1.selectbox(
             "",
             [""] + benefit_list + ["OTHER"],
             key=f"{prefix}_b_{i}"
