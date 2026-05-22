@@ -108,39 +108,38 @@ def build_table(prefix):
 manual_mode = False
 
 if benefit == "OTHER":
-    benefit = col1.text_input(
-        "",
-        key=f"{prefix}_custom_{i}",
-        placeholder="Enter new benefit"
-    ).upper()
+    benefit = col1.selectbox(
+            "",
+            [""] + benefit_list + ["OTHER"],
+            key=f"{prefix}_b_{i}"
+        )
 
-    manual_mode = True
-else:
-    # Check if system has amount options
-    options = get_amounts(community, benefit, year, month)
-    if len(options) == 0:
-        manual_mode = True
+        if benefit == "OTHER":
+            benefit = col1.text_input(
+                "",
+                key=f"{prefix}_custom_{i}",
+                placeholder="Enter new benefit"
+            ).upper()
 
-# ✅ AMOUNT INPUT LOGIC (FIXED)
-if not manual_mode:
-    display_vals = [f"${x:,.2f}" for x in options]
+        options = get_amounts(community, benefit, year, month)
 
-    selected = col2.selectbox(
-        "",
-        display_vals,
-        key=f"{prefix}_a_{i}"
-    )
+        if benefit != "" and len(options) > 0:
+            display_vals = [f"${x:,.2f}" for x in options]
 
-    amount_val = float(selected.replace("$","").replace(",",""))
+            selected = col2.selectbox(
+                "",
+                display_vals,
+                key=f"{prefix}_a_{i}"
+            )
 
-else:
-    amount_val = col2.number_input(
-        "Amount ($)",
-        value=0.00,
-        step=0.01,
-        key=f"{prefix}_manual_{i}_{benefit}",  # 🔥 important: dynamic key
-        format="%.2f"
-    )
+            amount_val = float(selected.replace("$","").replace(",",""))
+        else:
+            amount_val = col2.number_input(
+                "Amount ($)",
+                value=0.00,
+                step=0.01,
+                key=f"{prefix}_manual_{i}"
+            )
 
         total += amount_val
 
