@@ -99,38 +99,48 @@ def build_table(prefix):
     for i in range(rows):
         col1, col2 = st.columns([1,1])
 
-        benefit = col1.selectbox(
-            "",
-            [""] + benefit_list + ["OTHER"],
-            key=f"{prefix}_b_{i}"
-        )
+       benefit = col1.selectbox(
+    "",
+    [""] + benefit_list + ["OTHER"],
+    key=f"{prefix}_b_{i}"
+)
 
-        if benefit == "OTHER":
-            benefit = col1.text_input(
-                "",
-                key=f"{prefix}_custom_{i}",
-                placeholder="Enter new benefit"
-            ).upper()
+manual_mode = False
 
-        options = get_amounts(community, benefit, year, month)
+if benefit == "OTHER":
+    benefit = col1.text_input(
+        "",
+        key=f"{prefix}_custom_{i}",
+        placeholder="Enter new benefit"
+    ).upper()
 
-        if benefit != "" and len(options) > 0:
-            display_vals = [f"${x:,.2f}" for x in options]
+    manual_mode = True
+else:
+    # Check if system has amount options
+    options = get_amounts(community, benefit, year, month)
+    if len(options) == 0:
+        manual_mode = True
 
-            selected = col2.selectbox(
-                "",
-                display_vals,
-                key=f"{prefix}_a_{i}"
-            )
+# ✅ AMOUNT INPUT LOGIC (FIXED)
+if not manual_mode:
+    display_vals = [f"${x:,.2f}" for x in options]
 
-            amount_val = float(selected.replace("$","").replace(",",""))
-        else:
-            amount_val = col2.number_input(
-                "Amount ($)",
-                value=0.00,
-                step=0.01,
-                key=f"{prefix}_manual_{i}"
-            )
+    selected = col2.selectbox(
+        "",
+        display_vals,
+        key=f"{prefix}_a_{i}"
+    )
+
+    amount_val = float(selected.replace("$","").replace(",",""))
+
+else:
+    amount_val = col2.number_input(
+        "Amount ($)",
+        value=0.00,
+        step=0.01,
+        key=f"{prefix}_manual_{i}_{benefit}",  # 🔥 important: dynamic key
+        format="%.2f"
+    )
 
         total += amount_val
 
