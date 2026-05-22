@@ -285,7 +285,7 @@ if len(st.session_state.history) > 0:
 
     df = st.session_state.history
 
-    # ✅ SAFER FILTER (fixes missing button issue)
+    #  SAFER FILTER 
     df = df[df["Client"].str.strip().str.upper() == client.strip().upper()]
 
     if len(df) > 0:
@@ -297,7 +297,7 @@ if len(st.session_state.history) > 0:
         st.subheader("TOTAL OVERPAYMENT / UNDERPAYMENT ACROSS MONTHS")
         st.write(f"${total:,.2f}")
 
-        # ✅ DOWNLOAD BUTTON (STREAMLIT SAFE)
+        #  DOWNLOAD BUTTON (STREAMLIT SAFE)
         import io
 
         df = df.copy()
