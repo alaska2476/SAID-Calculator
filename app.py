@@ -284,11 +284,38 @@ if st.button("Save Month Calculation"):
 if len(st.session_state.history) > 0:
 
     df = st.session_state.history
-    df = df[df["Client"] == client]
 
-    st.dataframe(df, use_container_width=True)
+    # ✅ SAFER FILTER (fixes missing button issue)
+    df = df[df["Client"].str.strip().str.upper() == client.strip().upper()]
 
-    total = df["Overpayment"].sum()
+    if len(df) > 0:
 
-    st.subheader("TOTAL OVERPAYMENT / UNDERPAYMENT ACROSS MONTHS")
-    st.write(f"${total:,.2f}")
+        st.dataframe(df, use_container_width=True)
+
+        total = df["Overpayment"].sum()
+
+        st.subheader("TOTAL OVERPAYMENT / UNDERPAYMENT ACROSS MONTHS")
+        st.write(f"${total:,.2f}")
+
+        # ✅ DOWNLOAD BUTTON (STREAMLIT SAFE)
+        import io
+
+        df = df.copy()
+
+        df["Month_Num"] = pd.to_datetime(df["Month"], format="%B").dt.month
+        df = df.sort_values(["Year", "Month_Num"])
+        df = df.drop(columns=["Month_Num"])
+
+        output = io.BytesIO()
+        df.to_excel(output, index=False, engine='openpyxl')
+        output.seek(0)
+
+        st.download_button(
+            label="📥 Download Full Client Summary",
+            data=output,
+            file_name=f"{client}_FULL_summary.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+    else:
+        st.info("No records found for this client yet. Click 'Save Month Calculation' first.")
