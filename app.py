@@ -97,44 +97,60 @@ def build_table(prefix):
     st.markdown("**Benefit | Amount**")
 
     for i in range(rows):
-        col1, col2 = st.columns([1,1])
 
-        benefit = col1.selectbox(
+    # ✅ FIRST ROW (normal always)
+    col1, col2 = st.columns([1,1])
+
+    selected = col1.selectbox(
+        "",
+        [""] + benefit_list + ["OTHER"],
+        key=f"{prefix}_b_{i}"
+    )
+
+    options = get_amounts(community, selected, year, month)
+
+    if selected != "" and selected != "OTHER" and len(options) > 0:
+
+        display_vals = [f"${x:,.2f}" for x in options]
+
+        selected_amt = col2.selectbox(
             "",
-            [""] + benefit_list + ["OTHER"],
-            key=f"{prefix}_b_{i}"
+            display_vals,
+            key=f"{prefix}_a_{i}"
         )
 
-        if benefit == "OTHER":
-            benefit = col1.text_input(
-                "",
-                key=f"{prefix}_custom_{i}",
-                placeholder="Enter new benefit"
-            ).upper()
+        amount_val = float(selected_amt.replace("$","").replace(",",""))
 
-        options = get_amounts(community, benefit, year, month)
+    else:
+        amount_val = col2.number_input(
+            "Amount ($)",
+            value=0.00,
+            step=0.01,
+            key=f"{prefix}_manual_{i}",
+            format="%.2f"
+        )
 
-        if benefit != "" and len(options) > 0:
-            display_vals = [f"${x:,.2f}" for x in options]
+    # ✅ SECOND ROW ONLY FOR OTHER (aligned perfectly)
+    if selected == "OTHER":
 
-            selected = col2.selectbox(
-                "",
-                display_vals,
-                key=f"{prefix}_a_{i}"
-            )
+        col1b, col2b = st.columns([1,1])
 
-            amount_val = float(selected.replace("$","").replace(",",""))
-        else:
-            amount_val = col2.number_input(
-                "Amount ($)",
-                value=0.00,
-                step=0.01,
-                key=f"{prefix}_manual_{i}"
-            )
+        benefit = col1b.text_input(
+            "",
+            key=f"{prefix}_custom_{i}",
+            placeholder="Enter new benefit"
+        ).upper()
 
-        total += amount_val
+        # ✅ SAME AMOUNT (linked)
+        amount_val = col2b.number_input(
+            "Amount ($)",
+            value=amount_val,
+            step=0.01,
+            key=f"{prefix}_manual_other_{i}",
+            format="%.2f"
+        )
 
-    return total
+    total += amount_val
 
 # =========================
 # DECLARED & ACTUAL
