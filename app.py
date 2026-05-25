@@ -98,6 +98,7 @@ def build_table(prefix):
     st.markdown("**Benefit | Amount**")
 
     for i in range(rows):
+
         col1, col2 = st.columns([1,1])
 
         selected = col1.selectbox(
@@ -106,11 +107,11 @@ def build_table(prefix):
             key=f"{prefix}_b_{i}"
         )
 
-        # ✅ CASE 1: OTHER → FORCE both inputs
+        # ✅ REPLACE dropdown with text input (same position)
         if selected == "OTHER":
 
             benefit = col1.text_input(
-                "",
+                "Benefit",
                 key=f"{prefix}_custom_{i}",
                 placeholder="Enter new benefit"
             ).upper()
@@ -119,21 +120,21 @@ def build_table(prefix):
                 "Amount ($)",
                 value=0.00,
                 step=0.01,
-                key=f"{prefix}_manual_other_{i}",  # ✅ UNIQUE KEY
+                key=f"{prefix}_manual_other_{i}",
                 format="%.2f"
             )
 
-        # ✅ CASE 2: NORMAL BENEFIT
         else:
             benefit = selected
 
             options = get_amounts(community, benefit, year, month)
 
             if benefit != "" and len(options) > 0:
+
                 display_vals = [f"${x:,.2f}" for x in options]
 
                 selected_amt = col2.selectbox(
-                    "",
+                    "Amount",
                     display_vals,
                     key=f"{prefix}_a_{i}"
                 )
@@ -145,14 +146,13 @@ def build_table(prefix):
                     "Amount ($)",
                     value=0.00,
                     step=0.01,
-                    key=f"{prefix}_manual_{i}",  # ✅ normal key
+                    key=f"{prefix}_manual_{i}_{benefit}",
                     format="%.2f"
                 )
 
         total += amount_val
 
     return total
-
 # =========================
 # DECLARED & ACTUAL
 # =========================
