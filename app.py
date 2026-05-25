@@ -9,7 +9,7 @@ st.set_page_config(layout="wide")
 
 st.markdown("""
 <style>
-.block-container {padding-top:0.0rem; padding-bottom: 0.5rem;}
+.block-container {padding-top:0.7rem; padding-bottom: 0.5rem;}
 div.row-widget.stHorizontal {gap: 0.3rem;}
 h1 {text-align: center;}
 </style>
