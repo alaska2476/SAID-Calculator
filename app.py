@@ -87,7 +87,6 @@ year = cols[4].selectbox("Benefit Year", sorted(Reference["Start Date"].dt.year.
 same = st.checkbox("Same as Declared", value=True)
 
 # =========================
-# =========================
 # TABLE FUNCTION
 # =========================
 def build_table(prefix):
@@ -113,7 +112,7 @@ def build_table(prefix):
             # remove amount in this row
             col2.write("")
 
-            # create 3 aligned rows
+            #  create 3 aligned rows
             for j in range(3):
 
                 col1b, col2b = st.columns([1,1])
@@ -126,14 +125,14 @@ def build_table(prefix):
 
                 amount_val = col2b.number_input(
                     "Amount ($)",
-                    value=None,
+                    value=0.00,
                     step=0.01,
                     key=f"{prefix}_manual_other_{i}_{j}",
                     format="%.2f"
                 )
 
-                #  FIXED INDENTATION
-                if amount_val is not None:
+                #  only add if benefit is entered
+                if benefit.strip() != "":
                     total += amount_val
 
         #  CASE 2: NORMAL BENEFIT
@@ -158,15 +157,13 @@ def build_table(prefix):
             else:
                 amount_val = col2.number_input(
                     "Amount ($)",
-                    value=None,
+                    value=0.00,
                     step=0.01,
                     key=f"{prefix}_manual_{i}_{benefit}",
                     format="%.2f"
                 )
 
-            #  FIXED INDENTATION
-            if amount_val is not None:
-                total += amount_val
+            total += amount_val
 
     return total
 
