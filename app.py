@@ -125,15 +125,16 @@ def build_table(prefix):
 
                 amount_val = col2b.number_input(
                     "Amount ($)",
-                    value=0.00,
+                    value=None,
                     step=0.01,
                     key=f"{prefix}_manual_other_{i}_{j}",
                     format="%.2f"
                 )
 
                 #  only add if benefit is entered
-                if benefit.strip() != "":
-                    total += amount_val
+                if amount_val is not None:
+    total += amount_val
+
 
         #  CASE 2: NORMAL BENEFIT
         else:
@@ -157,13 +158,14 @@ def build_table(prefix):
             else:
                 amount_val = col2.number_input(
                     "Amount ($)",
-                    value=0.00,
+                    value=None,
                     step=0.01,
                     key=f"{prefix}_manual_{i}_{benefit}",
                     format="%.2f"
                 )
 
-            total += amount_val
+            if amount_val is not None:
+    total += amount_val
 
     return total
 
