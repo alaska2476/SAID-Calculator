@@ -106,13 +106,13 @@ def build_table(prefix):
             key=f"{prefix}_b_{i}"
         )
 
-        # ✅ CASE 1: OTHER → allow 3 entries
+        #  CASE 1: OTHER → allow 3 entries
         if selected == "OTHER":
 
             # remove amount in this row
             col2.write("")
 
-            # ✅ create 3 aligned rows
+            #  create 3 aligned rows
             for j in range(3):
 
                 col1b, col2b = st.columns([1,1])
@@ -131,11 +131,11 @@ def build_table(prefix):
                     format="%.2f"
                 )
 
-                # ✅ only add if benefit is entered
+                #  only add if benefit is entered
                 if benefit.strip() != "":
                     total += amount_val
 
-        # ✅ CASE 2: NORMAL BENEFIT
+        #  CASE 2: NORMAL BENEFIT
         else:
 
             benefit = selected
