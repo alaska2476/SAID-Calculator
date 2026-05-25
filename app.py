@@ -99,38 +99,54 @@ def build_table(prefix):
     for i in range(rows):
         col1, col2 = st.columns([1,1])
 
-        benefit = col1.selectbox(
+        selected = col1.selectbox(
             "",
             [""] + benefit_list + ["OTHER"],
             key=f"{prefix}_b_{i}"
         )
 
-        if benefit == "OTHER":
+        # ✅ CASE 1: OTHER → force both inputs
+        if selected == "OTHER":
+
             benefit = col1.text_input(
                 "",
                 key=f"{prefix}_custom_{i}",
                 placeholder="Enter new benefit"
             ).upper()
 
-        options = get_amounts(community, benefit, year, month)
-
-        if benefit != "" and len(options) > 0:
-            display_vals = [f"${x:,.2f}" for x in options]
-
-            selected = col2.selectbox(
-                "",
-                display_vals,
-                key=f"{prefix}_a_{i}"
-            )
-
-            amount_val = float(selected.replace("$","").replace(",",""))
-        else:
             amount_val = col2.number_input(
                 "Amount ($)",
                 value=0.00,
                 step=0.01,
-                key=f"{prefix}_manual_{i}"
+                key=f"{prefix}_manual_other_{i}",
+                format="%.2f"
             )
+
+        # ✅ CASE 2: Normal benefit
+        else:
+            benefit = selected
+
+            options = get_amounts(community, benefit, year, month)
+
+            if benefit != "" and len(options) > 0:
+                display_vals = [f"${x:,.2f}" for x in options]
+
+                selected_amt = col2.selectbox(
+                    "",
+                    display_vals,
+                    key=f"{prefix}_a_{i}"
+                )
+
+                amount_val = float(selected_amt.replace("$","").replace(",",""))
+
+            else:
+                amount_val = col2.number_input(
+                    "Amount ($)",
+                    value=0.00,
+                    step=0.01,
+                    key=f"{prefix}_manual_{i}",
+                    format="%.2f"
+                )
 
         total += amount_val
 
