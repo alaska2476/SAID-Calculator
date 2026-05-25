@@ -170,7 +170,8 @@ def build_table(prefix):
 # =========================
 # DECLARED & ACTUAL
 # =========================
-d1, spacer, d2 = st.columns([1, 0.2, 1])
+d1, spacer, d2 = st.columns([1, 0.4, 1])
+
 
 
 with d1:
