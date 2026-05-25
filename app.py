@@ -87,6 +87,7 @@ year = cols[4].selectbox("Benefit Year", sorted(Reference["Start Date"].dt.year.
 same = st.checkbox("Same as Declared", value=True)
 
 # =========================
+# =========================
 # TABLE FUNCTION
 # =========================
 def build_table(prefix):
@@ -105,7 +106,7 @@ def build_table(prefix):
             key=f"{prefix}_b_{i}"
         )
 
-        # ✅ CASE 1: OTHER → force both inputs
+        # ✅ CASE 1: OTHER → FORCE both inputs
         if selected == "OTHER":
 
             benefit = col1.text_input(
@@ -118,11 +119,11 @@ def build_table(prefix):
                 "Amount ($)",
                 value=0.00,
                 step=0.01,
-                key=f"{prefix}_manual_other_{i}",
+                key=f"{prefix}_manual_other_{i}",  # ✅ UNIQUE KEY
                 format="%.2f"
             )
 
-        # ✅ CASE 2: Normal benefit
+        # ✅ CASE 2: NORMAL BENEFIT
         else:
             benefit = selected
 
@@ -144,7 +145,7 @@ def build_table(prefix):
                     "Amount ($)",
                     value=0.00,
                     step=0.01,
-                    key=f"{prefix}_manual_{i}",
+                    key=f"{prefix}_manual_{i}",  # ✅ normal key
                     format="%.2f"
                 )
 
