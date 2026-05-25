@@ -106,28 +106,34 @@ def build_table(prefix):
             key=f"{prefix}_b_{i}"
         )
 
-        # ✅ CASE 1: OTHER
+        # ✅ CASE 1: OTHER → allow 3 entries
         if selected == "OTHER":
 
-            # ❌ remove amount in this row
+            # remove amount in this row
             col2.write("")
 
-            # ✅ NEW ROW (aligned)
-            col1b, col2b = st.columns([1,1])
+            # ✅ create 3 aligned rows
+            for j in range(3):
 
-            benefit = col1b.text_input(
-                "",
-                key=f"{prefix}_custom_{i}",
-                placeholder="Enter new benefit"
-            ).upper()
+                col1b, col2b = st.columns([1,1])
 
-            amount_val = col2b.number_input(
-                "Amount ($)",
-                value=0.00,
-                step=0.01,
-                key=f"{prefix}_manual_other_{i}",
-                format="%.2f"
-            )
+                benefit = col1b.text_input(
+                    "",
+                    key=f"{prefix}_custom_{i}_{j}",
+                    placeholder=f"Enter new benefit {j+1}"
+                ).upper()
+
+                amount_val = col2b.number_input(
+                    "Amount ($)",
+                    value=0.00,
+                    step=0.01,
+                    key=f"{prefix}_manual_other_{i}_{j}",
+                    format="%.2f"
+                )
+
+                # ✅ only add if benefit is entered
+                if benefit.strip() != "":
+                    total += amount_val
 
         # ✅ CASE 2: NORMAL BENEFIT
         else:
@@ -157,7 +163,7 @@ def build_table(prefix):
                     format="%.2f"
                 )
 
-        total += amount_val
+            total += amount_val
 
     return total
 
