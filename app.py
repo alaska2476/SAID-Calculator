@@ -88,6 +88,7 @@ same = st.checkbox("Same as Declared", value=True)
 
 # =========================
 # =========================
+# =========================
 # TABLE FUNCTION
 # =========================
 def build_table(prefix):
@@ -99,19 +100,20 @@ def build_table(prefix):
 
     for i in range(rows):
 
-        col1, col2 = st.columns([1,1])
-
-        selected = col1.selectbox(
+        # ✅ ROW 1: dropdown only
+        selected = st.selectbox(
             "",
             [""] + benefit_list + ["OTHER"],
             key=f"{prefix}_b_{i}"
         )
 
-        # ✅ REPLACE dropdown with text input (same position)
+        # ✅ CASE 1: OTHER → NEW ROW for benefit + amount
         if selected == "OTHER":
 
+            col1, col2 = st.columns([1,1])
+
             benefit = col1.text_input(
-                "Benefit",
+                "",
                 key=f"{prefix}_custom_{i}",
                 placeholder="Enter new benefit"
             ).upper()
@@ -124,7 +126,13 @@ def build_table(prefix):
                 format="%.2f"
             )
 
+        # ✅ CASE 2: NORMAL BENEFIT
         else:
+
+            col1, col2 = st.columns([1,1])
+
+            col1.write(selected)
+
             benefit = selected
 
             options = get_amounts(community, benefit, year, month)
@@ -134,7 +142,7 @@ def build_table(prefix):
                 display_vals = [f"${x:,.2f}" for x in options]
 
                 selected_amt = col2.selectbox(
-                    "Amount",
+                    "Amount ($)",
                     display_vals,
                     key=f"{prefix}_a_{i}"
                 )
