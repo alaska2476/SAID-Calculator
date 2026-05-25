@@ -206,7 +206,13 @@ net_income = c1.number_input("Net Income ($)", 0.00, key="net_income")
 less_exemption = c2.number_input("Less Exemption ($)", 0.00, key="less_exemption")
 
 net_result = net_income - less_exemption
-c3.markdown(f"**Net After Exemptions:** ${net_result:,.2f}")
+with c3:
+    st.markdown("Net After Exemptions ($)")
+    st.text_input(
+        "",
+        f"${net_result:,.2f}",
+        disabled=True
+    )
 
 # =========================
 # OTHER INCOME
