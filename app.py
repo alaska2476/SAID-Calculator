@@ -190,13 +190,19 @@ with d2:
 # =========================
 # TOTALS
 # =========================
-t1, t2 = st.columns(2)
+# ✅ TOTALS (ALIGNED WITH DECLARED / ACTUAL)
+d1a, spacer2, d2a = st.columns([1, 0.4, 1])
 
-t1.markdown(f"**Total Declared:** ${declared_total:,.2f}")
-t2.markdown(f"**Total Actual:** ${actual_total:,.2f}")
+with d1a:
+    st.markdown(f"**Total Declared:** ${declared_total:,.2f}")
+
+with spacer2:
+    st.write("")
+
+with d2a:
+    st.markdown(f"**Total Actual:** ${actual_total:,.2f}")
 
 st.divider()
-
 # =========================
 # INCOME
 # =========================
