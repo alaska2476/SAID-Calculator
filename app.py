@@ -125,7 +125,7 @@ def build_table(prefix):
 
                 amount_val = col2b.number_input(
                     "Amount ($)",
-                     value=None,
+                    value=0.00,
                     step=0.01,
                     key=f"{prefix}_manual_other_{i}_{j}",
                     format="%.2f"
@@ -157,7 +157,7 @@ def build_table(prefix):
             else:
                 amount_val = col2.number_input(
                     "Amount ($)",
-                     value=None,
+                    value=0.00,
                     step=0.01,
                     key=f"{prefix}_manual_{i}_{benefit}",
                     format="%.2f"
