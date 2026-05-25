@@ -169,7 +169,7 @@ def build_table(prefix):
                 total += amount_val
 
     return total
-``
+
 # =========================
 # DECLARED & ACTUAL
 # =========================
