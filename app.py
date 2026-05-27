@@ -7,16 +7,8 @@ import os
 # =========================
 st.set_page_config(layout="wide")
 
-st.markdown("""
-<style>
-.block-container {padding-top:0.8rem; padding-bottom: 0.5rem;}
-div.row-widget.stHorizontal {gap: 0.3rem;}
-h1 {text-align: center;}
-</style>
-""", unsafe_allow_html=True)
-
 # =========================
-# SAFE LOAD
+# LOAD DATA
 # =========================
 def load_excel_safe(path):
     if os.path.exists(path):
@@ -25,9 +17,6 @@ def load_excel_safe(path):
         st.error(f"Missing file: {path}")
         st.stop()
 
-# =========================
-# LOAD DATA
-# =========================
 Reference = load_excel_safe("Reference.xlsx")
 Community = load_excel_safe("Community.xlsx")
 
@@ -38,8 +27,6 @@ Reference["End Date"] = pd.to_datetime(Reference["End Date"])
 Reference["Benefit Type"] = Reference["Benefit Type"].str.upper().str.strip()
 Reference["Tier"] = Reference["Tier"].str.upper().str.strip()
 Reference["Amount"] = Reference["Amount"].replace(r'[\$,]', '', regex=True).astype(float)
-
-Community["Tier"] = Community["Tier"].str.upper().str.strip()
 
 # =========================
 # FUNCTIONS
@@ -53,7 +40,7 @@ def get_amounts(comm, benefit, year, month):
         return []
 
     tier = get_tier(comm)
-    input_date = pd.to_datetime(f"{year} {month} 01", format="%Y %B %d")
+    input_date = pd.to_datetime(f"{year} {month} 01")
 
     df = Reference[
         (Reference["Benefit Type"] == benefit) &
@@ -75,98 +62,60 @@ client = cols[0].text_input("Client")
 case = cols[1].text_input("Case #")
 community = cols[2].selectbox("Community", Community["Community"].unique())
 
-month_names = [
+month = cols[3].selectbox("Month", [
     "January","February","March","April","May","June",
     "July","August","September","October","November","December"
-]
+])
 
-month = cols[3].selectbox("Benefit Month", month_names)
-year = cols[4].selectbox("Benefit Year", sorted(Reference["Start Date"].dt.year.unique()))
+year = cols[4].selectbox("Year", sorted(Reference["Start Date"].dt.year.unique()))
 
 same = st.checkbox("Same as Declared", value=True)
 
 # =========================
-# TABLE FUNCTION
+# TABLE FUNCTION (FIXED)
 # =========================
 def build_table(prefix):
+
     rows = 6
     total = 0
     benefit_list = sorted(Reference["Benefit Type"].unique())
 
-    st.markdown("**Benefit | Suggested | Amount**")
+    st.markdown("**Benefit | Amount**")
 
     for i in range(rows):
 
-        col1, col2 = st.columns([1,2])  # wider amount column
+        col1, col2 = st.columns([1,1])
 
-        selected = col1.selectbox("", [""] + benefit_list + ["OTHER"], key=f"{prefix}_b_{i}")
+        benefit = col1.selectbox(
+            "",
+            [""] + benefit_list,
+            key=f"{prefix}_benefit_{i}"
+        )
 
-        # ✅ OTHER
-        if selected == "OTHER":
+        options = get_amounts(community, benefit, year, month)
 
-            col2.write("")
+        # ✅ check if suggestions exist
+        if benefit != "" and len(options) > 0:
 
-            for j in range(3):
-                col1b, col2b = st.columns([1,1])
+            # ✅ show suggestion buttons INLINE (clean)
+            btn_cols = col2.columns(len(options))
 
-                benefit = col1b.text_input("", key=f"{prefix}_custom_{i}_{j}")
+            for idx, val in enumerate(options):
+                if btn_cols[idx].button(
+                    f"{val:.2f}",
+                    key=f"{prefix}_btn_{i}_{idx}"
+                ):
+                    st.session_state[f"{prefix}_amount_{i}"] = val
 
-                amount_val = col2b.number_input(
-                    "",
-                    value=None,
-                    step=0.01,
-                    key=f"{prefix}_manual_other_{i}_{j}",
-                    format="%.2f"
-                )
+        # ✅ SINGLE INPUT FIELD (ONLY ONE)
+        amount_val = col2.number_input(
+            "",
+            value=st.session_state.get(f"{prefix}_amount_{i}", 0.0),
+            step=0.01,
+            key=f"{prefix}_amount_{i}"
+        )
 
-                if benefit.strip() != "" and amount_val is not None:
-                    total += amount_val
-
-        # ✅ NORMAL BENEFIT (FIXED)
-        else:
-
-            benefit = selected
-            options = get_amounts(community, benefit, year, month)
-
-            # ✅ split into SAME ROW
-            suggest_col, manual_col = col2.columns([1,1])
-
-            if benefit != "" and len(options) > 0:
-
-                display_vals = [f"${x:,.2f}" for x in options]
-
-                suggestion = suggest_col.selectbox(
-                    "",
-                    [""] + display_vals,
-                    key=f"{prefix}_suggest_{i}"
-                )
-
-                manual_input = manual_col.number_input(
-                    "",
-                    value=None,
-                    step=0.01,
-                    key=f"{prefix}_manual_{i}",
-                    format="%.2f"
-                )
-
-                if manual_input is not None:
-                    amount_val = manual_input
-                elif suggestion != "":
-                    amount_val = float(suggestion.replace("$","").replace(",",""))
-                else:
-                    amount_val = 0
-
-            else:
-                amount_val = manual_col.number_input(
-                    "",
-                    value=None,
-                    step=0.01,
-                    key=f"{prefix}_manual_{i}_{benefit}",
-                    format="%.2f"
-                )
-
-            if amount_val is not None:
-                total += amount_val
+        total += amount_val
 
     return total
 
@@ -190,13 +139,8 @@ with d2:
 # =========================
 # TOTALS
 # =========================
-d1a, spacer2, d2a = st.columns([1, 0.4, 1])
-
-with d1a:
-    st.markdown(f"**Total Declared:** ${declared_total:,.2f}")
-
-with d2a:
-    st.markdown(f"**Total Actual:** ${actual_total:,.2f}")
+st.markdown(f"### Total Declared: ${declared_total:,.2f}")
+st.markdown(f"### Total Actual: ${actual_total:,.2f}")
 
 st.divider()
 
@@ -207,19 +151,31 @@ st.subheader("INCOME")
 
 c1, c2, c3 = st.columns(3)
 
-net_income = c1.number_input("Net Income ($)", value=None)
-less_exemption = c2.number_input("Less Exemption ($)", value=None)
+net_income = c1.number_input("Net Income ($)", 0.00)
+less_exemption = c2.number_input("Less Exemption ($)", 0.00)
 
-net_result = (net_income or 0) - (less_exemption or 0)
+net_result = net_income - less_exemption
+c3.markdown(f"**Net After Exemptions:** ${net_result:,.2f}")
 
-with c3:
-    st.markdown("Net After Exemptions")
-    st.text_input("", f"${net_result:,.2f}", disabled=True)
+# =========================
+# OTHER INCOME
+# =========================
+st.subheader("Other Income")
+
+c1, c2, c3 = st.columns(3)
+
+surplus = c1.number_input("Surplus ($)", 0.00)
+interest = c2.number_input("Interest income ($)", 0.00)
+other_less = c3.number_input("Less Exemption ($)", 0.00)
+
+total_other = surplus + interest - other_less
+
+st.markdown(f"**Total Other Income:** ${total_other:,.2f}")
 
 # =========================
 # FINAL CALCULATIONS
 # =========================
-chargeable = net_result
+chargeable = net_result + total_other
 
 c1, c2, c3 = st.columns(3)
 
@@ -228,11 +184,11 @@ c1.markdown(f"**Chargeable Income:** ${chargeable:,.2f}")
 budget = actual_total - chargeable
 c2.markdown(f"**Budget deficit/surplus:** ${budget:,.2f}")
 
-benefits_issued = c3.number_input("Benefits Issued ($)", value=None)
+benefits_issued = c3.number_input("Benefits Issued ($)", 0.00)
 
-overpayment = (benefits_issued or 0) - budget
+overpayment = benefits_issued - budget
 
 c1, c2 = st.columns(2)
 
 c1.markdown(f"**OVERPAYMENT:** ${overpayment:,.2f}")
-fraud = c2.number_input("Fraud Overpayment ($)", value=None)
+fraud = c2.number_input("Fraud Overpayment ($)", 0.00)
