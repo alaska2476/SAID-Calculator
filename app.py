@@ -144,15 +144,32 @@ def build_table(prefix):
 
             if benefit != "" and len(options) > 0:
 
-                display_vals = [f"${x:,.2f}" for x in options]
+    # ✅ Show suggestions
+    display_vals = [f"${x:,.2f}" for x in options]
 
-                selected_amt = col2.selectbox(
-                    "",
-                    display_vals,
-                    key=f"{prefix}_a_{i}"
-                )
+    suggestion = col2.selectbox(
+        "Suggested Amount",
+        [""] + display_vals,
+        key=f"{prefix}_suggest_{i}"
+    )
 
-                amount_val = float(selected_amt.replace("$","").replace(",",""))
+    # ✅ Manual override (always available)
+    manual_input = col2.number_input(
+        "Amount ($)",
+        value=None,
+        step=0.01,
+        key=f"{prefix}_manual_{i}",
+        format="%.2f"
+    )
+
+    # ✅ Logic: use manual if entered, else suggestion
+    if manual_input is not None:
+        amount_val = manual_input
+    elif suggestion != "":
+        amount_val = float(suggestion.replace("$","").replace(",",""))
+    else:
+        amount_val = 0
+
 
             else:
                 amount_val = col2.number_input(
