@@ -90,31 +90,29 @@ same = st.checkbox("Same as Declared", value=True)
 # TABLE FUNCTION
 # =========================
 def build_table(prefix):
-
     rows = 6
     total = 0
     benefit_list = sorted(Reference["Benefit Type"].unique())
 
-    st.markdown("### Benefit Breakdown")
+    st.markdown("**Benefit | Amount**")
 
     for i in range(rows):
 
         col1, col2 = st.columns([1,1])
 
-        # BENEFIT DROPDOWN
         selected = col1.selectbox(
             "",
             [""] + benefit_list + ["OTHER"],
             key=f"{prefix}_b_{i}"
         )
 
-        # =========================
-        # OTHER
-        # =========================
+        #  CASE 1: OTHER → allow 3 entries
         if selected == "OTHER":
 
+            # remove amount in this row
             col2.write("")
 
+            #  create 3 aligned rows
             for j in range(3):
 
                 col1b, col2b = st.columns([1,1])
@@ -122,78 +120,52 @@ def build_table(prefix):
                 benefit = col1b.text_input(
                     "",
                     key=f"{prefix}_custom_{i}_{j}",
-                    placeholder=f"Enter benefit {j+1}"
-                )
+                    placeholder=f"Enter new benefit {j+1}"
+                ).upper()
 
                 amount_val = col2b.number_input(
                     "Amount ($)",
                     value=0.00,
                     step=0.01,
-                    key=f"{prefix}_other_amt_{i}_{j}"
+                    key=f"{prefix}_manual_other_{i}_{j}",
+                    format="%.2f"
                 )
 
+                #  only add if benefit is entered
                 if benefit.strip() != "":
                     total += amount_val
 
-        # =========================
-        # NORMAL BENEFIT ✅
-        # =========================
+        #  CASE 2: NORMAL BENEFIT
         else:
 
             benefit = selected
+
             options = get_amounts(community, benefit, year, month)
 
-            dropdown_key = f"{prefix}_dropdown_{i}"
-            input_key = f"{prefix}_input_{i}"
-            prev_key = f"{prefix}_prev_{i}"
+            if benefit != "" and len(options) > 0:
 
-            # FORMAT DISPLAY
-            display_options = [""] + [f"${x:,.2f}" for x in options]
+                display_vals = [f"${x:,.2f}" for x in options]
 
-            # -------- DROPDOWN (SELECT VALUES) --------
-            chosen = col2.selectbox(
-                "",
-                display_options,
-                key=dropdown_key
-            )
+                selected_amt = col2.selectbox(
+                    "",
+                    display_vals,
+                    key=f"{prefix}_a_{i}"
+                )
 
-            # -------- INITIALIZE --------
-            if input_key not in st.session_state:
-                st.session_state[input_key] = ""
+                amount_val = float(selected_amt.replace("$","").replace(",",""))
 
-            if prev_key not in st.session_state:
-                st.session_state[prev_key] = ""
-
-            # -------- AUTO-FILL WHEN BENEFIT CHANGES --------
-            if benefit != st.session_state[prev_key]:
-                if len(options) > 0:
-                    st.session_state[input_key] = f"{options[0]:.2f}"
-                else:
-                    st.session_state[input_key] = ""
-                st.session_state[prev_key] = benefit
-
-            # -------- WHEN USER PICKS FROM DROPDOWN --------
-            if chosen != "":
-                clean_value = chosen.replace("$", "").replace(",", "")
-                st.session_state[input_key] = clean_value
-
-            # ✅ REAL EDITABLE FIELD (EXCEL BEHAVIOR)
-            value = col2.text_input(
-                "Enter / Edit Amount",
-                key=input_key,
-                placeholder="Type or select value"
-            )
-
-            # SAFE CONVERSION
-            try:
-                amount_val = float(value)
-            except:
-                amount_val = 0.0
+            else:
+                amount_val = col2.number_input(
+                    "Amount ($)",
+                    value=0.00,
+                    step=0.01,
+                    key=f"{prefix}_manual_{i}_{benefit}",
+                    format="%.2f"
+                )
 
             total += amount_val
 
     return total
-
 
 # =========================
 # DECLARED & ACTUAL
