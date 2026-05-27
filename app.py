@@ -135,24 +135,52 @@ def build_table(prefix):
                 if benefit.strip() != "":
                     total += amount_val
 
-        #  CASE 2: NORMAL BENEFIT
+        # ✅ CASE 2: NORMAL BENEFIT
+else:
+
+    benefit = selected
+    options = get_amounts(community, benefit, year, month)
+
+    if benefit != "" and len(options) > 0:
+
+        display_vals = [f"${x:,.2f}" for x in options]
+
+        # ✅ Suggestion dropdown (optional)
+        suggestion = col2.selectbox(
+            "Suggested Amount",
+            [""] + display_vals,
+            key=f"{prefix}_suggest_{i}"
+        )
+
+        # ✅ Manual override (always available)
+        manual_input = col2.number_input(
+            "Amount ($)",
+            value=None,
+            step=0.01,
+            key=f"{prefix}_manual_{i}",
+            format="%.2f"
+        )
+
+        # ✅ FINAL VALUE LOGIC
+        if manual_input is not None:
+            amount_val = manual_input
+        elif suggestion != "":
+            amount_val = float(suggestion.replace("$","").replace(",",""))
         else:
+            amount_val = 0
 
-            benefit = selected
+    else:
+        amount_val = col2.number_input(
+            "Amount ($)",
+            value=None,
+            step=0.01,
+            key=f"{prefix}_manual_{i}_{benefit}",
+            format="%.2f"
+        )
 
-            options = get_amounts(community, benefit, year, month)
+    if amount_val is not None:
+        total += amount_val
 
-            if benefit != "" and len(options) > 0:
-
-                display_vals = [f"${x:,.2f}" for x in options]
-
-                selected_amt = col2.selectbox(
-                    "",
-                    display_vals,
-                    key=f"{prefix}_a_{i}"
-                )
-
-                amount_val = float(selected_amt.replace("$","").replace(",",""))
 
             else:
                 amount_val = col2.number_input(
