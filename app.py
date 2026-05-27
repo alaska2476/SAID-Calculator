@@ -30,7 +30,6 @@ def load_excel_safe(path):
 # =========================
 Reference = load_excel_safe("Reference.xlsx")
 Community = load_excel_safe("Community.xlsx")
-file_path = "monthly_records.xlsx"
 
 Reference.columns = ["Benefit Type","Start Date","End Date","Tier","Amount"]
 
@@ -94,11 +93,11 @@ def build_table(prefix):
     total = 0
     benefit_list = sorted(Reference["Benefit Type"].unique())
 
-    st.markdown("**Benefit | Amount**")
+    st.markdown("**Benefit | Suggested | Amount**")
 
     for i in range(rows):
 
-        col1, col2 = st.columns([1,1])
+        col1, col2 = st.columns([1,2])  # wider amount column
 
         selected = col1.selectbox("", [""] + benefit_list + ["OTHER"], key=f"{prefix}_b_{i}")
 
@@ -113,7 +112,7 @@ def build_table(prefix):
                 benefit = col1b.text_input("", key=f"{prefix}_custom_{i}_{j}")
 
                 amount_val = col2b.number_input(
-                    "Amount ($)",
+                    "",
                     value=None,
                     step=0.01,
                     key=f"{prefix}_manual_other_{i}_{j}",
@@ -123,24 +122,27 @@ def build_table(prefix):
                 if benefit.strip() != "" and amount_val is not None:
                     total += amount_val
 
-        # ✅ NORMAL BENEFIT
+        # ✅ NORMAL BENEFIT (FIXED)
         else:
 
             benefit = selected
             options = get_amounts(community, benefit, year, month)
 
+            # ✅ split into SAME ROW
+            suggest_col, manual_col = col2.columns([1,1])
+
             if benefit != "" and len(options) > 0:
 
                 display_vals = [f"${x:,.2f}" for x in options]
 
-                suggestion = col2.selectbox(
-                    "Suggested Amount",
+                suggestion = suggest_col.selectbox(
+                    "",
                     [""] + display_vals,
                     key=f"{prefix}_suggest_{i}"
                 )
 
-                manual_input = col2.number_input(
-                    "Amount ($)",
+                manual_input = manual_col.number_input(
+                    "",
                     value=None,
                     step=0.01,
                     key=f"{prefix}_manual_{i}",
@@ -155,8 +157,8 @@ def build_table(prefix):
                     amount_val = 0
 
             else:
-                amount_val = col2.number_input(
-                    "Amount ($)",
+                amount_val = manual_col.number_input(
+                    "",
                     value=None,
                     step=0.01,
                     key=f"{prefix}_manual_{i}_{benefit}",
