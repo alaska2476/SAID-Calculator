@@ -16,7 +16,7 @@ h1 {text-align: center;}
 """, unsafe_allow_html=True)
 
 # =========================
-# SAFE LOAD WITH CACHE
+# LOAD DATA (CACHED)
 # =========================
 @st.cache_data
 def load_excel_safe(path):
@@ -26,9 +26,6 @@ def load_excel_safe(path):
         st.error(f"Missing file: {path}")
         st.stop()
 
-# =========================
-# LOAD DATA
-# =========================
 Reference = load_excel_safe("Reference.xlsx")
 Community = load_excel_safe("Community.xlsx")
 file_path = "monthly_records.xlsx"
@@ -90,7 +87,7 @@ year = cols[4].selectbox("Benefit Year", sorted(Reference["Start Date"].dt.year.
 same = st.checkbox("Same as Declared", value=True)
 
 # =========================
-# TABLE FUNCTION (✅ EXCEL STYLE)
+# EXCEL-LIKE TABLE ✅
 # =========================
 def build_table(prefix):
 
@@ -104,15 +101,14 @@ def build_table(prefix):
 
         col1, col2 = st.columns([1,1])
 
+        # Benefit selection
         selected = col1.selectbox(
             "",
             [""] + benefit_list + ["OTHER"],
             key=f"{prefix}_b_{i}"
         )
 
-        # =========================
-        # CASE 1: OTHER
-        # =========================
+        # OTHER
         if selected == "OTHER":
 
             col2.write("")
@@ -125,45 +121,63 @@ def build_table(prefix):
                     "",
                     key=f"{prefix}_custom_{i}_{j}",
                     placeholder=f"Enter benefit {j+1}"
-                ).upper()
+                )
 
                 amount_val = col2b.number_input(
                     "Amount ($)",
                     value=0.00,
                     step=0.01,
-                    key=f"{prefix}_other_amt_{i}_{j}",
-                    format="%.2f"
+                    key=f"{prefix}_other_amt_{i}_{j}"
                 )
 
                 if benefit.strip() != "":
                     total += amount_val
 
-        # =========================
-        # CASE 2: NORMAL BENEFIT (✅ FIXED)
-        # =========================
+        # NORMAL BENEFIT ✅
         else:
 
             benefit = selected
             options = get_amounts(community, benefit, year, month)
 
-            # ✅ Get default amount (first option)
-            default_val = options[0] if len(options) > 0 else 0.00
+            amt_key = f"{prefix}_amt_{i}"
+            prev_key = f"{prefix}_prev_{i}"
 
-            amount_val = col2.number_input(
+            # Initialize
+            if amt_key not in st.session_state:
+                st.session_state[amt_key] = ""
+
+            if prev_key not in st.session_state:
+                st.session_state[prev_key] = ""
+
+            # Auto-fill when benefit changes
+            if benefit != st.session_state[prev_key]:
+                if len(options) > 0:
+                    st.session_state[amt_key] = str(options[0])
+                else:
+                    st.session_state[amt_key] = ""
+
+                st.session_state[prev_key] = benefit
+
+            # ✅ SINGLE EDITABLE FIELD (LIKE EXCEL)
+            value = col2.text_input(
                 "",
-                value=float(default_val),
-                step=0.01,
-                key=f"{prefix}_amt_{i}",
-                format="%.2f"
+                key=amt_key,
+                placeholder="Enter amount"
             )
 
-            # ✅ show suggestions but DO NOT force them
+            # Convert safely
+            try:
+                amount_val = float(value)
+            except:
+                amount_val = 0.0
+
+            # Suggestions (like Excel hint)
             if len(options) > 0:
                 col2.caption(
-                    "Suggested: " + ", ".join(f"${x:,.2f}" for x in options)
+                    "Suggested: " + ", ".join(f"{x:.2f}" for x in options)
                 )
             elif benefit != "":
-                col2.caption("No predefined value — enter manually")
+                col2.caption("Enter any value")
 
             total += amount_val
 
@@ -226,7 +240,7 @@ total_other = surplus + interest - other_less
 st.markdown(f"**Total Other Income:** ${total_other:,.2f}")
 
 # =========================
-# FINAL CALCULATIONS
+# FINAL
 # =========================
 chargeable = net_result + total_other
 
@@ -240,19 +254,8 @@ c2.markdown(f"**Budget deficit/surplus:** ${budget:,.2f}")
 benefits_issued = c3.number_input("Benefits Issued ($)", 0.00)
 
 overpayment = benefits_issued - budget
-
 label = "OVERPAYMENT" if overpayment >= 0 else "UNDERPAYMENT"
 
 c1, c2 = st.columns(2)
 c1.markdown(f"**{label}:** ${abs(overpayment):,.2f}")
-
 fraud = c2.number_input("Fraud Overpayment ($)", 0.00)
-
-st.divider()
-
-# =========================
-# CLEAR BUTTON ✅
-# =========================
-if st.button("🔄 Clear Form"):
-    st.experimental_rerun()
-
