@@ -203,6 +203,12 @@ with col1_inc:
     d_less = st.number_input("Less Exemption ($)", 0.00, key="d_less")
     declared_net_result = d_net - d_less
     st.markdown(f"**Net:** ${declared_net_result:,.2f}")
+    st.markdown(f"**Total Other Income:** ${declared_other_total:,.2f}")
+
+declared_total_income = declared_net_result + declared_other_total
+
+st.markdown(f"✅ **Total Income:** ${declared_total_income:,.2f}")
+
 
 with col2_inc:
     st.markdown("**Actual Income**")
