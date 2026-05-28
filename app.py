@@ -131,8 +131,7 @@ with col2:
 st.divider()
 
 # =========================
-# =========================
-# INCOME (ALIGNED + MULTI ROW ✅)
+# INCOME (FINAL ALIGNED VERSION ✅)
 # =========================
 st.subheader("INCOME")
 
@@ -144,13 +143,14 @@ col1_inc, _, col2_inc = st.columns([1, 0.3, 1])
 with col1_inc:
     st.markdown("**Declared Income**")
 
-    # ✅ Primary income
-    d_net_main = st.number_input("Net Income ($)", 0.0, key="d_net_main")
-    d_less_main = st.number_input("Less Exemption ($)", 0.0, key="d_less_main")
+    # ✅ MAIN ROW (SIDE BY SIDE)
+    c1, c2 = st.columns(2)
+    d_net_main = c1.number_input("Net Income ($)", 0.0, key="d_net_main")
+    d_less_main = c2.number_input("Less Exemption ($)", 0.0, key="d_less_main")
 
     declared_net_total = d_net_main - d_less_main
 
-    # ✅ Additional rows (4 entries)
+    # ✅ ADDITIONAL ROWS (ALIGNED)
     for i in range(4):
         c1, c2 = st.columns(2)
 
@@ -161,6 +161,31 @@ with col1_inc:
 
     st.markdown(f"**Net: ${declared_net_total:,.2f}**")
 
+
+# =========================
+# ACTUAL
+# =========================
+with col2_inc:
+    st.markdown("**Actual Income**")
+
+    # ✅ MAIN ROW (SIDE BY SIDE — MATCHES DECLARED)
+    c1, c2 = st.columns(2)
+    a_net_main = c1.number_input("Net Income ($)", 0.0, key="a_net_main")
+    a_less_main = c2.number_input("Less Exemption ($)", 0.0, key="a_less_main")
+
+    actual_net_total = a_net_main - a_less_main
+
+    # ✅ ADDITIONAL ROWS (ALIGNED SAME WAY)
+    for i in range(4):
+        c1, c2 = st.columns(2)
+
+        amt = c1.number_input(f"Other Amount {i+1} ($)", 0.0, key=f"a_amt_{i}")
+        less = c2.number_input(f"Less {i+1} ($)", 0.0, key=f"a_less_{i}")
+
+        actual_net_total += (amt - less)
+
+    st.markdown(f"**Net: ${actual_net_total:,.2f}**")
+``
 # =========================
 # ACTUAL
 # =========================
