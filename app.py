@@ -217,7 +217,6 @@ with col2_inc:
         st.markdown(f"**Net:** ${actual_net_result:,.2f}")
 
 # =========================
-# =========================
 # OTHER INCOME
 # =========================
 st.subheader("OTHER INCOME")
@@ -255,7 +254,30 @@ with col2_o:
         actual_other_total = a_surplus + a_interest - a_less_other
 
         st.markdown(f"**Total Other Income:** ${actual_other_total:,.2f}")
+# =========================
+# TOTAL INCOME (UNDER EACH SIDE)
+# =========================
+st.subheader("TOTAL INCOME")
 
+col1_ti, _, col2_ti = st.columns([1, 0.3, 1])
+
+# ✅ Declared side
+with col1_ti:
+    declared_total_income = declared_net_result + declared_other_total
+
+    st.markdown("**Declared Total Income**")
+    st.markdown(f"Net: ${declared_net_result:,.2f}")
+    st.markdown(f"Other Income: ${declared_other_total:,.2f}")
+    st.markdown(f"✅ **Total Income:** ${declared_total_income:,.2f}")
+
+# ✅ Actual side
+with col2_ti:
+    actual_total_income = actual_net_result + actual_other_total
+
+    st.markdown("**Actual Total Income**")
+    st.markdown(f"Net: ${actual_net_result:,.2f}")
+    st.markdown(f"Other Income: ${actual_other_total:,.2f}")
+    st.markdown(f"✅ **Total Income:** ${actual_total_income:,.2f}")
 # =========================
 # FINAL CALCULATIONS
 # =========================
