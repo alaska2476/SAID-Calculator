@@ -197,11 +197,19 @@ with c2:
 
 
 # =========================
-# OVERPAYMENT
+# OVERPAYMENT (LEFT-ALIGNED + SHORTER ✅)
 # =========================
 st.divider()
 
-st.markdown("**Benefits Issued ($)**")
-issued = st.number_input("", 0.0, key="benefits_issued")
-overpayment = issued - actual_budget
-st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
+c1, c2, c3 = st.columns([2, 3, 1])  # ✅ LEFT reduced width
+
+# ✅ Benefits Issued (LEFT side, shorter)
+with c1:
+    st.markdown("**Benefits Issued ($)**")
+    issued = st.number_input("", 0.0, key="benefits_issued")
+
+# ✅ Overpayment (RIGHT side)
+with c2:
+    overpayment = issued - actual_budget
+    st.markdown("**Overpayment**")
+    st.markdown(f"### ${overpayment:,.2f}")
