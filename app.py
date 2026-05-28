@@ -171,21 +171,6 @@ with c2:
     st.markdown(f"Total: ${actual_other:,.2f}")
 
 # =========================
-# TOTAL INCOME
-# =========================
-
-c1,_,c2 = st.columns([1,0.3,1])
-
-with c1:
-    declared_total_income = declared_net + declared_other
-    st.markdown(f"Chargeable Income: ${declared_total_income:,.2f}")
-
-with c2:
-    actual_total_income = actual_net + actual_other
-    st.markdown(f"Chargeable Income: ${actual_total_income:,.2f}")
-
-# =========================
-# =========================
 # FINAL CALCULATIONS (CLEAN STYLE)
 # =========================
 
