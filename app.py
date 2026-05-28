@@ -202,18 +202,58 @@ with d2a:
 
 st.divider()
 # =========================
-# INCOME
-# =========================
 st.subheader("INCOME")
 
-c1, c2, c3 = st.columns(3)
+col1_inc, spacer_inc, col2_inc = st.columns([1, 0.3, 1])
 
-net_income = c1.number_input("Net Income ($)", 0.00, key="net_income")
-less_exemption = c2.number_input("Less Exemption ($)", 0.00, key="less_exemption")
+# =========================
+# DECLARED INCOME
+# =========================
+with col1_inc:
+    st.markdown("**Declared Income**")
 
-net_result = net_income - less_exemption
-c3.markdown(f"**Net After Exemptions:** ${net_result:,.2f}")
+    d_net = st.number_input(
+        "Net Income ($)",
+        0.00,
+        key="declared_net_income"
+    )
 
+    d_less = st.number_input(
+        "Less Exemption ($)",
+        0.00,
+        key="declared_less_exemption"
+    )
+
+    declared_net_result = d_net - d_less
+
+    st.markdown(f"**Net After Exemptions:** ${declared_net_result:,.2f}")
+
+# =========================
+# ACTUAL INCOME
+# =========================
+with col2_inc:
+    st.markdown("**Actual Income**")
+
+    if same:
+        actual_net_result = declared_net_result
+        st.info("Using Declared Income")
+    else:
+        a_net = st.number_input(
+            "Net Income ($)",
+            0.00,
+            key="actual_net_income"
+        )
+
+        a_less = st.number_input(
+            "Less Exemption ($)",
+            0.00,
+            key="actual_less_exemption"
+        )
+
+        actual_net_result = a_net - a_less
+
+        st.markdown(f"**Net After Exemptions:** ${actual_net_result:,.2f}")
+        
 # =========================
 # OTHER INCOME
 # =========================
