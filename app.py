@@ -197,22 +197,14 @@ with c2:
 
 
 # =========================
-# OVERPAYMENT (LEFT ALIGN ONLY ✅)
+# OVERPAYMENT 
 # =========================
 st.divider()
-
 col1_op, _, col2_op = st.columns([1, 0.3, 1])
-
-# ✅ LEFT column only (Declared side)
 with col1_op:
     st.markdown("**Benefits Issued ($)**")
-
     issued = st.number_input("", 0.0, key="benefits_issued")
-
     overpayment = issued - actual_budget
-
     st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
-
-# ✅ RIGHT column intentionally left blank
 with col2_op:
     st.write("")
