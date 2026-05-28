@@ -113,7 +113,7 @@ def build_table(prefix):
             col2.write("")
 
             #  create 3 aligned rows
-            for j in range(3):
+            for j in range(10):
 
                 col1b, col2b = st.columns([1,1])
 
