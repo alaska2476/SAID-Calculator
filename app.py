@@ -182,7 +182,7 @@ with c1:
 
 with c2:
     actual_total_income = actual_net + actual_other
-    st.markdown(f**"Chargeable Income: ${actual_total_income:,.2f}")
+    st.markdown(f"**Chargeable Income: ${actual_total_income:,.2f}")
 
 # =========================
 # FINAL CALC
