@@ -197,18 +197,11 @@ with c2:
 
 
 # =========================
-# OVERPAYMENT 
+# OVERPAYMENT
 # =========================
 st.divider()
-st.markdown("**Benefits Issued ($)**")
-st.markdown("""
-<style>
-div[data-testid="stNumberInput"] {
-    width: 250px !important;
-}
-</style>
-""", unsafe_allow_html=True)
 
+st.markdown("**Benefits Issued ($)**")
 issued = st.number_input("", 0.0, key="benefits_issued")
 overpayment = issued - actual_budget
 st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
