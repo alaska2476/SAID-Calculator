@@ -68,7 +68,7 @@ def get_amounts(comm, benefit, year, month):
 # =========================
 # HEADER
 # =========================
-st.title("CALCULATIONS FOR COURT PURPOSES")
+st.title("SAID TRANSITION CALCULATOR")
 
 cols = st.columns(5)
 
