@@ -207,7 +207,7 @@ st.markdown("**Benefits Issued ($)**")
 st.markdown("""
 <style>
 div[data-testid="stNumberInput"] input {
-    max-width: -300px;   /* 🔥 adjust to match yellow mark */
+    max-width: 100px;   /* 🔥 adjust to match yellow mark */
 }
 </style>
 """, unsafe_allow_html=True)
