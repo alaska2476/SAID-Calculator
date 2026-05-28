@@ -197,27 +197,24 @@ with c2:
 
 
 # =========================
-# OVERPAYMENT (FIX SPACING ✅)
+# OVERPAYMENT (MATCH WIDTH ✅)
 # =========================
 st.divider()
 
-# ✅ Reduce spacing
+# ✅ Scoped CSS (ONLY this input gets smaller)
 st.markdown("""
 <style>
-.stMarkdown {
-    margin-bottom: -10px;
+/* Target ONLY this one input using the key */
+div[data-testid="stNumberInput"] div:has(input[id*="benefits_issued"]) {
+    max-width: 280px;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ✅ Label
 st.markdown("**Benefits Issued ($)**")
 
-# ✅ Input (now closer)
 issued = st.number_input("", 0.0, key="benefits_issued")
 
-# ✅ Overpayment
 overpayment = issued - actual_budget
 
 st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
-
