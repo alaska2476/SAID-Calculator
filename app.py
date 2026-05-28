@@ -58,7 +58,7 @@ def get_amounts(comm, benefit, year, month):
     return sorted(df["Amount"].unique())
 
 # =========================
-# HEADER ROW (RESTORED ✅)
+# HEADER ROW 
 # =========================
 c1,c2,c3,c4,c5 = st.columns(5)
 
@@ -197,11 +197,12 @@ with c2:
 
 
 # =========================
+# =========================
 # OVERPAYMENT
 # =========================
 st.divider()
 
-issued = st.number_input("Benefits Issued ($)", 0.0)
+st.markdown("**Benefits Issued ($)**")
+issued = st.number_input("", 0.0, key="benefits_issued")
 overpayment = issued - actual_budget
-
 st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
