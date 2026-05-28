@@ -178,25 +178,33 @@ c1,_,c2 = st.columns([1,0.3,1])
 
 with c1:
     declared_total_income = declared_net + declared_other
-    st.markdown(f"**Chargeable Income: ${declared_total_income:,.2f}")
+    st.markdown(f"Chargeable Income: ${declared_total_income:,.2f}")
 
 with c2:
     actual_total_income = actual_net + actual_other
-    st.markdown(f"**Chargeable Income: ${actual_total_income:,.2f}")
+    st.markdown(f"Chargeable Income: ${actual_total_income:,.2f}")
 
 # =========================
-# FINAL CALC
+# =========================
+# FINAL CALCULATIONS (CLEAN STYLE)
 # =========================
 
-c1,_,c2 = st.columns([1,0.3,1])
+c1, _, c2 = st.columns([1, 0.3, 1])
 
 with c1:
     declared_budget = declared_total - declared_total_income
-    st.markdown(f"**Benefit: ${declared_budget:,.2f}")
+    declared_chargeable = declared_total_income
+
+    st.markdown(f"**Chargeable Income: ${declared_chargeable:,.2f}**")
+    st.markdown(f"**Benefit: ${declared_budget:,.2f}**")
 
 with c2:
     actual_budget = actual_total - actual_total_income
-    st.markdown(f"**Budget deficit/surplus: ${actual_budget:,.2f}")
+    actual_chargeable = actual_total_income
+
+    st.markdown(f"**Chargeable Income: ${actual_chargeable:,.2f}**")
+    st.markdown(f"**Budget deficit/surplus: ${actual_budget:,.2f}**")
+
 
 # =========================
 # OVERPAYMENT
