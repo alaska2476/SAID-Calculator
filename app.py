@@ -183,7 +183,7 @@ with col2_inc:
         actual_net_total += (amt - less)
 
     st.markdown(f"**Net: ${actual_net_total:,.2f}**")
-``
+
 # =========================
 # OTHER INCOME
 # =========================
