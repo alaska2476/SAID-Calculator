@@ -217,20 +217,44 @@ with col2_inc:
         st.markdown(f"**Net:** ${actual_net_result:,.2f}")
 
 # =========================
+# =========================
 # OTHER INCOME
 # =========================
-st.subheader("Other Income")
+st.subheader("OTHER INCOME")
 
-c1, c2, c3 = st.columns(3)
+col1_o, spacer_o, col2_o = st.columns([1, 0.3, 1])
 
-surplus = c1.number_input("Surplus ($)", 0.00)
-interest = c2.number_input("Interest income ($)", 0.00)
-other_less = c3.number_input("Less Exemption ($)", 0.00)
+# =========================
+# DECLARED OTHER INCOME
+# =========================
+with col1_o:
+    st.markdown("**Declared Other Income**")
 
-total_other = surplus + interest - other_less
+    d_surplus = st.number_input("Surplus ($)", 0.00, key="d_surplus")
+    d_interest = st.number_input("Interest income ($)", 0.00, key="d_interest")
+    d_less_other = st.number_input("Less Exemption ($)", 0.00, key="d_less_other")
 
-st.markdown(f"**Total Other Income:** ${total_other:,.2f}")
+    declared_other_total = d_surplus + d_interest - d_less_other
 
+    st.markdown(f"**Total Other Income:** ${declared_other_total:,.2f}")
+
+# =========================
+# ACTUAL OTHER INCOME
+# =========================
+with col2_o:
+    st.markdown("**Actual Other Income**")
+
+    if same:
+        actual_other_total = declared_other_total
+        st.info("Using Declared Other Income")
+    else:
+        a_surplus = st.number_input("Surplus ($)", 0.00, key="a_surplus")
+        a_interest = st.number_input("Interest income ($)", 0.00, key="a_interest")
+        a_less_other = st.number_input("Less Exemption ($)", 0.00, key="a_less_other")
+
+        actual_other_total = a_surplus + a_interest - a_less_other
+
+        st.markdown(f"**Total Other Income:** ${actual_other_total:,.2f}")
 # =========================
 # FINAL CALCULATIONS
 # =========================
