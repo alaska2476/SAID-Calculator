@@ -169,36 +169,32 @@ with c2:
     a_l = st.number_input("Less", 0.0, key="a_l")
     actual_other = a_s + a_i - a_l
     st.markdown(f"Total: ${actual_other:,.2f}")
-
 # =========================
-# TOTAL INCOME
+# TOTAL INCOME 
 # =========================
-st.subheader("TOTAL INCOME")
 
-c1,_,c2 = st.columns([1,0.3,1])
-
-with c1:
-    declared_total_income = declared_net + declared_other
-    st.markdown(f"Total Income: ${declared_total_income:,.2f}")
-
-with c2:
-    actual_total_income = actual_net + actual_other
-    st.markdown(f"Total Income: ${actual_total_income:,.2f}")
-
+declared_total_income = declared_net + declared_other
+actual_total_income = actual_net + actual_other
 # =========================
-# FINAL CALC
+# FINAL CALCULATIONS (CLEAN STYLE)
 # =========================
-st.subheader("FINAL")
 
-c1,_,c2 = st.columns([1,0.3,1])
+c1, _, c2 = st.columns([1, 0.3, 1])
 
 with c1:
     declared_budget = declared_total - declared_total_income
-    st.markdown(f"Benefit: ${declared_budget:,.2f}")
+    declared_chargeable = declared_total_income
+
+    st.markdown(f"**Chargeable Income: ${declared_chargeable:,.2f}**")
+    st.markdown(f"**Benefit: ${declared_budget:,.2f}**")
 
 with c2:
     actual_budget = actual_total - actual_total_income
-    st.markdown(f"Benefit: ${actual_budget:,.2f}")
+    actual_chargeable = actual_total_income
+
+    st.markdown(f"**Chargeable Income: ${actual_chargeable:,.2f}**")
+    st.markdown(f"**Budget deficit/surplus: ${actual_budget:,.2f}**")
+
 
 # =========================
 # OVERPAYMENT
