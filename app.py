@@ -169,6 +169,12 @@ with c2:
     a_l = st.number_input("Less", 0.0, key="a_l")
     actual_other = a_s + a_i - a_l
     st.markdown(f"Total: ${actual_other:,.2f}")
+# =========================
+# TOTAL INCOME
+# =========================
+
+declared_total_income = declared_net + declared_other
+actual_total_income = actual_net + actual_other
 
 # =========================
 # FINAL CALCULATIONS (CLEAN STYLE)
