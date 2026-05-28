@@ -132,7 +132,7 @@ with col2:
 st.divider()
 
 # =========================
-# INCOME (MULTI ROW ✅)
+# INCOME 
 # =========================
 st.subheader("INCOME")
 
@@ -234,13 +234,15 @@ if st.button("Save Month Calculation"):
         "Month": month,
         "Year": year,
         "Declared_Total_Benefits": declared_total,
-        "Actual_Total_Benefits": actual_total,
         "Declared_Net_Total": declared_net_total,
-        "Actual_Net_Total": actual_net_total,
         "Declared_Other": declared_other,
-        "Actual_Other": actual_other,
         "Declared_Total_Income": declared_total_income,
+        
+        "Actual_Total_Benefits": actual_total,
+        "Actual_Net_Total": actual_net_total,
+        "Actual_Other": actual_other,
         "Actual_Total_Income": actual_total_income,
+        
         "Chargeable_Income": actual_total_income,
         "Budget_Deficit_Surplus": actual_budget,
         "Benefits_Issued": issued,
