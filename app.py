@@ -205,31 +205,61 @@ with c2:
     actual_other = a_s + a_i - a_l
     st.markdown(f"Total: ${actual_other:,.2f}")
 # =========================
-# TOTAL INCOME
 # =========================
+# INCOME (FINAL STRUCTURE ✅)
+# =========================
+st.subheader("INCOME")
 
-declared_total_income = declared_net + declared_other
-actual_total_income = actual_net + actual_other
+col1_inc, _, col2_inc = st.columns([1, 0.3, 1])
 
 # =========================
-# FINAL CALCULATIONS (CLEAN STYLE)
+# DECLARED
 # =========================
+with col1_inc:
+    st.markdown("**Declared Income**")
 
-c1, _, c2 = st.columns([1, 0.3, 1])
+    # ✅ MAIN ROW
+    c1, c2 = st.columns(2)
+    d_net_main = c1.number_input("Net Income ($)", 0.0, key="d_net_main")
+    d_less_main = c2.number_input("Less Exemption ($)", 0.0, key="d_less_main")
 
-with c1:
-    declared_budget = declared_total - declared_total_income
-    declared_chargeable = declared_total_income
+    declared_net_total = d_net_main - d_less_main
 
-    st.markdown(f"**Chargeable Income: ${declared_chargeable:,.2f}**")
-    st.markdown(f"**Benefit: ${declared_budget:,.2f}**")
+    # ✅ ADDITIONAL ROWS (EMPTY STYLE EXACTLY LIKE IMAGE)
+    for i in range(4):
+        c1, c2 = st.columns(2)
 
-with c2:
-    actual_budget = actual_total - actual_total_income
-    actual_chargeable = actual_total_income
+        amt = c1.number_input(f"Other Amount {i+1} ($)", 0.0, key=f"d_amt_{i}")
+        less = c2.number_input(f"Less {i+1} ($)", 0.0, key=f"d_less_{i}")
 
-    st.markdown(f"**Chargeable Income: ${actual_chargeable:,.2f}**")
-    st.markdown(f"**Budget deficit/surplus: ${actual_budget:,.2f}**")
+        declared_net_total += (amt - less)
+
+    st.markdown(f"**Net: ${declared_net_total:,.2f}**")
+
+# =========================
+# ACTUAL
+# =========================
+with col2_inc:
+    st.markdown("**Actual Income**")
+
+    # ✅ MAIN ROW
+    c1, c2 = st.columns(2)
+    a_net_main = c1.number_input("Net Income ($)", 0.0, key="a_net_main")
+    a_less_main = c2.number_input("Less Exemption ($)", 0.0, key="a_less_main")
+
+    actual_net_total = a_net_main - a_less_main
+
+    # ✅ ADDITIONAL ROWS
+    for i in range(4):
+        c1, c2 = st.columns(2)
+
+        amt = c1.number_input(f"Other Amount {i+1} ($)", 0.0, key=f"a_amt_{i}")
+        less = c2.number_input(f"Less {i+1} ($)", 0.0, key=f"a_less_{i}")
+
+        actual_net_total += (amt - less)
+
+    st.markdown(f"**Net: ${actual_net_total:,.2f}**")
+
 
 
 # =========================
