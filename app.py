@@ -237,12 +237,10 @@ if st.button("Save Month Calculation"):
         "Declared_Net_Total": declared_net_total,
         "Declared_Other": declared_other,
         "Declared_Total_Income": declared_total_income,
-        
         "Actual_Total_Benefits": actual_total,
         "Actual_Net_Total": actual_net_total,
         "Actual_Other": actual_other,
         "Actual_Total_Income": actual_total_income,
-        
         "Chargeable_Income": actual_total_income,
         "Budget_Deficit_Surplus": actual_budget,
         "Benefits_Issued": issued,
