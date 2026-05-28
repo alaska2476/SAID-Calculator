@@ -255,10 +255,11 @@ with col2_o:
         actual_other_total = a_surplus + a_interest - a_less_other
 
         st.markdown(f"**Total Other Income:** ${actual_other_total:,.2f}")
+
 # =========================
 # FINAL CALCULATIONS
 # =========================
-chargeable = actual_net_result + total_other
+chargeable = actual_net_result + actual_other_total
 
 c1, c2, c3 = st.columns(3)
 
@@ -275,5 +276,3 @@ c1, c2 = st.columns(2)
 
 c1.markdown(f"**OVERPAYMENT:** ${overpayment:,.2f}")
 fraud = c2.number_input("Fraud Overpayment ($)", 0.00)
-
-st.divider()
