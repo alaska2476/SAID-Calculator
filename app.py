@@ -197,11 +197,23 @@ with c2:
 
 
 # =========================
-# OVERPAYMENT
+# OVERPAYMENT (FIX WIDTH ONLY ✅)
 # =========================
 st.divider()
 
 st.markdown("**Benefits Issued ($)**")
+
+# ✅ limit width only (keeps position unchanged)
+st.markdown("""
+<style>
+div[data-testid="stNumberInput"] input {
+    max-width: 300px;   /* 🔥 adjust to match yellow mark */
+}
+</style>
+""", unsafe_allow_html=True)
+
 issued = st.number_input("", 0.0, key="benefits_issued")
+
 overpayment = issued - actual_budget
+
 st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
