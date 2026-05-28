@@ -251,4 +251,3 @@ if len(st.session_state.history) > 0:
 
     total = st.session_state.history["Overpayment"].sum()
     st.markdown(f"**Total Overpayment: ${total:,.2f}**")
-
