@@ -197,19 +197,22 @@ with c2:
 
 
 # =========================
-# OVERPAYMENT (LEFT-ALIGNED + SHORTER ✅)
+# OVERPAYMENT (FAR RIGHT ✅)
 # =========================
 st.divider()
 
-c1, c2, c3 = st.columns([2, 3, 1])  # ✅ LEFT reduced width
+# ✅ wide spacing between left and right
+c1, c2 = st.columns([1, 3])
 
-# ✅ Benefits Issued (LEFT side, shorter)
+# ✅ LEFT → Benefits Issued
 with c1:
     st.markdown("**Benefits Issued ($)**")
     issued = st.number_input("", 0.0, key="benefits_issued")
 
-# ✅ Overpayment (RIGHT side)
+# ✅ RIGHT → Overpayment pushed far right
 with c2:
     overpayment = issued - actual_budget
-    st.markdown("**Overpayment**")
-    st.markdown(f"### ${overpayment:,.2f}")
+
+    # push text to the right using alignment
+    st.markdown(
+        f"<div style='text-align: right;'>"
