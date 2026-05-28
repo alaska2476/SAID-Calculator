@@ -255,29 +255,35 @@ with col2_o:
 
         st.markdown(f"**Total Other Income:** ${actual_other_total:,.2f}")
 # =========================
-# TOTAL INCOME (UNDER EACH SIDE)
+# =========================
+# TOTAL INCOME + BENEFIT
 # =========================
 st.subheader("TOTAL INCOME")
 
 col1_ti, _, col2_ti = st.columns([1, 0.3, 1])
 
-# ✅ Declared side
+# ✅ DECLARED SIDE
 with col1_ti:
     declared_total_income = declared_net_result + declared_other_total
+    declared_benefit = declared_total - declared_total_income
 
-    st.markdown("**Declared Total Income**")
+    st.markdown("**Declared**")
     st.markdown(f"Net: ${declared_net_result:,.2f}")
     st.markdown(f"Other Income: ${declared_other_total:,.2f}")
-    st.markdown(f"✅ **Total Income:** ${declared_total_income:,.2f}")
+    st.markdown(f"✅ Total Income: ${declared_total_income:,.2f}")
+    st.markdown(f"✅ Benefit: ${declared_benefit:,.2f}")
 
-# ✅ Actual side
+# ✅ ACTUAL SIDE
 with col2_ti:
     actual_total_income = actual_net_result + actual_other_total
+    actual_benefit = actual_total - actual_total_income
 
-    st.markdown("**Actual Total Income**")
+    st.markdown("**Actual**")
     st.markdown(f"Net: ${actual_net_result:,.2f}")
     st.markdown(f"Other Income: ${actual_other_total:,.2f}")
-    st.markdown(f"✅ **Total Income:** ${actual_total_income:,.2f}")
+    st.markdown(f"✅ Total Income: ${actual_total_income:,.2f}")
+    st.markdown(f"✅ Benefit: ${actual_benefit:,.2f}")
+
 # =========================
 # FINAL CALCULATIONS
 # =========================
