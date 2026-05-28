@@ -114,7 +114,7 @@ with col1:
     st.subheader("Declared")
     st.markdown("**Benefit | Amount**")
     declared_total = build_table("d")
-    st.markdown(f"### ✅ Total Declared: ${declared_total:,.2f}")
+    st.markdown(f"### Total Declared: ${declared_total:,.2f}")
 
 with col2:
     st.subheader("Actual")
@@ -126,7 +126,7 @@ with col2:
         st.markdown("**Benefit | Amount**")
         actual_total = build_table("a")
 
-    st.markdown(f"### ✅ Total Actual: ${actual_total:,.2f}")
+    st.markdown(f"### Total Actual: ${actual_total:,.2f}")
 
 st.divider()
 
