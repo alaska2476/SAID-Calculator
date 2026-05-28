@@ -88,7 +88,7 @@ def build_table(prefix):
         b = c1.selectbox("", [""] + benefits + ["OTHER"], key=f"{prefix}_b_{i}")
 
         if b == "OTHER":
-            for j in range(5):
+            for j in range(10):
                 c3,c4 = st.columns(2)
 
                 name = c3.text_input("", key=f"{prefix}_custom_{i}_{j}")
