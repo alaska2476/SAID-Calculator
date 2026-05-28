@@ -60,6 +60,8 @@ def get_amounts(comm, benefit, year, month):
 # =========================
 # HEADER ROW 
 # =========================
+st.title("CALCULATIONS FOR COURT PURPOSES")
+
 c1,c2,c3,c4,c5 = st.columns(5)
 
 client = c1.text_input("Client")
