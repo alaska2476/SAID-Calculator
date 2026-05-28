@@ -204,7 +204,7 @@ st.divider()
 st.markdown("**Benefits Issued ($)**")
 
 # ✅ create centered narrow column
-_, c1, _ = st.columns([1, 1, 5)   # adjust ratio here
+_, c1, _ = st.columns([1, 1, 5])   # adjust ratio here
 
 issued = c1.number_input("", 0.0, key="benefits_issued")
 
