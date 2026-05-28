@@ -197,24 +197,18 @@ with c2:
 
 
 # =========================
-# OVERPAYMENT (MATCH WIDTH ✅)
+# OVERPAYMENT 
 # =========================
 st.divider()
-
-# ✅ Scoped CSS (ONLY this input gets smaller)
+st.markdown("**Benefits Issued ($)**")
 st.markdown("""
 <style>
-/* Target ONLY this one input using the key */
-div[data-testid="stNumberInput"] div:has(input[id*="benefits_issued"]) {
-    max-width: 280px;
+div[data-testid="stNumberInput"] {
+    width: 250px !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("**Benefits Issued ($)**")
-
 issued = st.number_input("", 0.0, key="benefits_issued")
-
 overpayment = issued - actual_budget
-
 st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
