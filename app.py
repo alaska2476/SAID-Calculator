@@ -197,7 +197,8 @@ with c2:
 
 
 # =========================
-# OVERPAYMENT 
+# =========================
+# OVERPAYMENT (COMPACT INPUT ✅)
 # =========================
 st.divider()
 
