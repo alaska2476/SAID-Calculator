@@ -226,11 +226,6 @@ with col2_op:
 # =========================
 # SAVE + DOWNLOAD
 # =========================
-file_path = "monthly_records.xlsx"
-
-if "history" not in st.session_state:
-    st.session_state.history = pd.DataFrame()
-
 if st.button("Save Month Calculation"):
 
     new_row = pd.DataFrame([{
