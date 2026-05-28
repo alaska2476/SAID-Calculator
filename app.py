@@ -131,24 +131,59 @@ with col2:
 st.divider()
 
 # =========================
-# INCOME
+# =========================
+# INCOME (ALIGNED + MULTI ROW ✅)
 # =========================
 st.subheader("INCOME")
 
-c1,_,c2 = st.columns([1,0.3,1])
+col1_inc, _, col2_inc = st.columns([1, 0.3, 1])
 
-with c1:
-    d_net = st.number_input("Net Income ($)", 0.0, key="d_net")
-    d_less = st.number_input("Less Exemption ($)", 0.0, key="d_less")
-    declared_net = d_net - d_less
-    st.markdown(f"Net: ${declared_net:,.2f}")
+# =========================
+# DECLARED
+# =========================
+with col1_inc:
+    st.markdown("**Declared Income**")
 
-with c2:
-    a_net = st.number_input("Net Income ($)", 0.0, key="a_net")
-    a_less = st.number_input("Less Exemption ($)", 0.0, key="a_less")
-    actual_net = a_net - a_less
-    st.markdown(f"Net: ${actual_net:,.2f}")
+    # ✅ Primary income
+    d_net_main = st.number_input("Net Income ($)", 0.0, key="d_net_main")
+    d_less_main = st.number_input("Less Exemption ($)", 0.0, key="d_less_main")
 
+    declared_net_total = d_net_main - d_less_main
+
+    # ✅ Additional rows (4 entries)
+    for i in range(4):
+        c1, c2 = st.columns(2)
+
+        amt = c1.number_input(f"Other Amount {i+1} ($)", 0.0, key=f"d_amt_{i}")
+        less = c2.number_input(f"Less {i+1} ($)", 0.0, key=f"d_less_{i}")
+
+        declared_net_total += (amt - less)
+
+    st.markdown(f"**Net: ${declared_net_total:,.2f}**")
+
+# =========================
+# ACTUAL
+# =========================
+with col2_inc:
+    st.markdown("**Actual Income**")
+
+    # ✅ Primary income
+    a_net_main = st.number_input("Net Income ($)", 0.0, key="a_net_main")
+    a_less_main = st.number_input("Less Exemption ($)", 0.0, key="a_less_main")
+
+    actual_net_total = a_net_main - a_less_main
+
+    # ✅ Additional rows
+    for i in range(4):
+        c1, c2 = st.columns(2)
+
+        amt = c1.number_input(f"Other Amount {i+1} ($)", 0.0, key=f"a_amt_{i}")
+        less = c2.number_input(f"Less {i+1} ($)", 0.0, key=f"a_less_{i}")
+
+        actual_net_total += (amt - less)
+
+    st.markdown(f"**Net: ${actual_net_total:,.2f}**")
+``
 # =========================
 # OTHER INCOME
 # =========================
