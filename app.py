@@ -232,8 +232,6 @@ if "history" not in st.session_state:
 
 if st.button("Save Month Calculation"):
 
-   if st.button("Save Month Calculation"):
-
     new_row = pd.DataFrame([{
         "Client": client,
         "Case": case,
