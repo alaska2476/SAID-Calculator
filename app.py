@@ -132,7 +132,7 @@ with col2:
 st.divider()
 
 # =========================
-# INCOME (MULTI ROW ✅)
+# INCOME 
 # =========================
 st.subheader("INCOME")
 
@@ -232,11 +232,26 @@ if "history" not in st.session_state:
 
 if st.button("Save Month Calculation"):
 
+   if st.button("Save Month Calculation"):
+
     new_row = pd.DataFrame([{
         "Client": client,
         "Case": case,
         "Month": month,
         "Year": year,
+        "Declared_Total_Needs": declared_total,
+        "Declared_Net_Income": declared_net_total,
+        "Declared_Other_Income": declared_other,
+        "Declared_Total_Income": declared_total_income,
+        
+        "Actual_Total_Benefits": actual_total,
+        "Actual_Net_Income": actual_net_total,
+        "Actual_Other_Income": actual_other,
+        "Actual_Total_Income": actual_total_income,
+
+        "Chargeable_Income": actual_total_income,
+        "Budget_Deficit_Surplus": actual_budget,
+        "Benefits_Issued": issued,
         "Overpayment": overpayment
     }])
 
