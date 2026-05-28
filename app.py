@@ -197,23 +197,27 @@ with c2:
 
 
 # =========================
-# OVERPAYMENT (FIX WIDTH — WORKING ✅)
+# OVERPAYMENT (FIX SPACING ✅)
 # =========================
 st.divider()
 
-st.markdown("**Benefits Issued ($)**")
-
-# ✅ FIX width properly
+# ✅ Reduce spacing
 st.markdown("""
 <style>
-div[data-testid="stNumberInput"] {
-    width: 250px !important;
+.stMarkdown {
+    margin-bottom: -10px;
 }
 </style>
 """, unsafe_allow_html=True)
 
+# ✅ Label
+st.markdown("**Benefits Issued ($)**")
+
+# ✅ Input (now closer)
 issued = st.number_input("", 0.0, key="benefits_issued")
 
+# ✅ Overpayment
 overpayment = issued - actual_budget
 
 st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
+``
