@@ -58,7 +58,7 @@ def get_amounts(comm, benefit, year, month):
     return sorted(df["Amount"].unique())
 
 # =========================
-# HEADER ROW 
+# HEADER
 # =========================
 st.title("SAID TRANSITION CALCULATOR")
 
@@ -76,7 +76,7 @@ year = c5.selectbox("Benefit Year", sorted(Reference["Start Date"].dt.year.uniqu
 same = st.checkbox("Same as Declared", value=True)
 
 # =========================
-# TABLE FUNCTION
+# BENEFIT TABLE
 # =========================
 def build_table(prefix):
     total = 0
@@ -90,6 +90,7 @@ def build_table(prefix):
         if b == "OTHER":
             for j in range(5):
                 c3,c4 = st.columns(2)
+
                 name = c3.text_input("", key=f"{prefix}_custom_{i}_{j}")
                 val = c4.number_input("Amount ($)", 0.0, key=f"{prefix}_other_{i}_{j}")
 
@@ -108,13 +109,12 @@ def build_table(prefix):
     return total
 
 # =========================
-# BENEFITS SECTION
+# BENEFITS
 # =========================
 col1,_,col2 = st.columns([1,0.3,1])
 
 with col1:
     st.subheader("Declared")
-    st.markdown("**Benefit | Amount**")
     declared_total = build_table("d")
     st.markdown(f"### Total Declared: ${declared_total:,.2f}")
 
@@ -125,7 +125,6 @@ with col2:
         actual_total = declared_total
         st.info("Actual total is using Declared total")
     else:
-        st.markdown("**Benefit | Amount**")
         actual_total = build_table("a")
 
     st.markdown(f"### Total Actual: ${actual_total:,.2f}")
@@ -133,69 +132,40 @@ with col2:
 st.divider()
 
 # =========================
-# =========================
-# INCOME (MULTIPLE ROWS ✅)
+# INCOME (MULTI ROW ✅)
 # =========================
 st.subheader("INCOME")
 
 col1_inc, _, col2_inc = st.columns([1, 0.3, 1])
 
-# =========================
-# DECLARED
-# =========================
 with col1_inc:
     st.markdown("**Declared Income**")
-
     declared_net_total = 0
 
-    # ✅ 4 rows
     for i in range(4):
-        c1, c2 = st.columns(2)
+        c1,c2 = st.columns(2)
 
-        net_val = c1.number_input(
-            f"Net Income {i+1} ($)",
-            0.0,
-            key=f"d_net_{i}"
-        )
-
-        less_val = c2.number_input(
-            f"Less Exemption {i+1} ($)",
-            0.0,
-            key=f"d_less_{i}"
-        )
+        net_val = c1.number_input(f"Net Income {i+1} ($)", 0.0, key=f"d_net_{i}")
+        less_val = c2.number_input(f"Less Exemption {i+1} ($)", 0.0, key=f"d_less_{i}")
 
         declared_net_total += (net_val - less_val)
 
     st.markdown(f"**Net: ${declared_net_total:,.2f}**")
 
-
-# =========================
-# ACTUAL
-# =========================
 with col2_inc:
     st.markdown("**Actual Income**")
-
     actual_net_total = 0
 
-    # ✅ same 4 rows
     for i in range(4):
-        c1, c2 = st.columns(2)
+        c1,c2 = st.columns(2)
 
-        net_val = c1.number_input(
-            f"Net Income {i+1} ($)",
-            0.0,
-            key=f"a_net_{i}"
-        )
-
-        less_val = c2.number_input(
-            f"Less Exemption {i+1} ($)",
-            0.0,
-            key=f"a_less_{i}"
-        )
+        net_val = c1.number_input(f"Net Income {i+1} ($)", 0.0, key=f"a_net_{i}")
+        less_val = c2.number_input(f"Less Exemption {i+1} ($)", 0.0, key=f"a_less_{i}")
 
         actual_net_total += (net_val - less_val)
 
     st.markdown(f"**Net: ${actual_net_total:,.2f}**")
+
 # =========================
 # OTHER INCOME
 # =========================
@@ -208,70 +178,59 @@ with c1:
     d_i = st.number_input("Interest", 0.0, key="d_i")
     d_l = st.number_input("Less", 0.0, key="d_l")
     declared_other = d_s + d_i - d_l
-    st.markdown(f"Total: ${declared_other:,.2f}")
 
 with c2:
     a_s = st.number_input("Surplus ($)", 0.0, key="a_s")
     a_i = st.number_input("Interest", 0.0, key="a_i")
     a_l = st.number_input("Less", 0.0, key="a_l")
     actual_other = a_s + a_i - a_l
-    st.markdown(f"Total: ${actual_other:,.2f}")
-# =========================
-# TOTAL INCOME 
-# =========================
 
-declared_total_income = declared_net + declared_other
-actual_total_income = actual_net + actual_other
 # =========================
-# FINAL CALCULATIONS (CLEAN STYLE)
+# TOTAL INCOME
 # =========================
+declared_total_income = declared_net_total + declared_other
+actual_total_income = actual_net_total + actual_other
 
+# =========================
+# FINAL
+# =========================
 c1, _, c2 = st.columns([1, 0.3, 1])
 
 with c1:
     declared_budget = declared_total - declared_total_income
-    declared_chargeable = declared_total_income
-
-    st.markdown(f"**Chargeable Income: ${declared_chargeable:,.2f}**")
+    st.markdown(f"**Chargeable Income: ${declared_total_income:,.2f}**")
     st.markdown(f"**Benefit: ${declared_budget:,.2f}**")
 
 with c2:
     actual_budget = actual_total - actual_total_income
-    actual_chargeable = actual_total_income
-
-    st.markdown(f"**Chargeable Income: ${actual_chargeable:,.2f}**")
+    st.markdown(f"**Chargeable Income: ${actual_total_income:,.2f}**")
     st.markdown(f"**Budget deficit/surplus: ${actual_budget:,.2f}**")
 
-
 # =========================
-# OVERPAYMENT 
+# OVERPAYMENT (LEFT)
 # =========================
 st.divider()
+
 col1_op, _, col2_op = st.columns([1, 0.3, 1])
+
 with col1_op:
     st.markdown("**Benefits Issued ($)**")
     issued = st.number_input("", 0.0, key="benefits_issued")
+
     overpayment = issued - actual_budget
     st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
+
 with col2_op:
     st.write("")
-    
+
 # =========================
-# SAVE + EXCEL 
+# SAVE + DOWNLOAD
 # =========================
 file_path = "monthly_records.xlsx"
 
 if "history" not in st.session_state:
-    st.session_state.history = pd.DataFrame(columns=[
-        "Client","Case","Month","Year",
-        "Declared_Net","Actual_Net",
-        "Declared_Other","Actual_Other",
-        "Declared_Total_Benefits","Actual_Total_Benefits",
-        "Declared_Chargeable","Actual_Chargeable",
-        "Benefits_Issued","Actual_Budget","Overpayment"
-    ])
+    st.session_state.history = pd.DataFrame()
 
-#  SAVE BUTTON
 if st.button("Save Month Calculation"):
 
     new_row = pd.DataFrame([{
@@ -279,96 +238,17 @@ if st.button("Save Month Calculation"):
         "Case": case,
         "Month": month,
         "Year": year,
-
-        "Declared_Net": declared_net,
-        "Actual_Net": actual_net,
-
-        "Declared_Other": declared_other,
-        "Actual_Other": actual_other,
-
-        "Declared_Total_Benefits": declared_total,
-        "Actual_Total_Benefits": actual_total,
-
-        "Declared_Chargeable": declared_total_income,
-        "Actual_Chargeable": actual_total_income,
-
-        "Benefits_Issued": issued,
-        "Actual_Budget": actual_budget,
         "Overpayment": overpayment
     }])
 
-    df = st.session_state.history
+    st.session_state.history = pd.concat([st.session_state.history, new_row])
 
-    #  remove duplicate month entries for same client
-    df = df[
-        ~(
-            (df["Client"] == client) &
-            (df["Month"] == month) &
-            (df["Year"] == year)
-        )
-    ]
+    st.success(f"Saved {client} - {month} {year}")
 
-    df = pd.concat([df, new_row], ignore_index=True)
-    st.session_state.history = df
-
-    #  save to Excel file
-    if os.path.exists(file_path):
-        existing = pd.read_excel(file_path)
-
-        existing = existing[
-            ~(
-                (existing["Client"] == client) &
-                (existing["Month"] == month) &
-                (existing["Year"] == year)
-            )
-        ]
-
-        final_df = pd.concat([existing, new_row], ignore_index=True)
-    else:
-        final_df = new_row
-
-    final_df.to_excel(file_path, index=False)
-
-    st.success(f" Saved {client} - {month} {year}")
-
-# =========================
-# SUMMARY + DOWNLOAD 
-# =========================
 if len(st.session_state.history) > 0:
 
-    df = st.session_state.history.copy()
+    st.dataframe(st.session_state.history)
 
-    #  filter by current client (safe)
-    df = df[df["Client"].str.strip().str.upper() == client.strip().upper()]
-
-    if len(df) > 0:
-
-        st.subheader("Client History")
-
-        st.dataframe(df, use_container_width=True)
-
-        total = df["Overpayment"].sum()
-
-        st.subheader("TOTAL OVERPAYMENT / UNDERPAYMENT")
-        st.markdown(f"**${total:,.2f}**")
-
-        #  download
-        import io
-
-        df["Month_Num"] = pd.to_datetime(df["Month"], format="%B").dt.month
-        df = df.sort_values(["Year", "Month_Num"])
-        df = df.drop(columns=["Month_Num"])
-
-        output = io.BytesIO()
-        df.to_excel(output, index=False, engine="openpyxl")
-        output.seek(0)
-
-        st.download_button(
-            label="📥 Download Full Client Summary",
-            data=output,
-            file_name=f"{client}_summary.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-
-    else:
-        st.info("No records found for this client yet. Click 'Save Month Calculation' first.")
+    total = st.session_state.history["Overpayment"].sum()
+    st.markdown(f"**Total Overpayment: ${total:,.2f}**")
+``
