@@ -2,17 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 
-# =========================
-# CONFIG
-# =========================
 st.set_page_config(layout="wide")
-
-st.markdown("""
-<style>
-.block-container {padding-top:0.8rem;}
-h1 {text-align:center;}
-</style>
-""", unsafe_allow_html=True)
 
 # =========================
 # LOAD DATA
@@ -27,12 +17,21 @@ def load_excel_safe(path):
 Reference = load_excel_safe("Reference.xlsx")
 Community = load_excel_safe("Community.xlsx")
 
-Reference.columns = ["Benefit Type","Start Date","End Date","Tier","Amount"]
-Reference["Start Date"] = pd.to_datetime(Reference["Start Date"])
-Reference["End Date"] = pd.to_datetime(Reference["End Date"])
-Reference["Benefit Type"] = Reference["Benefit Type"].str.upper().str.strip()
-Reference["Tier"] = Reference["Tier"].str.upper().str.strip()
-Reference["Amount"] = Reference["Amount"].replace(r'[\$,]', '', regex=True).astype(float)
+# ✅ Updated columns
+Reference["Start_Date"] = pd.to_datetime(Reference["Start_Date"])
+Reference["End_Date"] = pd.to_datetime(Reference["End_Date"])
+Reference["Benefit"] = Reference["Benefit"].str.upper().str.strip()
+Reference["Tier"] = Reference["Tier"].fillna("ALL").str.upper()
+
+# =========================
+# ADD BENEFIT GROUP (UI LOGIC)
+# =========================
+def get_group(x):
+    if "PUBLIC CONSULTATION HOME" in x:
+        return "P/C HOME"
+    return x
+
+Reference["Group"] = Reference["Benefit"].apply(get_group)
 
 # =========================
 # FUNCTIONS
@@ -41,70 +40,91 @@ def get_tier(comm):
     t = Community.loc[Community["Community"] == comm, "Tier"]
     return t.values[0] if len(t) > 0 else "D"
 
-def get_amounts(comm, benefit, year, month):
-    if benefit in ["", "OTHER"]:
+def get_benefits(group):
+    return sorted(Reference.loc[Reference["Group"] == group, "Benefit"].unique())
+
+def get_amounts(comm, benefit, adults, children, year, month):
+
+    if benefit == "":
         return []
 
     tier = get_tier(comm)
-    date = pd.to_datetime(f"{year} {month} 01")
+    date = pd.to_datetime(f"{year}-{month:02d}-01")
 
     df = Reference[
-        (Reference["Benefit Type"] == benefit) &
-        (Reference["Tier"] == tier) &
-        (Reference["Start Date"] <= date) &
-        (Reference["End Date"] >= date)
+        (Reference["Benefit"] == benefit) &
+        ((Reference["Tier"] == tier) | (Reference["Tier"] == "ALL")) &
+        ((Reference["Adults"] == adults) | (Reference["Adults"].isna())) &
+        (Reference["Children"] == children) &
+        (Reference["Start_Date"] <= date) &
+        (Reference["End_Date"] >= date)
     ]
 
-    return sorted(df["Amount"].unique())
+    return sorted(df["Amount"].dropna().unique())
 
 # =========================
 # HEADER
 # =========================
 st.title("SAID TRANSITION CALCULATOR")
 
-c1,c2,c3,c4,c5 = st.columns(5)
+c1,c2,c3,c4,c5,c6,c7 = st.columns(7)
 
 client = c1.text_input("Client")
 case = c2.text_input("Case #")
-community = c3.selectbox("Community", Community["Community"].unique())
-month = c4.selectbox("Benefit Month", [
-    "January","February","March","April","May","June",
-    "July","August","September","October","November","December"
-])
-year = c5.selectbox("Benefit Year", sorted(Reference["Start Date"].dt.year.unique()))
+
+community = c3.selectbox("Community", sorted(Community["Community"].unique()))
+
+# ✅ NEW FILTERS
+adults = c4.selectbox("Adults", list(range(0,6)))
+children = c5.selectbox("Children", list(range(0,27)))
+
+month_lookup = {
+    "January":1,"February":2,"March":3,"April":4,"May":5,"June":6,
+    "July":7,"August":8,"September":9,"October":10,"November":11,"December":12
+}
+
+month_name = c6.selectbox("Month", list(month_lookup.keys()))
+month = month_lookup[month_name]
+
+year = c7.selectbox("Year", sorted(Reference["Start_Date"].dt.year.unique()))
 
 same = st.checkbox("Same as Declared", value=True)
 
 # =========================
-# BENEFIT TABLE
+# BUILD TABLE
 # =========================
 def build_table(prefix):
+
     total = 0
-    benefits = sorted(Reference["Benefit Type"].unique())
+    groups = sorted(Reference["Group"].unique())
 
     for i in range(6):
-        c1,c2 = st.columns(2)
 
-        b = c1.selectbox("", [""] + benefits + ["OTHER"], key=f"{prefix}_b_{i}")
+        c1,c2,c3 = st.columns([1,1,1])
 
-        if b == "OTHER":
-            for j in range(10):
-                c3,c4 = st.columns(2)
+        group = c1.selectbox("Benefit Group", [""] + groups + ["OTHER"], key=f"{prefix}_g_{i}")
 
-                name = c3.text_input("", key=f"{prefix}_custom_{i}_{j}")
-                val = c4.number_input("Amount ($)", 0.0, key=f"{prefix}_other_{i}_{j}")
+        if group == "OTHER":
+            val = c2.number_input("Amount", 0.0, key=f"{prefix}_other_{i}")
+            total += val
+            continue
 
-                if name.strip():
-                    total += val
+        # ✅ show sub-options (HOME 1-5 etc.)
+        options = get_benefits(group) if group != "" else []
+
+        if options:
+            benefit = c2.selectbox("Type", options, key=f"{prefix}_b_{i}")
         else:
-            opts = get_amounts(community, b, year, month)
+            benefit = ""
 
-            if opts:
-                val = c2.selectbox("", opts, key=f"{prefix}_amt_{i}")
-            else:
-                val = c2.number_input("Amount ($)", 0.0, key=f"{prefix}_num_{i}")
+        amounts = get_amounts(community, benefit, adults, children, year, month)
 
-            total += float(val)
+        if amounts:
+            val = c3.selectbox("Amount", amounts, key=f"{prefix}_amt_{i}")
+        else:
+            val = c3.number_input("Amount", 0.0, key=f"{prefix}_num_{i}")
+
+        total += float(val)
 
     return total
 
@@ -123,144 +143,8 @@ with col2:
 
     if same:
         actual_total = declared_total
-        st.info("Actual total is using Declared total")
+        st.info("Using declared values")
     else:
         actual_total = build_table("a")
 
     st.markdown(f"### Total Actual: ${actual_total:,.2f}")
-
-st.divider()
-
-# =========================
-# INCOME 
-# =========================
-st.subheader("INCOME")
-
-col1_inc, _, col2_inc = st.columns([1, 0.3, 1])
-
-with col1_inc:
-    st.markdown("**Declared Income**")
-    declared_net_total = 0
-
-    for i in range(4):
-        c1,c2 = st.columns(2)
-
-        net_val = c1.number_input(f"Net Income {i+1} ($)", 0.0, key=f"d_net_{i}")
-        less_val = c2.number_input(f"Less Exemption {i+1} ($)", 0.0, key=f"d_less_{i}")
-
-        declared_net_total += (net_val - less_val)
-
-    st.markdown(f"**Net: ${declared_net_total:,.2f}**")
-
-with col2_inc:
-    st.markdown("**Actual Income**")
-    actual_net_total = 0
-
-    for i in range(4):
-        c1,c2 = st.columns(2)
-
-        net_val = c1.number_input(f"Net Income {i+1} ($)", 0.0, key=f"a_net_{i}")
-        less_val = c2.number_input(f"Less Exemption {i+1} ($)", 0.0, key=f"a_less_{i}")
-
-        actual_net_total += (net_val - less_val)
-
-    st.markdown(f"**Net: ${actual_net_total:,.2f}**")
-
-# =========================
-# OTHER INCOME
-# =========================
-st.subheader("OTHER INCOME")
-
-c1,_,c2 = st.columns([1,0.3,1])
-
-with c1:
-    d_s = st.number_input("Surplus ($)", 0.0, key="d_s")
-    d_i = st.number_input("Interest", 0.0, key="d_i")
-    d_l = st.number_input("Less", 0.0, key="d_l")
-    declared_other = d_s + d_i - d_l
-
-with c2:
-    a_s = st.number_input("Surplus ($)", 0.0, key="a_s")
-    a_i = st.number_input("Interest", 0.0, key="a_i")
-    a_l = st.number_input("Less", 0.0, key="a_l")
-    actual_other = a_s + a_i - a_l
-
-# =========================
-# TOTAL INCOME
-# =========================
-declared_total_income = declared_net_total + declared_other
-actual_total_income = actual_net_total + actual_other
-
-# =========================
-# FINAL
-# =========================
-c1, _, c2 = st.columns([1, 0.3, 1])
-
-with c1:
-    declared_budget = declared_total - declared_total_income
-    st.markdown(f"**Chargeable Income: ${declared_total_income:,.2f}**")
-    st.markdown(f"**Benefit: ${declared_budget:,.2f}**")
-
-with c2:
-    actual_budget = actual_total - actual_total_income
-    st.markdown(f"**Chargeable Income: ${actual_total_income:,.2f}**")
-    st.markdown(f"**Budget deficit/surplus: ${actual_budget:,.2f}**")
-
-# =========================
-# OVERPAYMENT (LEFT)
-# =========================
-st.divider()
-
-col1_op, _, col2_op = st.columns([1, 0.3, 1])
-
-with col1_op:
-    st.markdown("**Benefits Issued ($)**")
-    issued = st.number_input("", 0.0, key="benefits_issued")
-
-    overpayment = issued - actual_budget
-    st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
-
-with col2_op:
-    st.write("")
-
-# =========================
-# SAVE + DOWNLOAD
-# =========================
-
-if "history" not in st.session_state:
-    st.session_state.history = pd.DataFrame()
-
-if st.button("Save Month Calculation"):
-
-    new_row = pd.DataFrame([{
-        "Client": client,
-        "Case": case,
-        "Month": month,
-        "Year": year,
-        "Declared_Total_Needs": declared_total,
-        "Declared_Net_Income": declared_net_total,
-        "Declared_Other_Income": declared_other,
-         "Declared_Total_Income": declared_total_income,
-
-        "Actual_Total_Needs": actual_total,
-        "Actual_Net_Income": actual_net_total,
-        "Actual_Other_Income": actual_other,
-        "Actual_Total_Income": actual_total_income,
-
-        "Chargeable_Income": actual_total_income,
-        "Budget_Deficit_Surplus": actual_budget,
-        
-        "Benefits_Issued": issued,
-        "Overpayment": overpayment
-    }])
-
-    st.session_state.history = pd.concat([st.session_state.history, new_row])
-
-    st.success(f"Saved {client} - {month} {year}")
-
-if len(st.session_state.history) > 0:
-
-    st.dataframe(st.session_state.history)
-
-    total = st.session_state.history["Overpayment"].sum()
-    st.markdown(f"**Total Overpayment: ${total:,.2f}**")
