@@ -153,7 +153,8 @@ with col1_inc:
 
         declared_net_total += (net_val - less_val)
 
-    st.markdown(f"**Net: ${declared_net_total:,.2f}**")
+    # ✅ FIXED LABEL (only one remains)
+    st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
 # ---- OTHER INCOME ----
 with col2_inc:
@@ -181,14 +182,11 @@ actual_total_income = declared_total_income
 # =========================
 c1, _, c2 = st.columns([1, 0.3, 1])
 
-# ✅ DECLARED SIDE (CLEANED)
 with c1:
     declared_benefit = declared_total - declared_net_total
-
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
     st.markdown(f"**Benefit: ${declared_benefit:,.2f}**")
 
-# ✅ ACTUAL SIDE
 with c2:
     actual_budget = actual_total - actual_total_income
     st.markdown(f"**Chargeable Income: ${actual_total_income:,.2f}**")
@@ -199,47 +197,7 @@ with c2:
 # =========================
 st.divider()
 
-col1_op, _, col2_op = st.columns([1, 0.3, 1])
+issued = st.number_input("Benefits Issued ($)", 0.0)
 
-with col1_op:
-    st.markdown("**Benefits Issued ($)**")
-    issued = st.number_input("", 0.0, key="benefits_issued")
-
-    overpayment = issued - actual_budget
-    st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
-
-# =========================
-# SAVE
-# =========================
-if "history" not in st.session_state:
-    st.session_state.history = pd.DataFrame()
-
-if st.button("Save Month Calculation"):
-
-    new_row = pd.DataFrame([{
-        "Client": client,
-        "Case": case,
-        "Month": month,
-        "Year": year,
-
-        "Declared_Total_Needs": declared_total,
-        "Declared_Net_Income": declared_net_total,
-        "Declared_Benefit": declared_benefit,
-
-        "Actual_Total_Needs": actual_total,
-        "Actual_Total_Income": actual_total_income,
-        "Budget_Deficit_Surplus": actual_budget,
-
-        "Benefits_Issued": issued,
-        "Overpayment": overpayment
-    }])
-
-    st.session_state.history = pd.concat([st.session_state.history, new_row])
-
-    st.success(f"Saved {client} - {month} {year}")
-
-if len(st.session_state.history) > 0:
-    st.dataframe(st.session_state.history)
-
-    total = st.session_state.history["Overpayment"].sum()
-    st.markdown(f"**Total Overpayment: ${total:,.2f}**")
+overpayment = issued - actual_budget
+st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
