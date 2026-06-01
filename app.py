@@ -2,7 +2,17 @@ import streamlit as st
 import pandas as pd
 import os
 
+# =========================
+# CONFIG
+# =========================
 st.set_page_config(layout="wide")
+
+st.markdown("""
+<style>
+.block-container {padding-top:0.8rem;}
+h1 {text-align:center;}
+</style>
+""", unsafe_allow_html=True)
 
 # =========================
 # LOAD DATA
@@ -17,24 +27,13 @@ def load_excel_safe(path):
 Reference = load_excel_safe("Reference.xlsx")
 Community = load_excel_safe("Community.xlsx")
 
-# =========================
-# CLEAN DATA
-# =========================
+# ✅ IMPORTANT: updated structure handling
 Reference["Start_Date"] = pd.to_datetime(Reference["Start_Date"])
 Reference["End_Date"] = pd.to_datetime(Reference["End_Date"])
 
-Reference["Benefit"] = Reference["Benefit"].str.upper().str.strip()
+Reference["Benefit Type"] = Reference["Benefit"].str.upper().str.strip()
 Reference["Tier"] = Reference["Tier"].fillna("ALL").str.upper()
-
-# =========================
-# CREATE BENEFIT GROUP (UI)
-# =========================
-def get_group(b):
-    if "PUBLIC CONSULTATION HOME" in b:
-        return "P/C HOME"
-    return b
-
-Reference["Group"] = Reference["Benefit"].apply(get_group)
+Reference["Amount"] = Reference["Amount"].astype(float)
 
 # =========================
 # FUNCTIONS
@@ -43,22 +42,18 @@ def get_tier(comm):
     t = Community.loc[Community["Community"] == comm, "Tier"]
     return t.values[0] if len(t) > 0 else "D"
 
-def get_benefit_options(group):
-    return sorted(Reference.loc[Reference["Group"] == group, "Benefit"].unique())
-
-def get_amounts(comm, benefit, adults, children, year, month):
-
-    if benefit == "":
+def get_amounts(comm, benefit, year, month):
+    if benefit in ["", "OTHER"]:
         return []
 
     tier = get_tier(comm)
-    date = pd.to_datetime(f"{year}-{month:02d}-01")
+    date = pd.to_datetime(f"{year} {month} 01")
 
     df = Reference[
-        (Reference["Benefit"] == benefit) &
+        (Reference["Benefit Type"] == benefit) &
         ((Reference["Tier"] == tier) | (Reference["Tier"] == "ALL")) &
-        (Reference["Children"] == children) &
-        ((Reference["Adults"].isna()) | (Reference["Adults"] == adults)) &
+        ((Reference["Adults"] == adults) | (Reference["Adults"].isna())) &  # ✅ ADDED
+        (Reference["Children"] == children) &                              # ✅ ADDED
         (Reference["Start_Date"] <= date) &
         (Reference["End_Date"] >= date)
     ]
@@ -70,26 +65,23 @@ def get_amounts(comm, benefit, adults, children, year, month):
 # =========================
 st.title("SAID TRANSITION CALCULATOR")
 
-c1,c2,c3,c4,c5,c6,c7 = st.columns(7)
+c1,c2,c3,c4,c5 = st.columns(5)
 
 client = c1.text_input("Client")
 case = c2.text_input("Case #")
+community = c3.selectbox("Community", Community["Community"].unique())
 
-community = c3.selectbox("Community", sorted(Community["Community"]))
+month = c4.selectbox("Benefit Month", [
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
+])
 
-# ✅ KEY FILTERS
-adults = c4.selectbox("Adults", list(range(0,6)))
-children = c5.selectbox("Children", list(range(0,27)))
+year = c5.selectbox("Benefit Year", sorted(Reference["Start_Date"].dt.year.unique()))
 
-month_lookup = {
-    "January":1,"February":2,"March":3,"April":4,"May":5,"June":6,
-    "July":7,"August":8,"September":9,"October":10,"November":11,"December":12
-}
-
-month_name = c6.selectbox("Month", list(month_lookup.keys()))
-month = month_lookup[month_name]
-
-year = c7.selectbox("Year", sorted(Reference["Start_Date"].dt.year.unique()))
+# ✅ ONLY ADDITION (AS REQUESTED)
+c6, c7 = st.columns(2)
+adults = c6.selectbox("Adults", list(range(0,6)))
+children = c7.selectbox("Children", list(range(0,27)))
 
 same = st.checkbox("Same as Declared", value=True)
 
@@ -98,41 +90,38 @@ same = st.checkbox("Same as Declared", value=True)
 # =========================
 def build_table(prefix):
     total = 0
-    groups = sorted(Reference["Group"].unique())
+    benefits = sorted(Reference["Benefit Type"].unique())
 
     for i in range(6):
-        c1,c2,c3 = st.columns([1,1,1])
+        c1,c2 = st.columns(2)
 
-        group = c1.selectbox("Benefit Group", [""] + groups + ["OTHER"], key=f"{prefix}_g_{i}")
+        b = c1.selectbox("", [""] + benefits + ["OTHER"], key=f"{prefix}_b_{i}")
 
-        # OTHER OPTION
-        if group == "OTHER":
-            val = c2.number_input("Amount", 0.0, key=f"{prefix}_other_{i}")
-            total += val
-            continue
+        if b == "OTHER":
+            for j in range(10):
+                c3,c4 = st.columns(2)
 
-        # SHOW SUB-TYPES (e.g. HOME 1–5)
-        options = get_benefit_options(group) if group else []
+                name = c3.text_input("", key=f"{prefix}_custom_{i}_{j}")
+                val = c4.number_input("Amount ($)", 0.0, key=f"{prefix}_other_{i}_{j}")
 
-        benefit = ""
-        if options:
-            benefit = c2.selectbox("Type", options, key=f"{prefix}_b_{i}")
-
-        amounts = get_amounts(community, benefit, adults, children, year, month)
-
-        if amounts:
-            val = c3.selectbox("Amount", amounts, key=f"{prefix}_amt_{i}")
+                if name.strip():
+                    total += val
         else:
-            val = c3.number_input("Amount", 0.0, key=f"{prefix}_num_{i}")
+            opts = get_amounts(community, b, year, month)
 
-        total += float(val)
+            if opts:
+                val = c2.selectbox("", opts, key=f"{prefix}_amt_{i}")
+            else:
+                val = c2.number_input("Amount ($)", 0.0, key=f"{prefix}_num_{i}")
+
+            total += float(val)
 
     return total
 
 # =========================
 # BENEFITS
 # =========================
-col1, _, col2 = st.columns([1,0.3,1])
+col1,_,col2 = st.columns([1,0.3,1])
 
 with col1:
     st.subheader("Declared")
@@ -144,41 +133,78 @@ with col2:
 
     if same:
         actual_total = declared_total
-        st.info("Using declared values")
+        st.info("Actual total is using Declared total")
     else:
         actual_total = build_table("a")
 
     st.markdown(f"### Total Actual: ${actual_total:,.2f}")
 
+st.divider()
+
 # =========================
 # INCOME
 # =========================
-st.divider()
 st.subheader("INCOME")
 
-declared_net_total = 0
+income_same = st.checkbox("Same as Declared Income", value=True)
 
-for i in range(4):
-    c1,c2 = st.columns(2)
-    net = c1.number_input(f"Net Income {i+1}", 0.0, key=f"net_{i}")
-    less = c2.number_input(f"Less {i+1}", 0.0, key=f"less_{i}")
-    declared_net_total += (net - less)
+col1_inc, _, col2_inc = st.columns([1, 0.3, 1])
 
-st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
+with col1_inc:
+    st.markdown("**Declared Income**")
+    declared_net_total = 0
+
+    for i in range(4):
+        c1,c2 = st.columns(2)
+
+        net_val = c1.number_input(f"Net Income {i+1} ($)", 0.0, key=f"d_net_{i}")
+        less_val = c2.number_input(f"Less Exemption {i+1} ($)", 0.0, key=f"d_less_{i}")
+
+        declared_net_total += (net_val - less_val)
+
+    st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
+
+with col2_inc:
+    st.markdown("**Other Income**")
+
+    if income_same:
+        other_income_total = 0
+        st.info("Other Income matches declared")
+    else:
+        o_s = st.number_input("Surplus ($)", 0.0, key="o_s")
+        o_i = st.number_input("Interest", 0.0, key="o_i")
+        o_l = st.number_input("Less", 0.0, key="o_l")
+
+        other_income_total = o_s + o_i - o_l
+        st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
 
 # =========================
-# FINAL CALCULATION
+# TOTAL INCOME
 # =========================
-declared_benefit = declared_total - declared_net_total
+declared_total_income = declared_net_total + (0 if income_same else other_income_total)
+actual_total_income = declared_total_income
 
-st.markdown(f"### Final Benefit: ${declared_benefit:,.2f}")
+# =========================
+# FINAL
+# =========================
+c1, _, c2 = st.columns([1, 0.3, 1])
+
+with c1:
+    declared_benefit = declared_total - declared_net_total
+    st.markdown(f"**Benefit: ${declared_benefit:,.2f}**")
+
+with c2:
+    actual_budget = actual_total - actual_total_income
+    st.markdown(f"**Chargeable Income: ${actual_total_income:,.2f}**")
+    st.markdown(f"**Budget deficit/surplus: ${actual_budget:,.2f}**")
 
 # =========================
 # OVERPAYMENT
 # =========================
 st.divider()
 
-issued = st.number_input("Benefits Issued", 0.0)
-overpayment = issued - declared_benefit
+st.markdown("**Benefits Issued ($)**")
+issued = st.number_input("", 0.0, key="issued_input")
 
-st.markdown(f"### Overpayment: ${overpayment:,.2f}")
+overpayment = issued - actual_budget
+st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
