@@ -209,3 +209,125 @@ issued = st.number_input("", 0.0, key="issued_input")
 
 overpayment = issued - actual_budget
 st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
+# =========================
+# SAVE + EXCEL
+# =========================
+
+file_path = "saved_calculations.xlsx"
+
+# ✅ Initialize storage
+if "history" not in st.session_state:
+    st.session_state.history = pd.DataFrame(columns=[
+        "Client","Case","Month","Year",
+        "Declared_Total","Actual_Total",
+        "Net_Income","Other_Income","Total_Income",
+        "Benefits_Issued","Budget","Overpayment"
+    ])
+
+# ✅ SAVE BUTTON
+if st.button("Save Month Calculation"):
+
+    # ✅ SAFE VARIABLES FROM CURRENT SCRIPT
+    net_income = declared_net_total
+    other_income = 0 if income_same else other_income_total
+    total_income = declared_total_income
+    benefits_issued = issued
+    budget = actual_budget
+
+    # ✅ BUILD ROW
+    new_row = pd.DataFrame([{
+        "Client": client,
+        "Case": case,
+        "Month": month,
+        "Year": year,
+        "Declared_Total": declared_total,
+        "Actual_Total": actual_total,
+        "Net_Income": net_income,
+        "Other_Income": other_income,
+        "Total_Income": total_income,
+        "Benefits_Issued": benefits_issued,
+        "Budget": budget,
+        "Overpayment": overpayment
+    }])
+
+    # ✅ REMOVE DUPLICATES (same client/month/year)
+    df = st.session_state.history
+
+    df = df[
+        ~(
+            (df["Client"] == client) &
+            (df["Month"] == month) &
+            (df["Year"] == year)
+        )
+    ]
+
+    df = pd.concat([df, new_row], ignore_index=True)
+    st.session_state.history = df
+
+    # ✅ SAVE TO FILE
+    if os.path.exists(file_path):
+
+        existing = pd.read_excel(file_path)
+
+        existing = existing[
+            ~(
+                (existing["Client"] == client) &
+                (existing["Month"] == month) &
+                (existing["Year"] == year)
+            )
+        ]
+
+        final = pd.concat([existing, new_row], ignore_index=True)
+
+    else:
+        final = new_row
+
+    final.to_excel(file_path, index=False)
+
+    st.success(f"Saved {client} - {month} {year}")
+
+# =========================
+# SUMMARY
+# =========================
+
+if len(st.session_state.history) > 0:
+
+    df = st.session_state.history
+
+    #  SAFE FILTER
+    df = df[df["Client"].str.strip().str.upper() == client.strip().upper()]
+
+    if len(df) > 0:
+
+        st.subheader("Client Summary")
+
+        st.dataframe(df, use_container_width=True)
+
+        total = df["Overpayment"].sum()
+
+        st.subheader("TOTAL OVERPAYMENT / UNDERPAYMENT ACROSS MONTHS")
+        st.write(f"${total:,.2f}")
+
+        #  DOWNLOAD
+        import io
+
+        df = df.copy()
+
+        df["Month_Num"] = pd.to_datetime(df["Month"], format="%B").dt.month
+        df = df.sort_values(["Year", "Month_Num"])
+        df = df.drop(columns=["Month_Num"])
+
+        output = io.BytesIO()
+        df.to_excel(output, index=False, engine='openpyxl')
+        output.seek(0)
+
+        st.download_button(
+            label=" Download Full Client Summary",
+            data=output,
+            file_name=f"{client}_FULL_summary.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+    else:
+        st.info("No records found for this client yet. Click 'Save Month Calculation' first.")
+
