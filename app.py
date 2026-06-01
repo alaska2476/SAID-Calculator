@@ -132,12 +132,13 @@ with col2:
 st.divider()
 
 # =========================
-# INCOME 
+# INCOME (UPDATED)
 # =========================
 st.subheader("INCOME")
 
 col1_inc, _, col2_inc = st.columns([1, 0.3, 1])
 
+# ---- DECLARED INCOME ----
 with col1_inc:
     st.markdown("**Declared Income**")
     declared_net_total = 0
@@ -152,44 +153,23 @@ with col1_inc:
 
     st.markdown(f"**Net: ${declared_net_total:,.2f}**")
 
+# ---- OTHER INCOME (REPLACED RIGHT SIDE) ----
 with col2_inc:
-    st.markdown("**Actual Income**")
-    actual_net_total = 0
+    st.markdown("**Other Income**")
 
-    for i in range(4):
-        c1,c2 = st.columns(2)
+    o_s = st.number_input("Surplus ($)", 0.0, key="o_s")
+    o_i = st.number_input("Interest", 0.0, key="o_i")
+    o_l = st.number_input("Less", 0.0, key="o_l")
 
-        net_val = c1.number_input(f"Net Income {i+1} ($)", 0.0, key=f"a_net_{i}")
-        less_val = c2.number_input(f"Less Exemption {i+1} ($)", 0.0, key=f"a_less_{i}")
+    other_income_total = o_s + o_i - o_l
 
-        actual_net_total += (net_val - less_val)
-
-    st.markdown(f"**Net: ${actual_net_total:,.2f}**")
-
-# =========================
-# OTHER INCOME
-# =========================
-st.subheader("OTHER INCOME")
-
-c1,_,c2 = st.columns([1,0.3,1])
-
-with c1:
-    d_s = st.number_input("Surplus ($)", 0.0, key="d_s")
-    d_i = st.number_input("Interest", 0.0, key="d_i")
-    d_l = st.number_input("Less", 0.0, key="d_l")
-    declared_other = d_s + d_i - d_l
-
-with c2:
-    a_s = st.number_input("Surplus ($)", 0.0, key="a_s")
-    a_i = st.number_input("Interest", 0.0, key="a_i")
-    a_l = st.number_input("Less", 0.0, key="a_l")
-    actual_other = a_s + a_i - a_l
+    st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
 
 # =========================
 # TOTAL INCOME
 # =========================
-declared_total_income = declared_net_total + declared_other
-actual_total_income = actual_net_total + actual_other
+declared_total_income = declared_net_total + other_income_total
+actual_total_income = declared_total_income  # same logic now
 
 # =========================
 # FINAL
@@ -207,7 +187,7 @@ with c2:
     st.markdown(f"**Budget deficit/surplus: ${actual_budget:,.2f}**")
 
 # =========================
-# OVERPAYMENT (LEFT)
+# OVERPAYMENT
 # =========================
 st.divider()
 
@@ -220,13 +200,9 @@ with col1_op:
     overpayment = issued - actual_budget
     st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
 
-with col2_op:
-    st.write("")
-
 # =========================
 # SAVE + DOWNLOAD
 # =========================
-
 if "history" not in st.session_state:
     st.session_state.history = pd.DataFrame()
 
@@ -237,14 +213,15 @@ if st.button("Save Month Calculation"):
         "Case": case,
         "Month": month,
         "Year": year,
+
         "Declared_Total_Needs": declared_total,
         "Declared_Net_Income": declared_net_total,
-        "Declared_Other_Income": declared_other,
-         "Declared_Total_Income": declared_total_income,
+        "Declared_Other_Income": other_income_total,
+        "Declared_Total_Income": declared_total_income,
 
         "Actual_Total_Needs": actual_total,
-        "Actual_Net_Income": actual_net_total,
-        "Actual_Other_Income": actual_other,
+        "Actual_Net_Income": declared_net_total,
+        "Actual_Other_Income": other_income_total,
         "Actual_Total_Income": actual_total_income,
 
         "Chargeable_Income": actual_total_income,
