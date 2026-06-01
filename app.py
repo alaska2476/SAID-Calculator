@@ -7,15 +7,15 @@ st.set_page_config(layout="wide")
 # =========================
 # LOAD DATA
 # =========================
-def load_data(path):
+def load_excel_safe(path):
     if os.path.exists(path):
-        return pd.read_csv(path)
+        return pd.read_excel(path, engine="openpyxl")
     else:
         st.error(f"Missing file: {path}")
         st.stop()
 
-Reference = load_data("Reference.csv")
-Community = load_data("Community.csv")
+Reference = load_excel_safe("Reference.xlsx")
+Community = load_excel_safe("Community.xlsx")
 
 # =========================
 # CLEAN DATA
@@ -27,7 +27,7 @@ Reference["Benefit"] = Reference["Benefit"].str.upper().str.strip()
 Reference["Tier"] = Reference["Tier"].fillna("ALL").str.upper()
 
 # =========================
-# CREATE BENEFIT GROUP
+# CREATE BENEFIT GROUP (UI)
 # =========================
 def get_group(b):
     if "PUBLIC CONSULTATION HOME" in b:
@@ -77,7 +77,7 @@ case = c2.text_input("Case #")
 
 community = c3.selectbox("Community", sorted(Community["Community"]))
 
-# ✅ NEW FILTERS
+# ✅ KEY FILTERS
 adults = c4.selectbox("Adults", list(range(0,6)))
 children = c5.selectbox("Children", list(range(0,27)))
 
@@ -94,7 +94,7 @@ year = c7.selectbox("Year", sorted(Reference["Start_Date"].dt.year.unique()))
 same = st.checkbox("Same as Declared", value=True)
 
 # =========================
-# BUILD BENEFIT TABLE
+# BENEFIT TABLE
 # =========================
 def build_table(prefix):
     total = 0
@@ -105,11 +105,13 @@ def build_table(prefix):
 
         group = c1.selectbox("Benefit Group", [""] + groups + ["OTHER"], key=f"{prefix}_g_{i}")
 
+        # OTHER OPTION
         if group == "OTHER":
             val = c2.number_input("Amount", 0.0, key=f"{prefix}_other_{i}")
             total += val
             continue
 
+        # SHOW SUB-TYPES (e.g. HOME 1–5)
         options = get_benefit_options(group) if group else []
 
         benefit = ""
@@ -130,7 +132,7 @@ def build_table(prefix):
 # =========================
 # BENEFITS
 # =========================
-col1, _, col2 = st.columns([1, 0.3, 1])
+col1, _, col2 = st.columns([1,0.3,1])
 
 with col1:
     st.subheader("Declared")
@@ -165,7 +167,7 @@ for i in range(4):
 st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
 # =========================
-# FINAL
+# FINAL CALCULATION
 # =========================
 declared_benefit = declared_total - declared_net_total
 
