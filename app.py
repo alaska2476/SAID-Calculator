@@ -168,7 +168,6 @@ with col2_inc:
         o_l = st.number_input("Less", 0.0, key="o_l")
 
         other_income_total = o_s + o_i - o_l
-
         st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
 
 # =========================
@@ -178,18 +177,18 @@ declared_total_income = declared_net_total + (0 if income_same else other_income
 actual_total_income = declared_total_income
 
 # =========================
-# FINAL (UPDATED LOGIC)
+# FINAL
 # =========================
 c1, _, c2 = st.columns([1, 0.3, 1])
 
-#  DECLARED SIDE 
+# ✅ DECLARED SIDE (CLEANED)
 with c1:
     declared_benefit = declared_total - declared_net_total
 
-    st.markdown(f"**Net Income Used: ${declared_net_total:,.2f}**")
+    st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
     st.markdown(f"**Benefit: ${declared_benefit:,.2f}**")
 
-#  ACTUAL SIDE
+# ✅ ACTUAL SIDE
 with c2:
     actual_budget = actual_total - actual_total_income
     st.markdown(f"**Chargeable Income: ${actual_total_income:,.2f}**")
