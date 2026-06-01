@@ -27,7 +27,9 @@ def load_excel_safe(path):
 Reference = load_excel_safe("Reference.xlsx")
 Community = load_excel_safe("Community.xlsx")
 
-# ✅ IMPORTANT: updated structure handling
+# =========================
+# CLEAN DATA
+# =========================
 Reference["Start_Date"] = pd.to_datetime(Reference["Start_Date"])
 Reference["End_Date"] = pd.to_datetime(Reference["End_Date"])
 
@@ -52,8 +54,8 @@ def get_amounts(comm, benefit, year, month):
     df = Reference[
         (Reference["Benefit Type"] == benefit) &
         ((Reference["Tier"] == tier) | (Reference["Tier"] == "ALL")) &
-        ((Reference["Adults"] == adults) | (Reference["Adults"].isna())) &  # ✅ ADDED
-        (Reference["Children"] == children) &                              # ✅ ADDED
+        ((Reference["Adults"] == adults) | (Reference["Adults"].isna())) &
+        (Reference["Children"] == children) &
         (Reference["Start_Date"] <= date) &
         (Reference["End_Date"] >= date)
     ]
@@ -61,11 +63,11 @@ def get_amounts(comm, benefit, year, month):
     return sorted(df["Amount"].dropna().unique())
 
 # =========================
-# HEADER
+# HEADER (ALL IN ONE LINE ✅)
 # =========================
 st.title("SAID TRANSITION CALCULATOR")
 
-c1,c2,c3,c4,c5 = st.columns(5)
+c1,c2,c3,c4,c5,c6,c7 = st.columns(7)
 
 client = c1.text_input("Client")
 case = c2.text_input("Case #")
@@ -78,8 +80,7 @@ month = c4.selectbox("Benefit Month", [
 
 year = c5.selectbox("Benefit Year", sorted(Reference["Start_Date"].dt.year.unique()))
 
-# ✅ ONLY ADDITION (AS REQUESTED)
-c6, c7 = st.columns(2)
+# ✅ NOW PERFECTLY ALIGNED
 adults = c6.selectbox("Adults", list(range(0,6)))
 children = c7.selectbox("Children", list(range(0,27)))
 
