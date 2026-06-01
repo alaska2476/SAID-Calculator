@@ -81,7 +81,7 @@ month = c4.selectbox("Benefit Month", [
 year = c5.selectbox("Benefit Year", list(range(2020, 2027)))
 
 #  NOW PERFECTLY ALIGNED
-adults = c6.selectbox("Adults", list(range(0,6)))
+adults = c6.selectbox("Adults", list(range(1,6)))
 children = c7.selectbox("Children", list(range(0,27)))
 
 same = st.checkbox("Same as Declared", value=True)
