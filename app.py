@@ -132,7 +132,7 @@ with col2:
 st.divider()
 
 # =========================
-# INCOME (WITH MATCHING TOGGLE)
+# INCOME
 # =========================
 st.subheader("INCOME")
 
@@ -155,13 +155,13 @@ with col1_inc:
 
     st.markdown(f"**Net: ${declared_net_total:,.2f}**")
 
-# ---- OTHER INCOME (CONDITIONAL) ----
+# ---- OTHER INCOME ----
 with col2_inc:
     st.markdown("**Other Income**")
 
     if income_same:
         other_income_total = 0
-        st.info("Other Income matches declared (hidden)")
+        st.info("Other Income matches declared")
     else:
         o_s = st.number_input("Surplus ($)", 0.0, key="o_s")
         o_i = st.number_input("Interest", 0.0, key="o_i")
@@ -178,15 +178,18 @@ declared_total_income = declared_net_total + (0 if income_same else other_income
 actual_total_income = declared_total_income
 
 # =========================
-# FINAL
+# FINAL (UPDATED LOGIC)
 # =========================
 c1, _, c2 = st.columns([1, 0.3, 1])
 
+#  DECLARED SIDE 
 with c1:
-    declared_budget = declared_total - declared_total_income
-    st.markdown(f"**Chargeable Income: ${declared_total_income:,.2f}**")
-    st.markdown(f"**Benefit: ${declared_budget:,.2f}**")
+    declared_benefit = declared_total - declared_net_total
 
+    st.markdown(f"**Net Income Used: ${declared_net_total:,.2f}**")
+    st.markdown(f"**Benefit: ${declared_benefit:,.2f}**")
+
+#  ACTUAL SIDE
 with c2:
     actual_budget = actual_total - actual_total_income
     st.markdown(f"**Chargeable Income: ${actual_total_income:,.2f}**")
@@ -207,7 +210,7 @@ with col1_op:
     st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
 
 # =========================
-# SAVE + HISTORY
+# SAVE
 # =========================
 if "history" not in st.session_state:
     st.session_state.history = pd.DataFrame()
@@ -222,13 +225,10 @@ if st.button("Save Month Calculation"):
 
         "Declared_Total_Needs": declared_total,
         "Declared_Net_Income": declared_net_total,
-        "Declared_Other_Income": (0 if income_same else other_income_total),
-        "Declared_Total_Income": declared_total_income,
+        "Declared_Benefit": declared_benefit,
 
         "Actual_Total_Needs": actual_total,
         "Actual_Total_Income": actual_total_income,
-
-        "Chargeable_Income": actual_total_income,
         "Budget_Deficit_Surplus": actual_budget,
 
         "Benefits_Issued": issued,
