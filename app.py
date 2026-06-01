@@ -76,7 +76,7 @@ year = c5.selectbox("Benefit Year", sorted(Reference["Start Date"].dt.year.uniqu
 same = st.checkbox("Same as Declared", value=True)
 
 # =========================
-# BENEFITS
+# BENEFIT TABLE
 # =========================
 def build_table(prefix):
     total = 0
@@ -108,6 +108,9 @@ def build_table(prefix):
 
     return total
 
+# =========================
+# BENEFITS
+# =========================
 col1,_,col2 = st.columns([1,0.3,1])
 
 with col1:
@@ -135,7 +138,7 @@ st.subheader("INCOME")
 
 income_same = st.checkbox("Same as Declared Income", value=True)
 
-col1_inc,_,col2_inc = st.columns([1,0.3,1])
+col1_inc, _, col2_inc = st.columns([1, 0.3, 1])
 
 # ---- DECLARED INCOME ----
 with col1_inc:
@@ -144,10 +147,13 @@ with col1_inc:
 
     for i in range(4):
         c1,c2 = st.columns(2)
+
         net_val = c1.number_input(f"Net Income {i+1} ($)", 0.0, key=f"d_net_{i}")
         less_val = c2.number_input(f"Less Exemption {i+1} ($)", 0.0, key=f"d_less_{i}")
+
         declared_net_total += (net_val - less_val)
 
+    # ✅ FIXED LABEL (only one remains)
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
 # ---- OTHER INCOME ----
@@ -158,47 +164,31 @@ with col2_inc:
         other_income_total = 0
         st.info("Other Income matches declared")
     else:
-        o_s = st.number_input("Surplus ($)", 0.0)
-        o_i = st.number_input("Interest", 0.0)
-        o_l = st.number_input("Less", 0.0)
+        o_s = st.number_input("Surplus ($)", 0.0, key="o_s")
+        o_i = st.number_input("Interest", 0.0, key="o_i")
+        o_l = st.number_input("Less", 0.0, key="o_l")
 
         other_income_total = o_s + o_i - o_l
         st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
 
 # =========================
-# CALCULATIONS
+# TOTAL INCOME
 # =========================
-
-#  DECLARED
-declared_benefit = declared_total - declared_net_total
-
-#  ACTUAL 
-actual_net_income = declared_net_total
-actual_other_income = other_income_total
-
-actual_chargeable_income = (
-    actual_total
-    + actual_net_income
-    + actual_other_income
-)
-
-actual_budget = actual_total - actual_chargeable_income
+declared_total_income = declared_net_total + (0 if income_same else other_income_total)
+actual_total_income = declared_total_income
 
 # =========================
-# FINAL DISPLAY
+# FINAL
 # =========================
-c1,_,c2 = st.columns([1,0.3,1])
+c1, _, c2 = st.columns([1, 0.3, 1])
 
-# DECLARED
 with c1:
+    declared_benefit = declared_total - declared_net_total
     st.markdown(f"**Benefit: ${declared_benefit:,.2f}**")
 
-# ACTUAL
 with c2:
-    st.markdown(f"**Total Actual: ${actual_total:,.2f}**")
-    st.markdown(f"**Net Income: ${actual_net_income:,.2f}**")
-    st.markdown(f"**Other Income: ${actual_other_income:,.2f}**")
-    st.markdown(f"**Chargeable Income: ${actual_chargeable_income:,.2f}**")
+    actual_budget = actual_total - actual_total_income
+    st.markdown(f"**Chargeable Income: ${actual_total_income:,.2f}**")
     st.markdown(f"**Budget deficit/surplus: ${actual_budget:,.2f}**")
 
 # =========================
