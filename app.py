@@ -196,7 +196,9 @@ with c2:
 # =========================
 st.divider()
 
-issued = st.number_input("Benefits Issued ($)", 0.0)
+st.markdown("**Benefits Issued ($)**")
+issued = st.number_input("", 0.0, key="issued_input")
+
 
 overpayment = issued - actual_budget
 st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
