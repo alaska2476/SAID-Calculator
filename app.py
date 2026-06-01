@@ -184,7 +184,6 @@ c1, _, c2 = st.columns([1, 0.3, 1])
 
 with c1:
     declared_benefit = declared_total - declared_net_total
-    st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
     st.markdown(f"**Benefit: ${declared_benefit:,.2f}**")
 
 with c2:
