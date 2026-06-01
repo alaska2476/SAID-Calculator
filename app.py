@@ -132,9 +132,11 @@ with col2:
 st.divider()
 
 # =========================
-# INCOME (UPDATED)
+# INCOME (WITH MATCHING TOGGLE)
 # =========================
 st.subheader("INCOME")
+
+income_same = st.checkbox("Same as Declared Income", value=True)
 
 col1_inc, _, col2_inc = st.columns([1, 0.3, 1])
 
@@ -153,23 +155,27 @@ with col1_inc:
 
     st.markdown(f"**Net: ${declared_net_total:,.2f}**")
 
-# ---- OTHER INCOME (REPLACED RIGHT SIDE) ----
+# ---- OTHER INCOME (CONDITIONAL) ----
 with col2_inc:
     st.markdown("**Other Income**")
 
-    o_s = st.number_input("Surplus ($)", 0.0, key="o_s")
-    o_i = st.number_input("Interest", 0.0, key="o_i")
-    o_l = st.number_input("Less", 0.0, key="o_l")
+    if income_same:
+        other_income_total = 0
+        st.info("Other Income matches declared (hidden)")
+    else:
+        o_s = st.number_input("Surplus ($)", 0.0, key="o_s")
+        o_i = st.number_input("Interest", 0.0, key="o_i")
+        o_l = st.number_input("Less", 0.0, key="o_l")
 
-    other_income_total = o_s + o_i - o_l
+        other_income_total = o_s + o_i - o_l
 
-    st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
+        st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
 
 # =========================
 # TOTAL INCOME
 # =========================
-declared_total_income = declared_net_total + other_income_total
-actual_total_income = declared_total_income  # same logic now
+declared_total_income = declared_net_total + (0 if income_same else other_income_total)
+actual_total_income = declared_total_income
 
 # =========================
 # FINAL
@@ -201,7 +207,7 @@ with col1_op:
     st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
 
 # =========================
-# SAVE + DOWNLOAD
+# SAVE + HISTORY
 # =========================
 if "history" not in st.session_state:
     st.session_state.history = pd.DataFrame()
@@ -216,17 +222,15 @@ if st.button("Save Month Calculation"):
 
         "Declared_Total_Needs": declared_total,
         "Declared_Net_Income": declared_net_total,
-        "Declared_Other_Income": other_income_total,
+        "Declared_Other_Income": (0 if income_same else other_income_total),
         "Declared_Total_Income": declared_total_income,
 
         "Actual_Total_Needs": actual_total,
-        "Actual_Net_Income": declared_net_total,
-        "Actual_Other_Income": other_income_total,
         "Actual_Total_Income": actual_total_income,
 
         "Chargeable_Income": actual_total_income,
         "Budget_Deficit_Surplus": actual_budget,
-        
+
         "Benefits_Issued": issued,
         "Overpayment": overpayment
     }])
@@ -236,7 +240,6 @@ if st.button("Save Month Calculation"):
     st.success(f"Saved {client} - {month} {year}")
 
 if len(st.session_state.history) > 0:
-
     st.dataframe(st.session_state.history)
 
     total = st.session_state.history["Overpayment"].sum()
