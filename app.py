@@ -78,9 +78,9 @@ month = c4.selectbox("Benefit Month", [
     "July","August","September","October","November","December"
 ])
 
-year = c5.selectbox("Benefit Year", sorted(Reference["Start_Date"].dt.year.unique()))
+year = c5.selectbox("Benefit Year", list(range(2020, 2027)))
 
-# ✅ NOW PERFECTLY ALIGNED
+#  NOW PERFECTLY ALIGNED
 adults = c6.selectbox("Adults", list(range(0,6)))
 children = c7.selectbox("Children", list(range(0,27)))
 
@@ -215,7 +215,7 @@ st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
 
 file_path = "saved_calculations.xlsx"
 
-# ✅ Initialize storage
+#  Initialize storage
 if "history" not in st.session_state:
     st.session_state.history = pd.DataFrame(columns=[
         "Client","Case","Month","Year",
@@ -224,17 +224,17 @@ if "history" not in st.session_state:
         "Benefits_Issued","Budget","Overpayment"
     ])
 
-# ✅ SAVE BUTTON
+#  SAVE BUTTON
 if st.button("Save Month Calculation"):
 
-    # ✅ SAFE VARIABLES FROM CURRENT SCRIPT
+    #  SAFE VARIABLES FROM CURRENT SCRIPT
     net_income = declared_net_total
     other_income = 0 if income_same else other_income_total
     total_income = declared_total_income
     benefits_issued = issued
     budget = actual_budget
 
-    # ✅ BUILD ROW
+    #  BUILD ROW
     new_row = pd.DataFrame([{
         "Client": client,
         "Case": case,
@@ -250,7 +250,7 @@ if st.button("Save Month Calculation"):
         "Overpayment": overpayment
     }])
 
-    # ✅ REMOVE DUPLICATES (same client/month/year)
+    #  REMOVE DUPLICATES (same client/month/year)
     df = st.session_state.history
 
     df = df[
@@ -264,7 +264,7 @@ if st.button("Save Month Calculation"):
     df = pd.concat([df, new_row], ignore_index=True)
     st.session_state.history = df
 
-    # ✅ SAVE TO FILE
+    #  SAVE TO FILE
     if os.path.exists(file_path):
 
         existing = pd.read_excel(file_path)
