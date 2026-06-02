@@ -28,7 +28,7 @@ Reference["Tier"] = Reference["Tier"].fillna("ALL").str.upper()
 Reference["Amount"] = Reference["Amount"].astype(float)
 
 # =========================
-# ✅ UNIVERSAL GROUPING LOGIC
+#  UNIVERSAL GROUPING LOGIC
 # =========================
 def assign_group(b):
 
@@ -37,12 +37,6 @@ def assign_group(b):
 
     if "APPROVED HOME" in b:
         return "APPROVED HOME"
-
-    if "SHELTER" in b:
-        return "S/C/H"
-
-    if "UTILIT" in b:
-        return "UTILITIES"
 
     if "TRUST" in b or "SN/TRUS" in b:
         return "SN/TRUS"
