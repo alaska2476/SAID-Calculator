@@ -35,8 +35,8 @@ def assign_group(b):
     if "LIVING" in b:
         return "LIVING"
 
-    if "APPROVED HOME" in b:
-        return "APPROVED HOME"
+    if "SPECIAL CARE" in b:
+        return "S/C/H"
 
     if "TRUST" in b or "SN/TRUS" in b:
         return "SN/TRUS"
