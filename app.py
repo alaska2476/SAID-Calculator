@@ -80,7 +80,16 @@ def assign_group(b):
         
     if "MEALS" in b:    
         return "MEALS"
+        
+    if "PERSONAL CARE" in b:
+        return "PC/HOME"
 
+    if "SALVATION ARMY" in b:    
+        return "SALVATION ARMY"
+        
+    if "SINGLE PARENT HOME" in b:    
+        return "SINGLE PARENT HOME"
+        
     return b
 
 Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
