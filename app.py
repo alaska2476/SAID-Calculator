@@ -47,12 +47,15 @@ def assign_group(b):
 
     if "APPROVED HOME" in b:
         return "APPROVED HOME"
-
+        
+    if "CLOTHING" in b:
+        return "CLOTHING"
+        
     if "SPECIAL CARE" in b:
         return "S/C/H"
 
-    if "CLOTHING" in b:
-        return "CLOTHING"
+    if "BOARD & ROOM" in b:
+        return "BOARD & ROOM"
 
     if "TRUST" in b or "SN/TRUS" in b:
         return "SN/TRUS"
