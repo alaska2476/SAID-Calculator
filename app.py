@@ -271,7 +271,7 @@ if len(st.session_state.history) > 0:
         )
 
     st.download_button(
-        label="Download Excel",
+        label="Download Summary",
         data=output.getvalue(),
         file_name=f"{client}_{month}_{year}_SAID.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
