@@ -44,10 +44,7 @@ def assign_group(b):
 
     if "LIVING" in b:
         return "LIVING"
-        
-    if "ROOM" in b:
-        return "BOARD & ROOM"
-        
+
     if "APPROVED HOME" in b:
         return "APPROVED HOME"
 
@@ -56,10 +53,7 @@ def assign_group(b):
 
     if "CLOTHING" in b:
         return "CLOTHING"
-        
-if "DISABILITY ALLOWANCE" in b:
-        return "DIS/ALL"
-     
+
     if "TRUST" in b or "SN/TRUS" in b:
         return "SN/TRUS"
 
