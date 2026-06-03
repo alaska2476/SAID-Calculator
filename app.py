@@ -56,6 +56,18 @@ def assign_group(b):
 
     if "CLOTHING" in b:
         return "CLOTHING"
+        
+if "DISABILITY ALLOWANCE" in b:
+        return "DIS/ALL"
+    
+    if "EDUCATION" in b:
+        return "EDUCATION"
+        
+         if "FAMILY HOMES " in b:
+        return "FAMILY HOMES "
+
+     if "HOUSEHOLD ALLOWANCE" in b:
+        return "HOUSEHOLD ALLOWANCE"
 
     if "TRUST" in b or "SN/TRUS" in b:
         return "SN/TRUS"
