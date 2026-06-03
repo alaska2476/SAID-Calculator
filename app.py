@@ -60,8 +60,7 @@ def assign_group(b):
 if "DISABILITY ALLOWANCE" in b:
         return "DIS/ALL"
     
-    if "EDUCATION" in b:
-        return "EDUCATION"
+    
         
          if "FAMILY HOMES " in b:
         return "FAMILY HOMES "
