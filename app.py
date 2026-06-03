@@ -51,8 +51,8 @@ def assign_group(b):
     if "SPECIAL CARE" in b:
         return "S/C/H"
 
-    if "UTILIT" in b:
-        return "UTILITIES"
+    if "CLOTHING" in b:
+        return "CLOTHING"
 
     if "TRUST" in b or "SN/TRUS" in b:
         return "SN/TRUS"
