@@ -59,7 +59,13 @@ def assign_group(b):
 
     if "TRUST" in b or "SN/TRUS" in b:
         return "SN/TRUS"
-
+        
+    if "CHILD BENEFIT" in b:
+        return "CHILD BENEFIT"
+    if "ROOM" in b:
+        return "BOARD & ROOM"
+        if "ROOM" in b:
+        return "BOARD & ROOM"
     return b  # fallback (no grouping)
 
 Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
