@@ -66,9 +66,10 @@ def assign_group(b):
     if "DISABILITY ALLOWANCE" in b:
         return "DIS/ALL"
         
-        if "FAMILY HOMES " in b:
+    if "FAMILY HOMES" in b:    
         return "FAMILY HOMES"
-    return b  
+
+    return b
 
 Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
 
