@@ -38,21 +38,46 @@ Reference["Tier"] = Reference["Tier"].fillna("ALL").str.upper()
 Reference["Amount"] = Reference["Amount"].astype(float)
 
 # =========================
+#  GROUPING 
+# =========================
+def assign_group(b):
+
+    if "LIVING" in b:
+        return "LIVING"
+
+    if "APPROVED HOME" in b:
+        return "APPROVED HOME"
+
+    if "SPECIAL CARE" in b:
+        return "S/C/H"
+
+    if "UTILIT" in b:
+        return "UTILITIES"
+
+    if "TRUST" in b or "SN/TRUS" in b:
+        return "SN/TRUS"
+
+    return b  # fallback (no grouping)
+
+Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
+
+# =========================
 # FUNCTIONS
 # =========================
 def get_tier(comm):
     t = Community.loc[Community["Community"] == comm, "Tier"]
     return t.values[0] if len(t) > 0 else "D"
 
-def get_amounts(comm, benefit, year, month):
-    if benefit in ["", "OTHER"]:
+def get_amounts(comm, group, year, month):
+
+    if group in ["", "OTHER"]:
         return []
 
     tier = get_tier(comm)
     date = pd.to_datetime(f"{year} {month} 01")
 
     df = Reference[
-        (Reference["Benefit Type"] == benefit) &
+        (Reference["Group"] == group) &   # ✅ USE GROUP
         ((Reference["Tier"] == tier) | (Reference["Tier"] == "ALL")) &
         ((Reference["Adults"] == adults) | (Reference["Adults"].isna())) &
         (Reference["Children"] == children) &
@@ -63,7 +88,7 @@ def get_amounts(comm, benefit, year, month):
     return sorted(df["Amount"].dropna().unique())
 
 # =========================
-# HEADER (ALL IN ONE LINE ✅)
+# HEADER
 # =========================
 st.title("SAID TRANSITION CALCULATOR")
 
@@ -80,7 +105,6 @@ month = c4.selectbox("Benefit Month", [
 
 year = c5.selectbox("Benefit Year", list(range(2020, 2027)))
 
-#  NOW PERFECTLY ALIGNED
 adults = c6.selectbox("Adults", list(range(1,6)))
 children = c7.selectbox("Children", list(range(1,27)))
 
@@ -90,8 +114,11 @@ same = st.checkbox("Same as Declared", value=True)
 # BENEFIT TABLE
 # =========================
 def build_table(prefix):
+
     total = 0
-    benefits = sorted(Reference["Benefit Type"].unique())
+
+    #  USE GROUPS IN DROPDOWN
+    benefits = sorted(Reference["Group"].unique())
 
     for i in range(6):
         c1,c2 = st.columns(2)
@@ -118,25 +145,7 @@ def build_table(prefix):
             total += float(val)
 
     return total
-    
-def assign_group(b):
 
-    if "LIVING" in b:
-        return "LIVING"
-
-    if "SPECIAL CARE" in b:
-        return "S/C/H"
-
-    if "UTILIT" in b:
-        return "UTILITIES"
-
-    if "TRUST" in b or "SN/TRUS" in b:
-        return "SN/TRUS"
-
-    # fallback
-    return b
-
-Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
 # =========================
 # BENEFITS
 # =========================
@@ -175,10 +184,8 @@ with col1_inc:
 
     for i in range(4):
         c1,c2 = st.columns(2)
-
         net_val = c1.number_input(f"Net Income {i+1} ($)", 0.0, key=f"d_net_{i}")
         less_val = c2.number_input(f"Less Exemption {i+1} ($)", 0.0, key=f"d_less_{i}")
-
         declared_net_total += (net_val - less_val)
 
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
@@ -190,161 +197,30 @@ with col2_inc:
         other_income_total = 0
         st.info("Other Income matches declared")
     else:
-        o_s = st.number_input("Surplus ($)", 0.0, key="o_s")
-        o_i = st.number_input("Interest", 0.0, key="o_i")
-        o_l = st.number_input("Less", 0.0, key="o_l")
+        o_s = st.number_input("Surplus ($)", 0.0)
+        o_i = st.number_input("Interest", 0.0)
+        o_l = st.number_input("Less", 0.0)
 
         other_income_total = o_s + o_i - o_l
         st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
 
 # =========================
-# TOTAL INCOME
-# =========================
-declared_total_income = declared_net_total + (0 if income_same else other_income_total)
-actual_total_income = declared_total_income
-
-# =========================
 # FINAL
 # =========================
-c1, _, c2 = st.columns([1, 0.3, 1])
+declared_total_income = declared_net_total + (0 if income_same else other_income_total)
 
-with c1:
-    declared_benefit = declared_total - declared_net_total
-    st.markdown(f"**Benefit: ${declared_benefit:,.2f}**")
+declared_benefit = declared_total - declared_net_total
 
-with c2:
-    actual_budget = actual_total - actual_total_income
-    st.markdown(f"**Chargeable Income: ${actual_total_income:,.2f}**")
-    st.markdown(f"**Budget deficit/surplus: ${actual_budget:,.2f}**")
+st.markdown(f"### Benefit: ${declared_benefit:,.2f}")
 
 # =========================
 # OVERPAYMENT
 # =========================
 st.divider()
 
-st.markdown("**Benefits Issued ($)**")
-issued = st.number_input("", 0.0, key="issued_input")
+issued = st.number_input("Benefits Issued ($)", 0.0)
 
+actual_budget = actual_total - declared_total_income
 overpayment = issued - actual_budget
+
 st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
-# =========================
-# SAVE + EXCEL
-# =========================
-
-file_path = "saved_calculations.xlsx"
-
-#  Initialize storage
-if "history" not in st.session_state:
-    st.session_state.history = pd.DataFrame(columns=[
-        "Client","Case","Month","Year",
-        "Declared_Total","Actual_Total",
-        "Net_Income","Other_Income","Total_Income",
-        "Benefits_Issued","Budget","Overpayment"
-    ])
-
-#  SAVE BUTTON
-if st.button("Save Month Calculation"):
-
-    #  SAFE VARIABLES FROM CURRENT SCRIPT
-    net_income = declared_net_total
-    other_income = 0 if income_same else other_income_total
-    total_income = declared_total_income
-    benefits_issued = issued
-    budget = actual_budget
-
-    #  BUILD ROW
-    new_row = pd.DataFrame([{
-        "Client": client,
-        "Case": case,
-        "Month": month,
-        "Year": year,
-        "Declared_Total": declared_total,
-        "Actual_Total": actual_total,
-        "Net_Income": net_income,
-        "Other_Income": other_income,
-        "Total_Income": total_income,
-        "Benefits_Issued": benefits_issued,
-        "Budget": budget,
-        "Overpayment": overpayment
-    }])
-
-    #  REMOVE DUPLICATES (same client/month/year)
-    df = st.session_state.history
-
-    df = df[
-        ~(
-            (df["Client"] == client) &
-            (df["Month"] == month) &
-            (df["Year"] == year)
-        )
-    ]
-
-    df = pd.concat([df, new_row], ignore_index=True)
-    st.session_state.history = df
-
-    #  SAVE TO FILE
-    if os.path.exists(file_path):
-
-        existing = pd.read_excel(file_path)
-
-        existing = existing[
-            ~(
-                (existing["Client"] == client) &
-                (existing["Month"] == month) &
-                (existing["Year"] == year)
-            )
-        ]
-
-        final = pd.concat([existing, new_row], ignore_index=True)
-
-    else:
-        final = new_row
-
-    final.to_excel(file_path, index=False)
-
-    st.success(f"Saved {client} - {month} {year}")
-
-# =========================
-# SUMMARY
-# =========================
-
-if len(st.session_state.history) > 0:
-
-    df = st.session_state.history
-
-    #  SAFE FILTER
-    df = df[df["Client"].str.strip().str.upper() == client.strip().upper()]
-
-    if len(df) > 0:
-
-        st.subheader("Client Summary")
-
-        st.dataframe(df, use_container_width=True)
-
-        total = df["Overpayment"].sum()
-
-        st.subheader("TOTAL OVERPAYMENT / UNDERPAYMENT ACROSS MONTHS")
-        st.write(f"${total:,.2f}")
-
-        #  DOWNLOAD
-        import io
-
-        df = df.copy()
-
-        df["Month_Num"] = pd.to_datetime(df["Month"], format="%B").dt.month
-        df = df.sort_values(["Year", "Month_Num"])
-        df = df.drop(columns=["Month_Num"])
-
-        output = io.BytesIO()
-        df.to_excel(output, index=False, engine='openpyxl')
-        output.seek(0)
-
-        st.download_button(
-            label=" Download Full Client Summary",
-            data=output,
-            file_name=f"{client}_FULL_summary.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-
-    else:
-        st.info("No records found for this client yet. Click 'Save Month Calculation' first.")
