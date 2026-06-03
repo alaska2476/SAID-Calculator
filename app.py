@@ -69,16 +69,18 @@ def assign_group(b):
     if "FAMILY HOMES" in b:    
         return "FAMILY HOMES"
         
-    if "EDUCATION" in b:    
+   
+  if "EDUCATION" in b:
         return "EDUCATION"
         
     if "HOUSEHOLD ALLOWANCE" in b:
-    return "HOUSEHOLD ALLOWANCE"   
+        return "HOUSEHOLD ALLOWANCE"
 
-if "LAUNDRY" in b:    
-    return "LAUNDRY"
+    if "LAUNDRY" in b:    
+        return "LAUNDRY"
 
-return b
+    return b
+
 
 Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
 
