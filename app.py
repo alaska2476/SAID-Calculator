@@ -106,7 +106,7 @@ month = c4.selectbox("Benefit Month", [
 
 year = c5.selectbox("Benefit Year", list(range(2020, 2027)))
 adults = c6.selectbox("Adults", list(range(1,6)))
-children = c7.selectbox("Children", list(range(0,27)))
+children = c7.selectbox("Children", list(range(1,27)))
 
 same = st.checkbox("Same as Declared", value=True)
 
@@ -217,12 +217,15 @@ overpayment = issued - actual_budget
 st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
 
 # =========================
-# SAVE + DOWNLOAD
+# SAVE + DOWNLOAD ✅ (WITH OVERWRITE)
 # =========================
+
 if "history" not in st.session_state:
     st.session_state.history = pd.DataFrame()
 
 if st.button("Save Month Calculation"):
+
+    # ✅ Create new row
     new_row = pd.DataFrame([{
         "Client": client,
         "Case": case,
@@ -243,12 +246,28 @@ if st.button("Save Month Calculation"):
         "Overpayment": overpayment
     }])
 
-    st.session_state.history = pd.concat(
-        [st.session_state.history, new_row],
-        ignore_index=True
+    # ✅ CHECK IF RECORD EXISTS
+    history = st.session_state.history
+
+    mask = (
+        (history["Client"] == client) &
+        (history["Case"] == case) &
+        (history["Month"] == month) &
+        (history["Year"] == year)
     )
 
-    st.success(f"Saved {client} - {month} {year}")
+    if mask.any():
+        # ✅ OVERWRITE EXISTING ROW
+        history = history[~mask]  # remove old row
+        history = pd.concat([history, new_row], ignore_index=True)
+        st.success(f"Updated {client} - {month} {year}")
+    else:
+        # ✅ ADD NEW ROW
+        history = pd.concat([history, new_row], ignore_index=True)
+        st.success(f"Saved {client} - {month} {year}")
+
+    # ✅ Save back to session
+    st.session_state.history = history
 
 # =========================
 # DISPLAY + DOWNLOAD
@@ -260,7 +279,8 @@ if len(st.session_state.history) > 0:
     total = st.session_state.history["Overpayment"].sum()
     st.markdown(f"**Total Overpayment: ${total:,.2f}**")
 
-    # Excel Download
+    # Download
+    import io
     output = io.BytesIO()
 
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -273,6 +293,6 @@ if len(st.session_state.history) > 0:
     st.download_button(
         label="Download Excel",
         data=output.getvalue(),
-        file_name=f"{client}_{month}_{year}_SAID.xlsx",
+        file_name=f"{client}_{year}_SAID.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
