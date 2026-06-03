@@ -55,7 +55,7 @@ def assign_group(b):
         return "S/C/H"
 
     if "ROOM" in b:
-        return "BOARD & ROOM"
+        return "BOARD & ROOM"   # ✅ fixed (removed &amp;)
 
     if "TRUST" in b or "SN/TRUS" in b:
         return "SN/TRUS"
@@ -69,8 +69,7 @@ def assign_group(b):
     if "FAMILY HOMES" in b:    
         return "FAMILY HOMES"
         
-   
-  if "EDUCATION" in b:
+    if "EDUCATION" in b:
         return "EDUCATION"
         
     if "HOUSEHOLD ALLOWANCE" in b:
@@ -80,7 +79,6 @@ def assign_group(b):
         return "LAUNDRY"
 
     return b
-
 
 Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
 
