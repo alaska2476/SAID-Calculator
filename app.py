@@ -44,7 +44,10 @@ def assign_group(b):
 
     if "LIVING" in b:
         return "LIVING"
-
+        
+    if "ROOM" in b:
+        return "BOARD & ROOM"
+        
     if "APPROVED HOME" in b:
         return "APPROVED HOME"
 
