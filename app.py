@@ -118,7 +118,25 @@ def build_table(prefix):
             total += float(val)
 
     return total
+    
+def assign_group(b):
 
+    if "LIVING" in b:
+        return "LIVING"
+
+    if "SPECIAL CARE" in b:
+        return "S/C/H"
+
+    if "UTILIT" in b:
+        return "UTILITIES"
+
+    if "TRUST" in b or "SN/TRUS" in b:
+        return "SN/TRUS"
+
+    # fallback
+    return b
+
+Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
 # =========================
 # BENEFITS
 # =========================
