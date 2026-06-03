@@ -71,6 +71,9 @@ def assign_group(b):
         
     if "EDUCATION" in b:    
         return "EDUCATION"
+        
+    if "HOUSEHOLD ALLOWANCE" in b:    
+        return "HOUSEHOLD ALLOWANCE"   
     return b
 
 Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
