@@ -77,6 +77,9 @@ def assign_group(b):
 
     if "LAUNDRY" in b:    
         return "LAUNDRY"
+        
+    if "MEALS" in b:    
+        return "MEALS"
 
     return b
 
