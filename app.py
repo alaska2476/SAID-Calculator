@@ -54,7 +54,7 @@ def assign_group(b):
     if "SPECIAL CARE" in b:
         return "S/C/H"
 
-    if "BOARD & ROOM" in b:
+    if "ROOM" in b:
         return "BOARD & ROOM"
 
     if "TRUST" in b or "SN/TRUS" in b:
