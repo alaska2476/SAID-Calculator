@@ -18,13 +18,59 @@ def load_excel_safe(path):
 Reference = load_excel_safe("Reference.xlsx")
 Community = load_excel_safe("Community.xlsx")
 
+# =========================
+# CLEAN DATA
+# =========================
 Reference["Start_Date"] = pd.to_datetime(Reference["Start_Date"])
 Reference["End_Date"] = pd.to_datetime(Reference["End_Date"])
 Reference["Benefit Type"] = Reference["Benefit"].str.upper().str.strip()
 Reference["Tier"] = Reference["Tier"].fillna("ALL").str.upper()
 Reference["Amount"] = Reference["Amount"].astype(float)
 
-Reference["Group"] = Reference["Benefit Type"]
+# =========================
+# ✅ GROUPING (FIXED)
+# =========================
+def assign_group(b):
+
+    if "LIVING" in b:
+        return "LIVING"
+
+    if "APPROVED HOME" in b:
+        return "APPROVED HOME"
+
+    if "CLOTHING" in b:
+        return "CLOTHING"
+
+    if "SPECIAL CARE" in b:
+        return "S/C/H"
+
+    if "ROOM" in b:
+        return "BOARD & ROOM"
+
+    if "TRUST" in b or "SN/TRUS" in b:
+        return "SN/TRUS"
+
+    if "CHILD BENEFIT" in b:
+        return "CHILD BENEFIT"
+
+    if "DISABILITY ALLOWANCE" in b:
+        return "DIS/ALL"
+
+    if "FAMILY HOMES" in b:
+        return "FAMILY HOMES"
+
+    if "EDUCATION" in b:
+        return "EDUCATION"
+
+    if "HOUSEHOLD ALLOWANCE" in b:
+        return "HOUSEHOLD ALLOWANCE"
+
+    if "LAUNDRY" in b:
+        return "LAUNDRY"
+
+    return b
+
+Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
 
 # =========================
 # FUNCTIONS
@@ -71,7 +117,7 @@ def build_table(prefix):
         b = c1.selectbox("", [""] + benefits + ["OTHER"], key=f"{prefix}_b_{i}")
 
         if b == "OTHER":
-            for j in range(10):
+            for j in range(5):
                 c3,c4 = st.columns(2)
                 name = c3.text_input("", key=f"{prefix}_name_{i}_{j}")
                 val = c4.number_input("Amount", 0.0, key=f"{prefix}_val_{i}_{j}")
@@ -123,7 +169,7 @@ with cb2:
 
 col1_inc,_,col2_inc = st.columns([1,0.3,1])
 
-# Declared Income
+# Declared
 with col1_inc:
     declared_net_total = 0
     for i in range(4):
@@ -134,7 +180,7 @@ with col1_inc:
 
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
-# New Income 
+# New Income
 with col2_inc:
     if same_income:
         other_income_total = 0
@@ -142,30 +188,19 @@ with col2_inc:
     else:
         total = 0
 
-        #  Surplus
         c1,c2 = st.columns(2)
-        s = c1.number_input("Surplus",0.0, key="surplus_val")
-        l = c2.number_input("Less",0.0, key="surplus_less")
-        total += (s - l)
+        total += c1.number_input("Surplus",0.0,key="s1") - c2.number_input("Less",0.0,key="l1")
 
-        #  Interest
         c3,c4 = st.columns(2)
-        i_val = c3.number_input("Interest",0.0, key="interest_val")
-        l2 = c4.number_input("Less ",0.0, key="interest_less")
-        total += (i_val - l2)
-        
+        total += c3.number_input("Interest",0.0,key="i1") - c4.number_input("Less ",0.0,key="l2")
+
         c5,c6 = st.columns(2)
-        o1 = c5.number_input("Other 1",0.0, key="other1_val")
-        o1_less = c6.number_input("Less ",0.0, key="other1_less")
-        total += (o1 - o1_less)
+        total += c5.number_input("Other 1",0.0,key="o1") - c6.number_input("Less ",0.0,key="l3")
 
         c7,c8 = st.columns(2)
-        o2 = c7.number_input("Other 2",0.0, key="other2_val")
-        o2_less = c8.number_input("Less ",0.0, key="other2_less")
-        total += (o2 - o2_less)
+        total += c7.number_input("Other 2",0.0,key="o2") - c8.number_input("Less ",0.0,key="l4")
 
         other_income_total = total
-
         st.markdown(f"**Total New Income: ${other_income_total:,.2f}**")
 
 # =========================
@@ -182,13 +217,13 @@ overpayment = issued - actual_budget
 st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
 
 # =========================
-# SAVE WITH OVERWRITE
+# SAVE
 # =========================
 if "history" not in st.session_state:
     st.session_state.history = pd.DataFrame(columns=[
         "Client","Case","Month","Year",
         "Declared_Total_Needs","Declared_Net_Income",
-        "Declared_New_Income","Declared_Total_Income",
+        "Declared_Other_Income","Declared_Total_Income",
         "Declared_Benefit","Actual_Total_Needs",
         "Actual_Total_Income","Budget_Deficit_Surplus",
         "Benefits_Issued","Overpayment"
@@ -213,19 +248,19 @@ if st.button("Save Month Calculation"):
         "Overpayment": overpayment
     }])
 
-    history = st.session_state.history.copy()
+    hist = st.session_state.history.copy()
 
-    if not history.empty:
+    if not hist.empty:
         mask = (
-            (history["Client"] == client) &
-            (history["Case"] == case) &
-            (history["Month"] == month) &
-            (history["Year"] == year)
+            (hist["Client"] == client) &
+            (hist["Case"] == case) &
+            (hist["Month"] == month) &
+            (hist["Year"] == year)
         )
-        history = history[~mask]
+        hist = hist[~mask]
 
-    st.session_state.history = pd.concat([history, new_row], ignore_index=True)
-    st.success(" Saved (auto-overwrite if exists)")
+    st.session_state.history = pd.concat([hist, new_row], ignore_index=True)
+    st.success("✅ Saved (auto overwrite)")
 
 # =========================
 # DISPLAY
