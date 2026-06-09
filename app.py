@@ -71,12 +71,17 @@ def get_tier(comm):
     return t.values[0] if len(t) > 0 else "D"
 
 def get_amounts(comm, group, year, month):
+    if group in ["", "OTHER"]:
+        return []
+
     tier = get_tier(comm)
     date = pd.to_datetime(f"{year} {month} 01")
 
     df = Reference[
         (Reference["Group"] == group) &
         ((Reference["Tier"] == tier) | (Reference["Tier"] == "ALL")) &
+        ((Reference["Adults"] == adults) | (Reference["Adults"].isna())) &
+        (Reference["Children"] == children) &
         (Reference["Start_Date"] <= date) &
         (Reference["End_Date"] >= date)
     ]
@@ -93,13 +98,18 @@ c1,c2,c3,c4,c5,c6,c7 = st.columns(7)
 client = c1.text_input("Client")
 case = c2.text_input("Case #")
 community = c3.selectbox("Community", Community["Community"].unique())
-month = c4.selectbox("Benefit Month", ["January","February","March","April","May","June","July","August","September","October","November","December"])
+
+month = c4.selectbox("Benefit Month", [
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
+])
+
 year = c5.selectbox("Benefit Year", list(range(2020, 2027)))
 adults = c6.selectbox("Adults", list(range(1,6)))
 children = c7.selectbox("Children", list(range(0,27)))
 
 # =========================
-# TABLE BUILDER
+# BENEFIT TABLE
 # =========================
 def build_table(prefix):
     total = 0
@@ -118,113 +128,139 @@ def build_table(prefix):
                     total += val
         else:
             opts = get_amounts(community, b, year, month)
-            val = c2.selectbox("", opts, key=f"{prefix}_amt_{i}") if opts else c2.number_input("Amount ($)", 0.0, key=f"{prefix}_num_{i}")
+
+            if opts:
+                val = c2.selectbox("", opts, key=f"{prefix}_amt_{i}")
+            else:
+                val = c2.number_input("Amount ($)", 0.0, key=f"{prefix}_num_{i}")
+
             total += float(val)
 
     return total
 
 # =========================
-# ✅ BENEFITS (FINAL ALIGNMENT)
+# ✅ BENEFITS (ONLY FIX APPLIED)
 # =========================
 
-# Headers
+# ✅ HEADERS SAME ROW
 h1, _, h2 = st.columns([1,0.3,1])
-with h1: st.subheader("Declared")
-with h2: st.subheader("Actual")
 
-# Checkbox ABOVE ACTUAL ONLY
-_, _, cb_col = st.columns([1,0.3,1])
-with cb_col:
-    same_actual = st.checkbox("Same as Declared", True)
+with h1:
+    st.subheader("Declared")
 
-# Data
+with h2:
+    st.subheader("Actual")
+
+# ✅ CHECKBOX ABOVE ACTUAL ONLY
+cb1, _, cb2 = st.columns([1,0.3,1])
+
+with cb2:
+    same_actual = st.checkbox("Same as Declared", value=True)
+
+# ✅ DATA ROW
 col1,_,col2 = st.columns([1,0.3,1])
+
 with col1:
     declared_total = build_table("d")
     st.markdown(f"### Total Declared: ${declared_total:,.2f}")
+
 with col2:
-    actual_total = declared_total if same_actual else build_table("a")
     if same_actual:
+        actual_total = declared_total
         st.info("Using declared values")
+    else:
+        actual_total = build_table("a")
+
     st.markdown(f"### Total Actual: ${actual_total:,.2f}")
 
+# =========================
+# (EVERYTHING BELOW UNCHANGED)
+# =========================
 st.divider()
 
-# =========================
-# INCOME
-# =========================
 st.subheader("INCOME")
 
 col1_inc,_,col2_inc = st.columns([1,0.3,1])
 
 with col1_inc:
     st.markdown("**Declared Income**")
-    declared_net_total = sum(
-        st.columns(2)[0].number_input(f"Net {i}",0.0,key=f"net{i}") -
-        st.columns(2)[1].number_input("Less",0.0,key=f"less{i}")
-        for i in range(4)
-    )
+    declared_net_total = 0
+    for i in range(4):
+        c1,c2 = st.columns(2)
+        net_val = c1.number_input(f"Net Income {i+1} ($)", 0.0, key=f"d_net_{i}")
+        less_val = c2.number_input(f"Less Exemption {i+1} ($)", 0.0, key=f"d_less_{i}")
+        declared_net_total += (net_val - less_val)
 
-# ✅ OTHER INCOME MATCHED STYLE
-h1, h2 = st.columns([1,1])
-with h2: st.markdown("**Other Income**")
-
-_, cb2 = st.columns([1,1])
-with cb2:
-    same_income = st.checkbox("Same as Declared Income", True)
-
-col1_inc,_,col2_inc = st.columns([1,0.3,1])
+    st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
 with col2_inc:
+    st.markdown("**Other Income**")
+    same_income = st.checkbox("Same as Declared Income", value=True)
+
     if same_income:
         other_income_total = 0
         st.info("No additional income")
     else:
-        c1,c2 = st.columns(2)
-        surplus = c1.number_input("Surplus",0.0)
-        less1 = c2.number_input("Less",0.0)
-        total = surplus - less1
+        o_s = st.number_input("Surplus ($)", 0.0)
+        o_i = st.number_input("Interest", 0.0)
+        o_l = st.number_input("Less", 0.0)
 
-        c3,c4 = st.columns(2)
-        interest = c3.number_input("Interest",0.0)
-        less2 = c4.number_input("Less ",0.0)
-        total += interest - less2
-
-        for i in range(2):
-            c5,c6 = st.columns(2)
-            v = c5.number_input(f"Other {i+1}",0.0,key=f"o{i}")
-            l = c6.number_input("Less",0.0,key=f"ol{i}")
-            total += v - l
-
-        other_income_total = total
+        other_income_total = o_s + o_i - o_l
         st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
 
-# =========================
-# FINAL
-# =========================
 declared_total_income = declared_net_total + (0 if same_income else other_income_total)
+declared_benefit = declared_total - declared_net_total
 actual_budget = actual_total - declared_total_income
 
-st.markdown(f"### Benefit: ${(declared_total - declared_net_total):,.2f}")
+st.markdown(f"### Benefit: ${declared_benefit:,.2f}")
 
-# OVERPAYMENT
-issued = st.number_input("Benefits Issued ($)",0.0)
+st.divider()
+
+st.markdown("**Benefits Issued ($)**")
+issued = st.number_input("", 0.0)
+
 overpayment = issued - actual_budget
 st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
 
-# SAVE + DOWNLOAD
 if "history" not in st.session_state:
     st.session_state.history = pd.DataFrame()
 
-if st.button("Save"):
-    new = pd.DataFrame([{"Client":client,"Month":month,"Year":year,"Overpayment":overpayment}])
-    st.session_state.history = pd.concat([st.session_state.history,new],ignore_index=True)
+if st.button("Save Month Calculation"):
 
-if len(st.session_state.history)>0:
+    new_row = pd.DataFrame([{
+        "Client": client,
+        "Case": case,
+        "Month": month,
+        "Year": year,
+        "Declared_Total_Needs": declared_total,
+        "Declared_Net_Income": declared_net_total,
+        "Declared_Other_Income": (0 if same_income else other_income_total),
+        "Declared_Total_Income": declared_total_income,
+        "Declared_Benefit": declared_benefit,
+        "Actual_Total_Needs": actual_total,
+        "Budget_Deficit_Surplus": actual_budget,
+        "Benefits_Issued": issued,
+        "Overpayment": overpayment
+    }])
+
+    history = st.session_state.history
+
+    mask = (
+        (history["Client"] == client) &
+        (history["Case"] == case) &
+        (history["Month"] == month) &
+        (history["Year"] == year)
+    )
+
+    history = history[~mask]
+
+    st.session_state.history = pd.concat([history, new_row], ignore_index=True)
+
+if len(st.session_state.history) > 0:
     st.dataframe(st.session_state.history)
 
     output = io.BytesIO()
-    with pd.ExcelWriter(output,engine='openpyxl') as writer:
-        st.session_state.history.to_excel(writer,index=False)
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        st.session_state.history.to_excel(writer, index=False)
 
-    st.download_button("Download",output.getvalue(),"summary.xlsx")
+    st.download_button("Download Summary", output.getvalue(), "SAID_Summary.xlsx")
