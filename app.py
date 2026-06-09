@@ -142,25 +142,23 @@ with col2_inc:
     else:
         total = 0
 
-        # ✅ Surplus
+        #  Surplus
         c1,c2 = st.columns(2)
         s = c1.number_input("Surplus",0.0, key="surplus_val")
         l = c2.number_input("Less",0.0, key="surplus_less")
         total += (s - l)
 
-        # ✅ Interest
+        #  Interest
         c3,c4 = st.columns(2)
         i_val = c3.number_input("Interest",0.0, key="interest_val")
         l2 = c4.number_input("Less ",0.0, key="interest_less")
         total += (i_val - l2)
-
-        # ✅ NEW ROW 1
+        
         c5,c6 = st.columns(2)
         o1 = c5.number_input("Other 1",0.0, key="other1_val")
         o1_less = c6.number_input("Less ",0.0, key="other1_less")
         total += (o1 - o1_less)
 
-        # ✅ NEW ROW 2
         c7,c8 = st.columns(2)
         o2 = c7.number_input("Other 2",0.0, key="other2_val")
         o2_less = c8.number_input("Less ",0.0, key="other2_less")
