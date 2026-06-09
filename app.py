@@ -43,7 +43,22 @@ Reference["Amount"] = Reference["Amount"].astype(float)
 def assign_group(b):
     if "LIVING" in b: return "LIVING"
     if "APPROVED HOME" in b: return "APPROVED HOME"
+    if "CLOTHING" in b: return "CLOTHING"
+    if "SPECIAL CARE" in b: return "S/C/H"
     if "ROOM" in b: return "BOARD & ROOM"
+    if "TRUST" in b or "SN/TRUS" in b: return "SN/TRUS"
+    if "CHILD BENEFIT" in b: return "CHILD BENEFIT"
+    if "DISABILITY ALLOWANCE" in b: return "DIS/ALL"
+    if "FAMILY HOMES" in b: return "FAMILY HOMES"
+    if "EDUCATION" in b: return "EDUCATION"
+    if "HOUSEHOLD ALLOWANCE" in b: return "HOUSEHOLD ALLOWANCE"
+    if "LAUNDRY" in b: return "LAUNDRY"
+    if "MEALS" in b: return "MEALS"
+    if "PERSONAL CARE" in b: return "PC/HOME"
+    if "SALVATION ARMY" in b: return "SALVATION ARMY"
+    if "SINGLE PARENT HOME" in b: return "SINGLE PARENT HOME"
+    if "TRAINING" in b: return "TRAINING"
+    if "YWCA" in b: return "YWCA"
     return b
 
 Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
@@ -65,6 +80,8 @@ def get_amounts(comm, group, year, month):
     df = Reference[
         (Reference["Group"] == group) &
         ((Reference["Tier"] == tier) | (Reference["Tier"] == "ALL")) &
+        ((Reference["Adults"] == adults) | (Reference["Adults"].isna())) &
+        (Reference["Children"] == children) &
         (Reference["Start_Date"] <= date) &
         (Reference["End_Date"] >= date)
     ]
@@ -76,32 +93,23 @@ def get_amounts(comm, group, year, month):
 # =========================
 st.title("SAID TRANSITION CALCULATOR")
 
-c1,c2,c3,c4,c5 = st.columns(5)
+c1,c2,c3,c4,c5,c6,c7 = st.columns(7)
 
 client = c1.text_input("Client")
 case = c2.text_input("Case #")
 community = c3.selectbox("Community", Community["Community"].unique())
-month = c4.selectbox("Month", ["January","February","March","April"])
-year = c5.selectbox("Year", [2024,2025,2026])
+
+month = c4.selectbox("Benefit Month", [
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
+])
+
+year = c5.selectbox("Benefit Year", list(range(2020, 2027)))
+adults = c6.selectbox("Adults", list(range(1,6)))
+children = c7.selectbox("Children", list(range(0,27)))
 
 # =========================
-# BENEFITS ✅ FIXED
-# =========================
-
-# ✅ Checkbox ABOVE both
-same_actual = st.checkbox("Same as Declared", True)
-
-# ✅ Headers aligned
-h1, h2 = st.columns(2)
-
-with h1:
-    st.markdown("### Declared")
-
-with h2:
-    st.markdown("### Actual")
-
-# =========================
-# TABLE BUILDER
+# BENEFITS
 # =========================
 def build_table(prefix):
     total = 0
@@ -114,8 +122,8 @@ def build_table(prefix):
         if b == "OTHER":
             for j in range(10):
                 c3,c4 = st.columns(2)
-                name = c3.text_input("", key=f"{prefix}_name_{i}_{j}")
-                val = c4.number_input("Amount", 0.0, key=f"{prefix}_val_{i}_{j}")
+                name = c3.text_input("", key=f"{prefix}_custom_{i}_{j}")
+                val = c4.number_input("Amount ($)", 0.0, key=f"{prefix}_other_{i}_{j}")
                 if name.strip():
                     total += val
         else:
@@ -124,22 +132,26 @@ def build_table(prefix):
             if opts:
                 val = c2.selectbox("", opts, key=f"{prefix}_amt_{i}")
             else:
-                val = c2.number_input("Amount", 0.0, key=f"{prefix}_num_{i}")
+                val = c2.number_input("Amount ($)", 0.0, key=f"{prefix}_num_{i}")
 
             total += float(val)
 
     return total
 
-# =========================
-# DATA ROW
-# =========================
-col1, col2 = st.columns(2)
+col1,_,col2 = st.columns([1,0.3,1])
 
+# Declared
 with col1:
+    st.subheader("Declared")
     declared_total = build_table("d")
     st.markdown(f"### Total Declared: ${declared_total:,.2f}")
 
+# ✅ Actual (LOCAL CONTROL)
 with col2:
+    st.subheader("Actual")
+
+    same_actual = st.checkbox("Same as Declared", value=True)
+
     if same_actual:
         actual_total = declared_total
         st.info("Using declared values")
@@ -159,54 +171,39 @@ col1_inc,_,col2_inc = st.columns([1,0.3,1])
 
 # Declared Income
 with col1_inc:
+    st.markdown("**Declared Income**")
     declared_net_total = 0
 
     for i in range(4):
         c1,c2 = st.columns(2)
-        net = c1.number_input(f"Net {i+1}", 0.0, key=f"net{i}")
-        less = c2.number_input("Less", 0.0, key=f"less{i}")
-        declared_net_total += (net - less)
+        net_val = c1.number_input(f"Net Income {i+1} ($)", 0.0, key=f"d_net_{i}")
+        less_val = c2.number_input(f"Less Exemption {i+1} ($)", 0.0, key=f"d_less_{i}")
+        declared_net_total += (net_val - less_val)
 
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
-# ✅ Other Income (checkbox ABOVE ✅)
+# ✅ Other Income (LOCAL CONTROL)
 with col2_inc:
-
-    same_income = st.checkbox("Same as Declared Income", True)
-
     st.markdown("**Other Income**")
+
+    same_income = st.checkbox("Same as Declared Income", value=True)
 
     if same_income:
         other_income_total = 0
         st.info("No additional income")
     else:
-        other_income_total = 0
+        o_s = st.number_input("Surplus ($)", 0.0)
+        o_i = st.number_input("Interest", 0.0)
+        o_l = st.number_input("Less", 0.0)
 
-        # Surplus
-        c1, c2 = st.columns(2)
-        s = c1.number_input("Surplus", 0.0)
-        l = c2.number_input("Less", 0.0)
-        other_income_total += (s - l)
-
-        # Interest
-        c3, c4 = st.columns(2)
-        i = c3.number_input("Interest", 0.0)
-        l2 = c4.number_input("Less", 0.0)
-        other_income_total += (i - l2)
-
-        # Others with LESS ✅
-        for i in range(2):
-            c5, c6 = st.columns(2)
-            v = c5.number_input(f"Other {i+1}", 0.0, key=f"o{i}")
-            l = c6.number_input("Less", 0.0, key=f"ol{i}")
-            other_income_total += (v - l)
-
+        other_income_total = o_s + o_i - o_l
         st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
 
 # =========================
 # FINAL
 # =========================
 declared_total_income = declared_net_total + (0 if same_income else other_income_total)
+
 declared_benefit = declared_total - declared_net_total
 actual_budget = actual_total - declared_total_income
 
@@ -215,6 +212,8 @@ st.markdown(f"### Benefit: ${declared_benefit:,.2f}")
 # =========================
 # OVERPAYMENT
 # =========================
+st.divider()
+
 st.markdown("**Benefits Issued ($)**")
 issued = st.number_input("", 0.0)
 
@@ -240,22 +239,28 @@ if st.button("Save Month Calculation"):
         "Declared_Total_Income": declared_total_income,
         "Declared_Benefit": declared_benefit,
         "Actual_Total_Needs": actual_total,
+        "Actual_Total_Income": declared_total_income,
         "Budget_Deficit_Surplus": actual_budget,
         "Benefits_Issued": issued,
         "Overpayment": overpayment
     }])
 
-    hist = st.session_state.history
+    history = st.session_state.history
 
     mask = (
-        (hist["Client"] == client) &
-        (hist["Case"] == case) &
-        (hist["Month"] == month) &
-        (hist["Year"] == year)
+        (history["Client"] == client) &
+        (history["Case"] == case) &
+        (history["Month"] == month) &
+        (history["Year"] == year)
     )
 
-    hist = hist[~mask]
-    st.session_state.history = pd.concat([hist, new_row], ignore_index=True)
+    if mask.any():
+        history = history[~mask]
+        st.success("Record updated")
+    else:
+        st.success("Record saved")
+
+    st.session_state.history = pd.concat([history, new_row], ignore_index=True)
 
 # =========================
 # DISPLAY + DOWNLOAD
@@ -271,4 +276,8 @@ if len(st.session_state.history) > 0:
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         st.session_state.history.to_excel(writer, index=False)
 
-    st.download_button("Download Summary", output.getvalue(), "SAID_Summary.xlsx")
+    st.download_button(
+        "Download Summary",
+        data=output.getvalue(),
+        file_name="SAID_Summary.xlsx"
+    )
