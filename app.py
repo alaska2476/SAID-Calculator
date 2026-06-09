@@ -134,7 +134,7 @@ with col1_inc:
 
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
-# Other Income 
+# New Income 
 with col2_inc:
     if same_income:
         other_income_total = 0
@@ -166,7 +166,7 @@ with col2_inc:
 
         other_income_total = total
 
-        st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
+        st.markdown(f"**Total New Income: ${other_income_total:,.2f}**")
 
 # =========================
 # FINAL
