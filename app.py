@@ -279,5 +279,4 @@ if len(st.session_state.history) > 0:
     st.download_button(
         "Download Summary",
         data=output.getvalue(),
-        file_name="SAID_Summary.xlsx"
-    ) SAME AS DELARED SHOULD GABOVEB ACTUAL AS SHWO IN IN THE YELLOW MARK  SUCH THAT THE OTHER ROW WILL MARCH EACH OTHER
+        file_name="SAID_Summary.xlsx")
