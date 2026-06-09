@@ -182,35 +182,37 @@ with col1_inc:
 
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
-# ✅ OTHER INCOME (FULL FIXED LOGIC ✅)
 with col2_inc:
-    st.markdown("**Other Income**")
 
-    same_income = st.checkbox("Same as Declared Income", True)
+    # ✅ CHECKBOX ON TOP (same as Actual ✅)
+    same_income = st.checkbox("Same as Declared Income", True, key="same_income")
+
+    st.markdown("**Other Income**")
 
     if same_income:
         other_income_total = 0
         st.info("No additional income")
+
     else:
         other_income_total = 0
 
-        # Surplus
+        # ✅ Surplus
         c1, c2 = st.columns(2)
         surplus = c1.number_input("Surplus", 0.0)
         surplus_less = c2.number_input("Less", 0.0)
         other_income_total += (surplus - surplus_less)
 
-        # Interest
+        # ✅ Interest
         c3, c4 = st.columns(2)
         interest = c3.number_input("Interest", 0.0)
-        interest_less = c4.number_input("Less ", 0.0)
+        interest_less = c4.number_input("Less", 0.0)
         other_income_total += (interest - interest_less)
 
-        # Other rows
+        # ✅ Other rows (same logic)
         for i in range(3):
             c5, c6 = st.columns(2)
             val = c5.number_input(f"Other {i+1}", 0.0, key=f"other_val_{i}")
-            less = c6.number_input("Less ", 0.0, key=f"other_less_{i}")
+            less = c6.number_input("Less", 0.0, key=f"other_less_{i}")
             other_income_total += (val - less)
 
         st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
