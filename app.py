@@ -43,22 +43,7 @@ Reference["Amount"] = Reference["Amount"].astype(float)
 def assign_group(b):
     if "LIVING" in b: return "LIVING"
     if "APPROVED HOME" in b: return "APPROVED HOME"
-    if "CLOTHING" in b: return "CLOTHING"
-    if "SPECIAL CARE" in b: return "S/C/H"
     if "ROOM" in b: return "BOARD & ROOM"
-    if "TRUST" in b or "SN/TRUS" in b: return "SN/TRUS"
-    if "CHILD BENEFIT" in b: return "CHILD BENEFIT"
-    if "DISABILITY ALLOWANCE" in b: return "DIS/ALL"
-    if "FAMILY HOMES" in b: return "FAMILY HOMES"
-    if "EDUCATION" in b: return "EDUCATION"
-    if "HOUSEHOLD ALLOWANCE" in b: return "HOUSEHOLD ALLOWANCE"
-    if "LAUNDRY" in b: return "LAUNDRY"
-    if "MEALS" in b: return "MEALS"
-    if "PERSONAL CARE" in b: return "PC/HOME"
-    if "SALVATION ARMY" in b: return "SALVATION ARMY"
-    if "SINGLE PARENT HOME" in b: return "SINGLE PARENT HOME"
-    if "TRAINING" in b: return "TRAINING"
-    if "YWCA" in b: return "YWCA"
     return b
 
 Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
@@ -80,8 +65,6 @@ def get_amounts(comm, group, year, month):
     df = Reference[
         (Reference["Group"] == group) &
         ((Reference["Tier"] == tier) | (Reference["Tier"] == "ALL")) &
-        ((Reference["Adults"] == adults) | (Reference["Adults"].isna())) &
-        (Reference["Children"] == children) &
         (Reference["Start_Date"] <= date) &
         (Reference["End_Date"] >= date)
     ]
@@ -93,23 +76,32 @@ def get_amounts(comm, group, year, month):
 # =========================
 st.title("SAID TRANSITION CALCULATOR")
 
-c1,c2,c3,c4,c5,c6,c7 = st.columns(7)
+c1,c2,c3,c4,c5 = st.columns(5)
 
 client = c1.text_input("Client")
 case = c2.text_input("Case #")
 community = c3.selectbox("Community", Community["Community"].unique())
-
-month = c4.selectbox("Benefit Month", [
-    "January","February","March","April","May","June",
-    "July","August","September","October","November","December"
-])
-
-year = c5.selectbox("Benefit Year", list(range(2020, 2027)))
-adults = c6.selectbox("Adults", list(range(1,6)))
-children = c7.selectbox("Children", list(range(0,27)))
+month = c4.selectbox("Month", ["January","February","March","April"])
+year = c5.selectbox("Year", [2024,2025,2026])
 
 # =========================
-# BENEFITS
+# BENEFITS ✅ FIXED
+# =========================
+
+# ✅ Checkbox ABOVE both
+same_actual = st.checkbox("Same as Declared", True)
+
+# ✅ Headers aligned
+h1, h2 = st.columns(2)
+
+with h1:
+    st.markdown("### Declared")
+
+with h2:
+    st.markdown("### Actual")
+
+# =========================
+# TABLE BUILDER
 # =========================
 def build_table(prefix):
     total = 0
@@ -122,8 +114,8 @@ def build_table(prefix):
         if b == "OTHER":
             for j in range(10):
                 c3,c4 = st.columns(2)
-                name = c3.text_input("", key=f"{prefix}_custom_{i}_{j}")
-                val = c4.number_input("Amount ($)", 0.0, key=f"{prefix}_other_{i}_{j}")
+                name = c3.text_input("", key=f"{prefix}_name_{i}_{j}")
+                val = c4.number_input("Amount", 0.0, key=f"{prefix}_val_{i}_{j}")
                 if name.strip():
                     total += val
         else:
@@ -132,29 +124,25 @@ def build_table(prefix):
             if opts:
                 val = c2.selectbox("", opts, key=f"{prefix}_amt_{i}")
             else:
-                val = c2.number_input("Amount ($)", 0.0, key=f"{prefix}_num_{i}")
+                val = c2.number_input("Amount", 0.0, key=f"{prefix}_num_{i}")
 
             total += float(val)
 
     return total
 
-col1,_,col2 = st.columns([1,0.3,1])
+# =========================
+# DATA ROW
+# =========================
+col1, col2 = st.columns(2)
 
-# ✅ DECLARED
 with col1:
-    st.subheader("Declared")
     declared_total = build_table("d")
     st.markdown(f"### Total Declared: ${declared_total:,.2f}")
 
-# ✅ ACTUAL (CHECKBOX ON TOP ✅)
 with col2:
-    same_actual = st.checkbox("Same as Declared", True)
-
-    st.subheader("Actual")
-
     if same_actual:
         actual_total = declared_total
-        st.info("Actual total is using Declared total")
+        st.info("Using declared values")
     else:
         actual_total = build_table("a")
 
@@ -169,24 +157,24 @@ st.subheader("INCOME")
 
 col1_inc,_,col2_inc = st.columns([1,0.3,1])
 
-# DECLARED INCOME
+# Declared Income
 with col1_inc:
-    st.markdown("**Declared Income**")
     declared_net_total = 0
 
     for i in range(4):
         c1,c2 = st.columns(2)
-        net = c1.number_input(f"Net Income {i+1}", 0.0, key=f"d_net_{i}")
-        less = c2.number_input("Less", 0.0, key=f"d_less_{i}")
+        net = c1.number_input(f"Net {i+1}", 0.0, key=f"net{i}")
+        less = c2.number_input("Less", 0.0, key=f"less{i}")
         declared_net_total += (net - less)
 
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
-# ✅ OTHER INCOME (FULL FIXED LOGIC ✅)
+# ✅ Other Income (checkbox ABOVE ✅)
 with col2_inc:
-    st.markdown("**Other Income**")
 
     same_income = st.checkbox("Same as Declared Income", True)
+
+    st.markdown("**Other Income**")
 
     if same_income:
         other_income_total = 0
@@ -196,22 +184,22 @@ with col2_inc:
 
         # Surplus
         c1, c2 = st.columns(2)
-        surplus = c1.number_input("Surplus", 0.0)
-        surplus_less = c2.number_input("Less", 0.0)
-        other_income_total += (surplus - surplus_less)
+        s = c1.number_input("Surplus", 0.0)
+        l = c2.number_input("Less", 0.0)
+        other_income_total += (s - l)
 
         # Interest
         c3, c4 = st.columns(2)
-        interest = c3.number_input("Interest", 0.0)
-        interest_less = c4.number_input("Less ", 0.0)
-        other_income_total += (interest - interest_less)
+        i = c3.number_input("Interest", 0.0)
+        l2 = c4.number_input("Less", 0.0)
+        other_income_total += (i - l2)
 
-        # Other rows
+        # Others with LESS ✅
         for i in range(2):
             c5, c6 = st.columns(2)
-            val = c5.number_input(f"Other {i+1}", 0.0, key=f"other_val_{i}")
-            less = c6.number_input("Less ", 0.0, key=f"other_less_{i}")
-            other_income_total += (val - less)
+            v = c5.number_input(f"Other {i+1}", 0.0, key=f"o{i}")
+            l = c6.number_input("Less", 0.0, key=f"ol{i}")
+            other_income_total += (v - l)
 
         st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
 
@@ -257,17 +245,17 @@ if st.button("Save Month Calculation"):
         "Overpayment": overpayment
     }])
 
-    history = st.session_state.history
+    hist = st.session_state.history
 
     mask = (
-        (history["Client"] == client) &
-        (history["Case"] == case) &
-        (history["Month"] == month) &
-        (history["Year"] == year)
+        (hist["Client"] == client) &
+        (hist["Case"] == case) &
+        (hist["Month"] == month) &
+        (hist["Year"] == year)
     )
 
-    history = history[~mask]
-    st.session_state.history = pd.concat([history, new_row], ignore_index=True)
+    hist = hist[~mask]
+    st.session_state.history = pd.concat([hist, new_row], ignore_index=True)
 
 # =========================
 # DISPLAY + DOWNLOAD
