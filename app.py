@@ -207,7 +207,7 @@ with col2_inc:
         other_income_total += (interest - interest_less)
 
         # Other rows
-        for i in range(3):
+        for i in range(2):
             c5, c6 = st.columns(2)
             val = c5.number_input(f"Other {i+1}", 0.0, key=f"other_val_{i}")
             less = c6.number_input("Less ", 0.0, key=f"other_less_{i}")
