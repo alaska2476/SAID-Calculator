@@ -8,13 +8,6 @@ import io
 # =========================
 st.set_page_config(layout="wide")
 
-st.markdown("""
-<style>
-.block-container {padding-top:0.8rem;}
-h1 {text-align:center;}
-</style>
-""", unsafe_allow_html=True)
-
 # =========================
 # LOAD DATA
 # =========================
@@ -37,16 +30,7 @@ Reference["Benefit Type"] = Reference["Benefit"].str.upper().str.strip()
 Reference["Tier"] = Reference["Tier"].fillna("ALL").str.upper()
 Reference["Amount"] = Reference["Amount"].astype(float)
 
-# =========================
-# GROUPING
-# =========================
-def assign_group(b):
-    if "LIVING" in b: return "LIVING"
-    if "APPROVED HOME" in b: return "APPROVED HOME"
-    if "ROOM" in b: return "BOARD & ROOM"
-    return b
-
-Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
+Reference["Group"] = Reference["Benefit Type"]
 
 # =========================
 # FUNCTIONS
@@ -65,8 +49,6 @@ def get_amounts(comm, group, year, month):
     df = Reference[
         (Reference["Group"] == group) &
         ((Reference["Tier"] == tier) | (Reference["Tier"] == "ALL")) &
-        ((Reference["Adults"] == adults) | (Reference["Adults"].isna())) &
-        (Reference["Children"] == children) &
         (Reference["Start_Date"] <= date) &
         (Reference["End_Date"] >= date)
     ]
@@ -84,12 +66,8 @@ client = c1.text_input("Client")
 case = c2.text_input("Case #")
 community = c3.selectbox("Community", Community["Community"].unique())
 
-month = c4.selectbox("Benefit Month", [
-    "January","February","March","April","May","June",
-    "July","August","September","October","November","December"
-])
-
-year = c5.selectbox("Benefit Year", list(range(2020, 2027)))
+month = c4.selectbox("Month", ["January","February","March","April","May","June","July","August","September","October","November","December"])
+year = c5.selectbox("Year", list(range(2020, 2027)))
 adults = c6.selectbox("Adults", list(range(1,6)))
 children = c7.selectbox("Children", list(range(0,27)))
 
@@ -107,19 +85,19 @@ def build_table(prefix):
         if b == "OTHER":
             for j in range(10):
                 c3,c4 = st.columns(2)
-                name = c3.text_input("", key=f"{prefix}_custom_{i}_{j}")
-                val = c4.number_input("Amount ($)", 0.0, key=f"{prefix}_other_{i}_{j}")
+                name = c3.text_input("", key=f"{prefix}_name_{i}_{j}")
+                val = c4.number_input("Amount", 0.0, key=f"{prefix}_val_{i}_{j}")
                 if name.strip():
                     total += val
         else:
             opts = get_amounts(community, b, year, month)
-            val = c2.selectbox("", opts, key=f"{prefix}_amt_{i}") if opts else c2.number_input("Amount ($)", 0.0, key=f"{prefix}_num_{i}")
+            val = c2.selectbox("", opts, key=f"{prefix}_amt_{i}") if opts else c2.number_input("Amount", 0.0, key=f"{prefix}_num_{i}")
             total += float(val)
 
     return total
 
 # =========================
-# ✅ BENEFITS
+# BENEFITS
 # =========================
 h1, _, h2 = st.columns([1,0.3,1])
 with h1: st.subheader("Declared")
@@ -133,18 +111,17 @@ col1,_,col2 = st.columns([1,0.3,1])
 
 with col1:
     declared_total = build_table("d")
-    st.markdown(f"### Total Declared: ${declared_total:,.2f}")
 
 with col2:
     actual_total = declared_total if same_actual else build_table("a")
-    if same_actual:
-        st.info("Using declared values")
-    st.markdown(f"### Total Actual: ${actual_total:,.2f}")
+
+st.markdown(f"### Total Declared: ${declared_total:,.2f}")
+st.markdown(f"### Total Actual: ${actual_total:,.2f}")
 
 st.divider()
 
 # =========================
-# ✅ INCOME
+# INCOME
 # =========================
 st.subheader("INCOME")
 
@@ -158,22 +135,17 @@ with cb2:
 
 col1_inc,_,col2_inc = st.columns([1,0.3,1])
 
-# Declared Income
+# Declared
 with col1_inc:
     declared_net_total = 0
     for i in range(4):
         c1,c2 = st.columns(2)
-        declared_net_total += (
-            c1.number_input(f"Net Income {i+1}",0.0,key=f"d_net_{i}") -
-            c2.number_input("Less",0.0,key=f"d_less_{i}")
-        )
-    st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
+        declared_net_total += c1.number_input(f"Net {i}",0.0,key=f"net{i}") - c2.number_input("Less",0.0,key=f"less{i}")
 
-# Other Income
+# Other
 with col2_inc:
     if same_income:
         other_income_total = 0
-        st.info("No additional income")
     else:
         total = 0
         c1,c2 = st.columns(2)
@@ -182,31 +154,22 @@ with col2_inc:
         c3,c4 = st.columns(2)
         total += c3.number_input("Interest",0.0) - c4.number_input("Less ",0.0)
 
-        for i in range(2):
-            c5,c6 = st.columns(2)
-            total += c5.number_input(f"Other {i+1}",0.0,key=f"o{i}") - c6.number_input("Less",0.0,key=f"ol{i}")
-
         other_income_total = total
-        st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
 
 # =========================
-# FINAL
+# FINAL CALC
 # =========================
 declared_total_income = declared_net_total + (0 if same_income else other_income_total)
 declared_benefit = declared_total - declared_net_total
 actual_budget = actual_total - declared_total_income
 
-st.markdown(f"### Benefit: ${declared_benefit:,.2f}")
-
-# =========================
-# OVERPAYMENT
-# =========================
 issued = st.number_input("Benefits Issued ($)",0.0)
 overpayment = issued - actual_budget
+
 st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
 
 # =========================
-# ✅ SAVE (FULL FIELDS)
+# SAVE (FULL + OVERWRITE)
 # =========================
 if "history" not in st.session_state:
     st.session_state.history = pd.DataFrame(columns=[
@@ -237,30 +200,26 @@ if st.button("Save Month Calculation"):
         "Overpayment": overpayment
     }])
 
-    hist = st.session_state.history
+    history = st.session_state.history.copy()
 
-    if not hist.empty:
+    if not history.empty:
         mask = (
-            (hist["Client"] == client) &
-            (hist["Case"] == case) &
-            (hist["Month"] == month) &
-            (hist["Year"] == year)
+            (history["Client"] == client) &
+            (history["Case"] == case) &
+            (history["Month"] == month) &
+            (history["Year"] == year)
         )
-        hist = hist[~mask]
+        history = history[~mask]
 
-    st.session_state.history = pd.concat([hist, new_row], ignore_index=True)
+    st.session_state.history = pd.concat([history, new_row], ignore_index=True)
 
 # =========================
 # DISPLAY + DOWNLOAD
 # =========================
 if len(st.session_state.history) > 0:
-
     st.dataframe(st.session_state.history)
 
-    st.markdown(f"**Total Overpayment: ${st.session_state.history['Overpayment'].sum():,.2f}**")
-
     output = io.BytesIO()
-
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         st.session_state.history.to_excel(writer, index=False)
 
