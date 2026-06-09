@@ -106,9 +106,7 @@ month = c4.selectbox("Benefit Month", [
 
 year = c5.selectbox("Benefit Year", list(range(2020, 2027)))
 adults = c6.selectbox("Adults", list(range(1,6)))
-children = c7.selectbox("Children", list(range(1,27)))
-
-same = st.checkbox("Same as Declared", value=True)
+children = c7.selectbox("Children", list(range(0,27)))
 
 # =========================
 # BENEFITS
@@ -142,13 +140,17 @@ def build_table(prefix):
 
 col1,_,col2 = st.columns([1,0.3,1])
 
+# ✅ Declared
 with col1:
     st.subheader("Declared")
     declared_total = build_table("d")
     st.markdown(f"### Total Declared: ${declared_total:,.2f}")
 
+# ✅ Actual (CHECKBOX INSIDE ✅)
 with col2:
     st.subheader("Actual")
+
+    same = st.checkbox("Same as Declared", value=True, key="same_actual")
 
     if same:
         actual_total = declared_total
@@ -165,10 +167,9 @@ st.divider()
 # =========================
 st.subheader("INCOME")
 
-income_same = st.checkbox("Same as Declared Income", value=True)
+col1_inc,_,col2_inc = st.columns([1,0.3,1])
 
-col1_inc,_,col2_inc = st.columns([1, 0.3, 1])
-
+# ✅ Declared Income
 with col1_inc:
     st.markdown("**Declared Income**")
     declared_net_total = 0
@@ -181,8 +182,11 @@ with col1_inc:
 
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
+# ✅ Other Income (CHECKBOX INSIDE ✅)
 with col2_inc:
     st.markdown("**Other Income**")
+
+    income_same = st.checkbox("Same as Declared Income", value=True, key="same_income")
 
     if income_same:
         other_income_total = 0
@@ -217,38 +221,48 @@ overpayment = issued - actual_budget
 st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
 
 # =========================
-# SAVE + DOWNLOAD
+# SAVE + OVERWRITE + DOWNLOAD ✅
 # =========================
 if "history" not in st.session_state:
     st.session_state.history = pd.DataFrame()
 
 if st.button("Save Month Calculation"):
+
     new_row = pd.DataFrame([{
         "Client": client,
         "Case": case,
         "Month": month,
         "Year": year,
-
         "Declared_Total_Needs": declared_total,
         "Declared_Net_Income": declared_net_total,
         "Declared_Other_Income": (0 if income_same else other_income_total),
         "Declared_Total_Income": declared_total_income,
         "Declared_Benefit": declared_benefit,
-
         "Actual_Total_Needs": actual_total,
         "Actual_Total_Income": declared_total_income,
         "Budget_Deficit_Surplus": actual_budget,
-
         "Benefits_Issued": issued,
         "Overpayment": overpayment
     }])
 
-    st.session_state.history = pd.concat(
-        [st.session_state.history, new_row],
-        ignore_index=True
+    history = st.session_state.history
+
+    mask = (
+        (history["Client"] == client) &
+        (history["Case"] == case) &
+        (history["Month"] == month) &
+        (history["Year"] == year)
     )
 
-    st.success(f"Saved {client} - {month} {year}")
+    if mask.any():
+        history = history[~mask]
+        history = pd.concat([history, new_row], ignore_index=True)
+        st.success(f"Updated {client} - {month} {year}")
+    else:
+        history = pd.concat([history, new_row], ignore_index=True)
+        st.success(f"Saved {client} - {month} {year}")
+
+    st.session_state.history = history
 
 # =========================
 # DISPLAY + DOWNLOAD
@@ -260,19 +274,13 @@ if len(st.session_state.history) > 0:
     total = st.session_state.history["Overpayment"].sum()
     st.markdown(f"**Total Overpayment: ${total:,.2f}**")
 
-    # Excel Download
     output = io.BytesIO()
 
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        st.session_state.history.to_excel(
-            writer,
-            index=False,
-            sheet_name="SAID Calculations"
-        )
+        st.session_state.history.to_excel(writer, index=False)
 
     st.download_button(
-        label="Download Summary",
+        "Download Summary",
         data=output.getvalue(),
-        file_name=f"{client}_{month}_{year}_SAID.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        file_name=f"{client}_SAID.xlsx"
     )
