@@ -140,21 +140,21 @@ def build_table(prefix):
 
 col1,_,col2 = st.columns([1,0.3,1])
 
-# Declared
+# ✅ DECLARED
 with col1:
     st.subheader("Declared")
     declared_total = build_table("d")
     st.markdown(f"### Total Declared: ${declared_total:,.2f}")
 
-# ✅ Actual (LOCAL CONTROL)
+# ✅ ACTUAL (CHECKBOX ON TOP ✅)
 with col2:
-    st.subheader("Actual")
+    same_actual = st.checkbox("Same as Declared", True)
 
-    same_actual = st.checkbox("Same as Declared", value=True)
+    st.subheader("Actual")
 
     if same_actual:
         actual_total = declared_total
-        st.info("Using declared values")
+        st.info("Actual total is using Declared total")
     else:
         actual_total = build_table("a")
 
@@ -169,41 +169,56 @@ st.subheader("INCOME")
 
 col1_inc,_,col2_inc = st.columns([1,0.3,1])
 
-# Declared Income
+# DECLARED INCOME
 with col1_inc:
     st.markdown("**Declared Income**")
     declared_net_total = 0
 
     for i in range(4):
         c1,c2 = st.columns(2)
-        net_val = c1.number_input(f"Net Income {i+1} ($)", 0.0, key=f"d_net_{i}")
-        less_val = c2.number_input(f"Less Exemption {i+1} ($)", 0.0, key=f"d_less_{i}")
-        declared_net_total += (net_val - less_val)
+        net = c1.number_input(f"Net Income {i+1}", 0.0, key=f"d_net_{i}")
+        less = c2.number_input("Less", 0.0, key=f"d_less_{i}")
+        declared_net_total += (net - less)
 
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
-# ✅ Other Income (LOCAL CONTROL)
+# ✅ OTHER INCOME (FULL FIXED LOGIC ✅)
 with col2_inc:
     st.markdown("**Other Income**")
 
-    same_income = st.checkbox("Same as Declared Income", value=True)
+    same_income = st.checkbox("Same as Declared Income", True)
 
     if same_income:
         other_income_total = 0
         st.info("No additional income")
     else:
-        o_s = st.number_input("Surplus ($)", 0.0)
-        o_i = st.number_input("Interest", 0.0)
-        o_l = st.number_input("Less", 0.0)
+        other_income_total = 0
 
-        other_income_total = o_s + o_i - o_l
+        # Surplus
+        c1, c2 = st.columns(2)
+        surplus = c1.number_input("Surplus", 0.0)
+        surplus_less = c2.number_input("Less", 0.0)
+        other_income_total += (surplus - surplus_less)
+
+        # Interest
+        c3, c4 = st.columns(2)
+        interest = c3.number_input("Interest", 0.0)
+        interest_less = c4.number_input("Less ", 0.0)
+        other_income_total += (interest - interest_less)
+
+        # Other rows
+        for i in range(2):
+            c5, c6 = st.columns(2)
+            val = c5.number_input(f"Other {i+1}", 0.0, key=f"other_val_{i}")
+            less = c6.number_input("Less ", 0.0, key=f"other_less_{i}")
+            other_income_total += (val - less)
+
         st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
 
 # =========================
 # FINAL
 # =========================
 declared_total_income = declared_net_total + (0 if same_income else other_income_total)
-
 declared_benefit = declared_total - declared_net_total
 actual_budget = actual_total - declared_total_income
 
@@ -212,8 +227,6 @@ st.markdown(f"### Benefit: ${declared_benefit:,.2f}")
 # =========================
 # OVERPAYMENT
 # =========================
-st.divider()
-
 st.markdown("**Benefits Issued ($)**")
 issued = st.number_input("", 0.0)
 
@@ -239,7 +252,6 @@ if st.button("Save Month Calculation"):
         "Declared_Total_Income": declared_total_income,
         "Declared_Benefit": declared_benefit,
         "Actual_Total_Needs": actual_total,
-        "Actual_Total_Income": declared_total_income,
         "Budget_Deficit_Surplus": actual_budget,
         "Benefits_Issued": issued,
         "Overpayment": overpayment
@@ -254,12 +266,7 @@ if st.button("Save Month Calculation"):
         (history["Year"] == year)
     )
 
-    if mask.any():
-        history = history[~mask]
-        st.success("Record updated")
-    else:
-        st.success("Record saved")
-
+    history = history[~mask]
     st.session_state.history = pd.concat([history, new_row], ignore_index=True)
 
 # =========================
@@ -276,7 +283,4 @@ if len(st.session_state.history) > 0:
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         st.session_state.history.to_excel(writer, index=False)
 
-    st.download_button(
-        "Download Summary",
-        data=output.getvalue(),
-        file_name="SAID_Summary.xlsx")
+    st.download_button("Download Summary", output.getvalue(), "SAID_Summary.xlsx")
