@@ -120,7 +120,7 @@ def build_table(prefix):
         b = c1.selectbox("", [""] + benefits + ["OTHER"], key=f"{prefix}_b_{i}")
 
         if b == "OTHER":
-            for j in range(10):  # ✅ 10 rows now
+            for j in range(10):  # ✅ 10 rows
                 c3,c4 = st.columns(2)
                 name = c3.text_input("", key=f"{prefix}_custom_{i}_{j}")
                 val = c4.number_input("Amount ($)", 0.0, key=f"{prefix}_other_{i}_{j}")
@@ -140,13 +140,11 @@ def build_table(prefix):
 
 col1,_,col2 = st.columns([1,0.3,1])
 
-# Declared
 with col1:
     st.subheader("Declared")
     declared_total = build_table("d")
     st.markdown(f"### Total Declared: ${declared_total:,.2f}")
 
-# Actual
 with col2:
     st.subheader("Actual")
 
@@ -182,42 +180,41 @@ with col1_inc:
 
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
-#  Other Income 
+# ✅ Other Income (FULL LOGIC)
 with col2_inc:
     st.markdown("**Other Income**")
 
-    same_income = st.checkbox("Same as Declared Income", value=True, key="same_income")
+    same_income = st.checkbox("Same as Declared Income", True)
 
     if same_income:
         other_income_total = 0
-        st.info("Other Income matches declared")
-
+        st.info("No additional income")
     else:
         other_income_total = 0
 
-        # ✅ ROW 1: Surplus
+        # Surplus
         c1, c2 = st.columns(2)
-        surplus = c1.number_input("Surplus ($)", 0.0)
-        surplus_less = c2.number_input("Less ($)", 0.0)
+        surplus = c1.number_input("Surplus", 0.0)
+        surplus_less = c2.number_input("Less", 0.0)
         other_income_total += (surplus - surplus_less)
 
-        # ✅ ROW 2: Interest
+        # Interest
         c3, c4 = st.columns(2)
-        interest = c3.number_input("Interest ($)", 0.0)
-        interest_less = c4.number_input("Less ($)", 0.0)
+        interest = c3.number_input("Interest", 0.0)
+        interest_less = c4.number_input("Less ", 0.0)
         other_income_total += (interest - interest_less)
 
-        # ✅ ROW 3+: Other items WITH LESS
+        # Other rows WITH LESS ✅
         for i in range(3):
             c5, c6 = st.columns(2)
 
-            val = c5.number_input(f"Other {i+1} ($)", 0.0, key=f"other_val_{i}")
-            less = c6.number_input("Less ($)", 0.0, key=f"other_less_{i}")
+            val = c5.number_input(f"Other {i+1}", 0.0, key=f"other_val_{i}")
+            less = c6.number_input("Less ", 0.0, key=f"other_less_{i}")
 
-            # ✅ SAME LOGIC: value - less
             other_income_total += (val - less)
 
         st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
+
 # =========================
 # FINAL
 # =========================
@@ -267,6 +264,7 @@ if st.button("Save Month Calculation"):
     )
 
     history = history[~mask]
+
     st.session_state.history = pd.concat([history, new_row], ignore_index=True)
 
 # =========================
