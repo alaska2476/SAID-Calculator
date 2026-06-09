@@ -182,41 +182,42 @@ with col1_inc:
 
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
-# ✅ Other Income (UPDATED STRUCTURE)
+#  Other Income 
 with col2_inc:
     st.markdown("**Other Income**")
 
-    same_income = st.checkbox("Same as Declared Income", True)
+    same_income = st.checkbox("Same as Declared Income", value=True, key="same_income")
 
     if same_income:
         other_income_total = 0
-        st.info("No additional income")
+        st.info("Other Income matches declared")
+
     else:
         other_income_total = 0
 
-        # Surplus
+        # ✅ ROW 1: Surplus
         c1, c2 = st.columns(2)
-        surplus = c1.number_input("Surplus", 0.0)
-        surplus_less = c2.number_input("Less", 0.0)
+        surplus = c1.number_input("Surplus ($)", 0.0)
+        surplus_less = c2.number_input("Less ($)", 0.0)
         other_income_total += (surplus - surplus_less)
 
-        # Interest
+        # ✅ ROW 2: Interest
         c3, c4 = st.columns(2)
-        interest = c3.number_input("Interest", 0.0)
-        interest_less = c4.number_input("Less ", 0.0)
+        interest = c3.number_input("Interest ($)", 0.0)
+        interest_less = c4.number_input("Less ($)", 0.0)
         other_income_total += (interest - interest_less)
 
-        # Extra rows
+        # ✅ ROW 3+: Other items WITH LESS
         for i in range(3):
             c5, c6 = st.columns(2)
-            name = c5.text_input(f"Other {i+1}", key=f"extra_name_{i}")
-            val = c6.number_input("Amount", 0.0, key=f"extra_val_{i}")
 
-            if name.strip():
-                other_income_total += val
+            val = c5.number_input(f"Other {i+1} ($)", 0.0, key=f"other_val_{i}")
+            less = c6.number_input("Less ($)", 0.0, key=f"other_less_{i}")
+
+            # ✅ SAME LOGIC: value - less
+            other_income_total += (val - less)
 
         st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
-
 # =========================
 # FINAL
 # =========================
