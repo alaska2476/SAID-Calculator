@@ -109,7 +109,7 @@ adults = c6.selectbox("Adults", list(range(1,6)))
 children = c7.selectbox("Children", list(range(0,27)))
 
 # =========================
-# BENEFIT TABLE
+# BENEFITS
 # =========================
 def build_table(prefix):
     total = 0
@@ -138,33 +138,20 @@ def build_table(prefix):
 
     return total
 
-# =========================
-# ✅ BENEFITS (ONLY FIX APPLIED)
-# =========================
-
-# ✅ HEADERS SAME ROW
-h1, _, h2 = st.columns([1,0.3,1])
-
-with h1:
-    st.subheader("Declared")
-
-with h2:
-    st.subheader("Actual")
-
-# ✅ CHECKBOX ABOVE ACTUAL ONLY
-cb1, _, cb2 = st.columns([1,0.3,1])
-
-with cb2:
-    same_actual = st.checkbox("Same as Declared", value=True)
-
-# ✅ DATA ROW
 col1,_,col2 = st.columns([1,0.3,1])
 
+# Declared
 with col1:
+    st.subheader("Declared")
     declared_total = build_table("d")
     st.markdown(f"### Total Declared: ${declared_total:,.2f}")
 
+# ✅ Actual (LOCAL CONTROL)
 with col2:
+    st.subheader("Actual")
+
+    same_actual = st.checkbox("Same as Declared", value=True)
+
     if same_actual:
         actual_total = declared_total
         st.info("Using declared values")
@@ -173,18 +160,20 @@ with col2:
 
     st.markdown(f"### Total Actual: ${actual_total:,.2f}")
 
-# =========================
-# (EVERYTHING BELOW UNCHANGED)
-# =========================
 st.divider()
 
+# =========================
+# INCOME
+# =========================
 st.subheader("INCOME")
 
 col1_inc,_,col2_inc = st.columns([1,0.3,1])
 
+# Declared Income
 with col1_inc:
     st.markdown("**Declared Income**")
     declared_net_total = 0
+
     for i in range(4):
         c1,c2 = st.columns(2)
         net_val = c1.number_input(f"Net Income {i+1} ($)", 0.0, key=f"d_net_{i}")
@@ -193,8 +182,10 @@ with col1_inc:
 
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
+# ✅ Other Income (LOCAL CONTROL)
 with col2_inc:
     st.markdown("**Other Income**")
+
     same_income = st.checkbox("Same as Declared Income", value=True)
 
     if same_income:
@@ -208,12 +199,19 @@ with col2_inc:
         other_income_total = o_s + o_i - o_l
         st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
 
+# =========================
+# FINAL
+# =========================
 declared_total_income = declared_net_total + (0 if same_income else other_income_total)
+
 declared_benefit = declared_total - declared_net_total
 actual_budget = actual_total - declared_total_income
 
 st.markdown(f"### Benefit: ${declared_benefit:,.2f}")
 
+# =========================
+# OVERPAYMENT
+# =========================
 st.divider()
 
 st.markdown("**Benefits Issued ($)**")
@@ -222,6 +220,9 @@ issued = st.number_input("", 0.0)
 overpayment = issued - actual_budget
 st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
 
+# =========================
+# SAVE + OVERWRITE + DOWNLOAD
+# =========================
 if "history" not in st.session_state:
     st.session_state.history = pd.DataFrame()
 
@@ -238,6 +239,7 @@ if st.button("Save Month Calculation"):
         "Declared_Total_Income": declared_total_income,
         "Declared_Benefit": declared_benefit,
         "Actual_Total_Needs": actual_total,
+        "Actual_Total_Income": declared_total_income,
         "Budget_Deficit_Surplus": actual_budget,
         "Benefits_Issued": issued,
         "Overpayment": overpayment
@@ -252,15 +254,30 @@ if st.button("Save Month Calculation"):
         (history["Year"] == year)
     )
 
-    history = history[~mask]
+    if mask.any():
+        history = history[~mask]
+        st.success("Record updated")
+    else:
+        st.success("Record saved")
 
     st.session_state.history = pd.concat([history, new_row], ignore_index=True)
 
+# =========================
+# DISPLAY + DOWNLOAD
+# =========================
 if len(st.session_state.history) > 0:
+
     st.dataframe(st.session_state.history)
 
+    st.markdown(f"**Total Overpayment: ${st.session_state.history['Overpayment'].sum():,.2f}**")
+
     output = io.BytesIO()
+
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         st.session_state.history.to_excel(writer, index=False)
 
-    st.download_button("Download Summary", output.getvalue(), "SAID_Summary.xlsx")
+    st.download_button(
+        "Download Summary",
+        data=output.getvalue(),
+        file_name="SAID_Summary.xlsx"
+    )
