@@ -188,7 +188,7 @@ if "history" not in st.session_state:
     st.session_state.history = pd.DataFrame(columns=[
         "Client","Case","Month","Year",
         "Declared_Total_Needs","Declared_Net_Income",
-        "Declared_Other_Income","Declared_Total_Income",
+        "Declared_New_Income","Declared_Total_Income",
         "Declared_Benefit","Actual_Total_Needs",
         "Actual_Total_Income","Budget_Deficit_Surplus",
         "Benefits_Issued","Overpayment"
