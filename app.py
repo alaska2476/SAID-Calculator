@@ -134,7 +134,7 @@ with col1_inc:
 
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
-# Other Income ✅ FIXED KEYS
+# Other Income 
 with col2_inc:
     if same_income:
         other_income_total = 0
@@ -212,7 +212,7 @@ if st.button("Save Month Calculation"):
         history = history[~mask]
 
     st.session_state.history = pd.concat([history, new_row], ignore_index=True)
-    st.success("✅ Saved (auto-overwrite if exists)")
+    st.success(" Saved (auto-overwrite if exists)")
 
 # =========================
 # DISPLAY
