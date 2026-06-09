@@ -173,3 +173,55 @@ st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
 # =========================
 if "history" not in st.session_state:
     st.session_state.history = pd.DataFrame(columns=[
+        "Client","Case","Month","Year",
+        "Declared_Total_Needs","Declared_Net_Income",
+        "Declared_Other_Income","Declared_Total_Income",
+        "Declared_Benefit","Actual_Total_Needs",
+        "Actual_Total_Income","Budget_Deficit_Surplus",
+        "Benefits_Issued","Overpayment"
+    ])
+
+if st.button("Save Month Calculation"):
+
+    new_row = pd.DataFrame([{
+        "Client": client,
+        "Case": case,
+        "Month": month,
+        "Year": year,
+        "Declared_Total_Needs": declared_total,
+        "Declared_Net_Income": declared_net_total,
+        "Declared_Other_Income": (0 if same_income else other_income_total),
+        "Declared_Total_Income": declared_total_income,
+        "Declared_Benefit": declared_benefit,
+        "Actual_Total_Needs": actual_total,
+        "Actual_Total_Income": declared_total_income,
+        "Budget_Deficit_Surplus": actual_budget,
+        "Benefits_Issued": issued,
+        "Overpayment": overpayment
+    }])
+
+    history = st.session_state.history.copy()
+
+    if not history.empty:
+        mask = (
+            (history["Client"] == client) &
+            (history["Case"] == case) &
+            (history["Month"] == month) &
+            (history["Year"] == year)
+        )
+        history = history[~mask]
+
+    st.session_state.history = pd.concat([history, new_row], ignore_index=True)
+    st.success("✅ Saved (auto-overwrite if exists)")
+
+# =========================
+# DISPLAY
+# =========================
+if len(st.session_state.history) > 0:
+    st.dataframe(st.session_state.history)
+
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        st.session_state.history.to_excel(writer, index=False)
+
+    st.download_button("Download Summary", output.getvalue(), "summary.xlsx")
