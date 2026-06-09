@@ -120,7 +120,7 @@ def build_table(prefix):
         b = c1.selectbox("", [""] + benefits + ["OTHER"], key=f"{prefix}_b_{i}")
 
         if b == "OTHER":
-            for j in range(10):  # ✅ 10 rows
+            for j in range(10):
                 c3,c4 = st.columns(2)
                 name = c3.text_input("", key=f"{prefix}_custom_{i}_{j}")
                 val = c4.number_input("Amount ($)", 0.0, key=f"{prefix}_other_{i}_{j}")
@@ -140,19 +140,21 @@ def build_table(prefix):
 
 col1,_,col2 = st.columns([1,0.3,1])
 
+# ✅ DECLARED
 with col1:
     st.subheader("Declared")
     declared_total = build_table("d")
     st.markdown(f"### Total Declared: ${declared_total:,.2f}")
 
+# ✅ ACTUAL (CHECKBOX ON TOP ✅)
 with col2:
-    st.subheader("Actual")
-
     same_actual = st.checkbox("Same as Declared", True)
+
+    st.subheader("Actual")
 
     if same_actual:
         actual_total = declared_total
-        st.info("Using declared values")
+        st.info("Actual total is using Declared total")
     else:
         actual_total = build_table("a")
 
@@ -167,7 +169,7 @@ st.subheader("INCOME")
 
 col1_inc,_,col2_inc = st.columns([1,0.3,1])
 
-# Declared Income
+# DECLARED INCOME
 with col1_inc:
     st.markdown("**Declared Income**")
     declared_net_total = 0
@@ -180,7 +182,7 @@ with col1_inc:
 
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
-# ✅ Other Income (FULL LOGIC)
+# ✅ OTHER INCOME (FULL FIXED LOGIC ✅)
 with col2_inc:
     st.markdown("**Other Income**")
 
@@ -204,13 +206,11 @@ with col2_inc:
         interest_less = c4.number_input("Less ", 0.0)
         other_income_total += (interest - interest_less)
 
-        # Other rows WITH LESS ✅
+        # Other rows
         for i in range(3):
             c5, c6 = st.columns(2)
-
             val = c5.number_input(f"Other {i+1}", 0.0, key=f"other_val_{i}")
             less = c6.number_input("Less ", 0.0, key=f"other_less_{i}")
-
             other_income_total += (val - less)
 
         st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
@@ -242,7 +242,10 @@ if "history" not in st.session_state:
 if st.button("Save Month Calculation"):
 
     new_row = pd.DataFrame([{
-        "Client": client, "Case": case, "Month": month, "Year": year,
+        "Client": client,
+        "Case": case,
+        "Month": month,
+        "Year": year,
         "Declared_Total_Needs": declared_total,
         "Declared_Net_Income": declared_net_total,
         "Declared_Other_Income": (0 if same_income else other_income_total),
@@ -264,7 +267,6 @@ if st.button("Save Month Calculation"):
     )
 
     history = history[~mask]
-
     st.session_state.history = pd.concat([history, new_row], ignore_index=True)
 
 # =========================
