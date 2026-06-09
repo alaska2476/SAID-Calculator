@@ -70,6 +70,7 @@ def get_amounts(comm, group, year, month):
         (Reference["Start_Date"] <= date) &
         (Reference["End_Date"] >= date)
     ]
+
     return sorted(df["Amount"].dropna().unique())
 
 # =========================
@@ -120,7 +121,6 @@ def build_table(prefix):
 # =========================
 # ✅ BENEFITS
 # =========================
-
 h1, _, h2 = st.columns([1,0.3,1])
 with h1: st.subheader("Declared")
 with h2: st.subheader("Actual")
@@ -141,6 +141,8 @@ with col2:
         st.info("Using declared values")
     st.markdown(f"### Total Actual: ${actual_total:,.2f}")
 
+st.divider()
+
 # =========================
 # ✅ INCOME
 # =========================
@@ -156,6 +158,7 @@ with cb2:
 
 col1_inc,_,col2_inc = st.columns([1,0.3,1])
 
+# Declared Income
 with col1_inc:
     declared_net_total = 0
     for i in range(4):
@@ -166,13 +169,13 @@ with col1_inc:
         )
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
+# Other Income
 with col2_inc:
     if same_income:
         other_income_total = 0
         st.info("No additional income")
     else:
         total = 0
-
         c1,c2 = st.columns(2)
         total += c1.number_input("Surplus",0.0) - c2.number_input("Less",0.0)
 
@@ -190,9 +193,10 @@ with col2_inc:
 # FINAL
 # =========================
 declared_total_income = declared_net_total + (0 if same_income else other_income_total)
+declared_benefit = declared_total - declared_net_total
 actual_budget = actual_total - declared_total_income
 
-st.markdown(f"### Benefit: ${(declared_total - declared_net_total):,.2f}")
+st.markdown(f"### Benefit: ${declared_benefit:,.2f}")
 
 # =========================
 # OVERPAYMENT
@@ -202,11 +206,16 @@ overpayment = issued - actual_budget
 st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
 
 # =========================
-# ✅ SAVE FIX (NO KEYERROR)
+# ✅ SAVE (FULL FIELDS)
 # =========================
 if "history" not in st.session_state:
     st.session_state.history = pd.DataFrame(columns=[
-        "Client","Case","Month","Year","Overpayment"
+        "Client","Case","Month","Year",
+        "Declared_Total_Needs","Declared_Net_Income",
+        "Declared_Other_Income","Declared_Total_Income",
+        "Declared_Benefit","Actual_Total_Needs",
+        "Actual_Total_Income","Budget_Deficit_Surplus",
+        "Benefits_Issued","Overpayment"
     ])
 
 if st.button("Save Month Calculation"):
@@ -216,6 +225,15 @@ if st.button("Save Month Calculation"):
         "Case": case,
         "Month": month,
         "Year": year,
+        "Declared_Total_Needs": declared_total,
+        "Declared_Net_Income": declared_net_total,
+        "Declared_Other_Income": (0 if same_income else other_income_total),
+        "Declared_Total_Income": declared_total_income,
+        "Declared_Benefit": declared_benefit,
+        "Actual_Total_Needs": actual_total,
+        "Actual_Total_Income": declared_total_income,
+        "Budget_Deficit_Surplus": actual_budget,
+        "Benefits_Issued": issued,
         "Overpayment": overpayment
     }])
 
@@ -239,7 +257,10 @@ if len(st.session_state.history) > 0:
 
     st.dataframe(st.session_state.history)
 
+    st.markdown(f"**Total Overpayment: ${st.session_state.history['Overpayment'].sum():,.2f}**")
+
     output = io.BytesIO()
+
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         st.session_state.history.to_excel(writer, index=False)
 
