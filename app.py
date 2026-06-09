@@ -8,13 +8,6 @@ import io
 # =========================
 st.set_page_config(layout="wide")
 
-st.markdown("""
-<style>
-.block-container {padding-top:0.8rem;}
-h1 {text-align:center;}
-</style>
-""", unsafe_allow_html=True)
-
 # =========================
 # LOAD DATA
 # =========================
@@ -37,31 +30,7 @@ Reference["Benefit Type"] = Reference["Benefit"].str.upper().str.strip()
 Reference["Tier"] = Reference["Tier"].fillna("ALL").str.upper()
 Reference["Amount"] = Reference["Amount"].astype(float)
 
-# =========================
-# GROUPING
-# =========================
-def assign_group(b):
-    if "LIVING" in b: return "LIVING"
-    if "APPROVED HOME" in b: return "APPROVED HOME"
-    if "CLOTHING" in b: return "CLOTHING"
-    if "SPECIAL CARE" in b: return "S/C/H"
-    if "ROOM" in b: return "BOARD & ROOM"
-    if "TRUST" in b or "SN/TRUS" in b: return "SN/TRUS"
-    if "CHILD BENEFIT" in b: return "CHILD BENEFIT"
-    if "DISABILITY ALLOWANCE" in b: return "DIS/ALL"
-    if "FAMILY HOMES" in b: return "FAMILY HOMES"
-    if "EDUCATION" in b: return "EDUCATION"
-    if "HOUSEHOLD ALLOWANCE" in b: return "HOUSEHOLD ALLOWANCE"
-    if "LAUNDRY" in b: return "LAUNDRY"
-    if "MEALS" in b: return "MEALS"
-    if "PERSONAL CARE" in b: return "PC/HOME"
-    if "SALVATION ARMY" in b: return "SALVATION ARMY"
-    if "SINGLE PARENT HOME" in b: return "SINGLE PARENT HOME"
-    if "TRAINING" in b: return "TRAINING"
-    if "YWCA" in b: return "YWCA"
-    return b
-
-Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
+Reference["Group"] = Reference["Benefit Type"]
 
 # =========================
 # FUNCTIONS
@@ -80,12 +49,9 @@ def get_amounts(comm, group, year, month):
     df = Reference[
         (Reference["Group"] == group) &
         ((Reference["Tier"] == tier) | (Reference["Tier"] == "ALL")) &
-        ((Reference["Adults"] == adults) | (Reference["Adults"].isna())) &
-        (Reference["Children"] == children) &
         (Reference["Start_Date"] <= date) &
         (Reference["End_Date"] >= date)
     ]
-
     return sorted(df["Amount"].dropna().unique())
 
 # =========================
@@ -109,7 +75,7 @@ adults = c6.selectbox("Adults", list(range(1,6)))
 children = c7.selectbox("Children", list(range(0,27)))
 
 # =========================
-# BENEFIT TABLE
+# TABLE BUILDER
 # =========================
 def build_table(prefix):
     total = 0
@@ -128,36 +94,22 @@ def build_table(prefix):
                     total += val
         else:
             opts = get_amounts(community, b, year, month)
-
-            if opts:
-                val = c2.selectbox("", opts, key=f"{prefix}_amt_{i}")
-            else:
-                val = c2.number_input("Amount ($)", 0.0, key=f"{prefix}_num_{i}")
-
+            val = c2.selectbox("", opts, key=f"{prefix}_amt_{i}") if opts else c2.number_input("Amount ($)", 0.0, key=f"{prefix}_num_{i}")
             total += float(val)
 
     return total
 
 # =========================
-# ✅ BENEFITS (ONLY FIX APPLIED)
+# BENEFITS
 # =========================
-
-# ✅ HEADERS SAME ROW
 h1, _, h2 = st.columns([1,0.3,1])
+with h1: st.subheader("Declared")
+with h2: st.subheader("Actual")
 
-with h1:
-    st.subheader("Declared")
+_, _, cb = st.columns([1,0.3,1])
+with cb:
+    same_actual = st.checkbox("Same as Declared", True)
 
-with h2:
-    st.subheader("Actual")
-
-# ✅ CHECKBOX ABOVE ACTUAL ONLY
-cb1, _, cb2 = st.columns([1,0.3,1])
-
-with cb2:
-    same_actual = st.checkbox("Same as Declared", value=True)
-
-# ✅ DATA ROW
 col1,_,col2 = st.columns([1,0.3,1])
 
 with col1:
@@ -165,65 +117,80 @@ with col1:
     st.markdown(f"### Total Declared: ${declared_total:,.2f}")
 
 with col2:
+    actual_total = declared_total if same_actual else build_table("a")
     if same_actual:
-        actual_total = declared_total
         st.info("Using declared values")
-    else:
-        actual_total = build_table("a")
 
     st.markdown(f"### Total Actual: ${actual_total:,.2f}")
 
 # =========================
-# (EVERYTHING BELOW UNCHANGED)
+# INCOME
 # =========================
 st.divider()
-
 st.subheader("INCOME")
+
+h1, _, h2 = st.columns([1,0.3,1])
+with h1: st.markdown("**Declared Income**")
+with h2: st.markdown("**Other Income**")
+
+_, _, cb2 = st.columns([1,0.3,1])
+with cb2:
+    same_income = st.checkbox("Same as Declared Income", True)
 
 col1_inc,_,col2_inc = st.columns([1,0.3,1])
 
+# Declared
 with col1_inc:
-    st.markdown("**Declared Income**")
     declared_net_total = 0
     for i in range(4):
         c1,c2 = st.columns(2)
-        net_val = c1.number_input(f"Net Income {i+1} ($)", 0.0, key=f"d_net_{i}")
-        less_val = c2.number_input(f"Less Exemption {i+1} ($)", 0.0, key=f"d_less_{i}")
-        declared_net_total += (net_val - less_val)
-
+        declared_net_total += (
+            c1.number_input(f"Net Income {i+1}",0.0,key=f"d_net_{i}") -
+            c2.number_input("Less",0.0,key=f"d_less_{i}")
+        )
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
+# Other
 with col2_inc:
-    st.markdown("**Other Income**")
-    same_income = st.checkbox("Same as Declared Income", value=True)
-
     if same_income:
         other_income_total = 0
         st.info("No additional income")
     else:
-        o_s = st.number_input("Surplus ($)", 0.0)
-        o_i = st.number_input("Interest", 0.0)
-        o_l = st.number_input("Less", 0.0)
+        total = 0
+        c1,c2 = st.columns(2)
+        total += c1.number_input("Surplus",0.0) - c2.number_input("Less",0.0)
 
-        other_income_total = o_s + o_i - o_l
+        c3,c4 = st.columns(2)
+        total += c3.number_input("Interest",0.0) - c4.number_input("Less",0.0)
+
+        other_income_total = total
         st.markdown(f"**Total Other Income: ${other_income_total:,.2f}**")
 
+# =========================
+# FINAL
+# =========================
 declared_total_income = declared_net_total + (0 if same_income else other_income_total)
 declared_benefit = declared_total - declared_net_total
 actual_budget = actual_total - declared_total_income
 
 st.markdown(f"### Benefit: ${declared_benefit:,.2f}")
 
-st.divider()
-
-st.markdown("**Benefits Issued ($)**")
-issued = st.number_input("", 0.0)
-
+issued = st.number_input("Benefits Issued ($)",0.0)
 overpayment = issued - actual_budget
 st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
 
+# =========================
+# SAVE (FULL + OVERWRITE)
+# =========================
 if "history" not in st.session_state:
-    st.session_state.history = pd.DataFrame()
+    st.session_state.history = pd.DataFrame(columns=[
+        "Client","Case","Month","Year",
+        "Declared_Total_Needs","Declared_Net_Income",
+        "Declared_Other_Income","Declared_Total_Income",
+        "Declared_Benefit","Actual_Total_Needs",
+        "Actual_Total_Income","Budget_Deficit_Surplus",
+        "Benefits_Issued","Overpayment"
+    ])
 
 if st.button("Save Month Calculation"):
 
@@ -238,24 +205,36 @@ if st.button("Save Month Calculation"):
         "Declared_Total_Income": declared_total_income,
         "Declared_Benefit": declared_benefit,
         "Actual_Total_Needs": actual_total,
+        "Actual_Total_Income": declared_total_income,
         "Budget_Deficit_Surplus": actual_budget,
         "Benefits_Issued": issued,
         "Overpayment": overpayment
     }])
 
-    history = st.session_state.history
+    history = st.session_state.history.copy()
 
-    mask = (
-        (history["Client"] == client) &
-        (history["Case"] == case) &
-        (history["Month"] == month) &
-        (history["Year"] == year)
-    )
+    if not history.empty:
+        mask = (
+            (history["Client"] == client) &
+            (history["Case"] == case) &
+            (history["Month"] == month) &
+            (history["Year"] == year)
+        )
 
-    history = history[~mask]
+        if mask.any():
+            history = history.loc[~mask]
+            st.success("✅ Record updated (overwritten)")
+        else:
+            st.success("✅ New record saved")
+
+    else:
+        st.success("✅ First record saved")
 
     st.session_state.history = pd.concat([history, new_row], ignore_index=True)
 
+# =========================
+# DISPLAY + DOWNLOAD
+# =========================
 if len(st.session_state.history) > 0:
     st.dataframe(st.session_state.history)
 
