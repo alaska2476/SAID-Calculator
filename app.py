@@ -300,26 +300,21 @@ if len(st.session_state.history) > 0:
     # ✅ final total
     total = export_df["Cumulative Overpayment"].iloc[-1]
 
-    # ✅ ✅ SAFE TOTAL ROW (FIXED)
-    summary_row = {col: None for col in export_df.columns}
-    summary_row["Month"] = "TOTAL"
-    summary_row["Cumulative Overpayment"] = float(total)
+   # ✅ get total cumulative value
+total = export_df["Cumulative Overpayment"].iloc[-1]
 
-    summary_row_df = pd.DataFrame([summary_row])
+# ✅ build TOTAL row with correct placement
+summary_row = {col: None for col in export_df.columns}
 
-    # ✅ append total row
-    export_df = pd.concat([export_df, summary_row_df], ignore_index=True)
+# ✅ FIRST COLUMN (LEFT)
+first_col = export_df.columns[0]
+summary_row[first_col] = "TOTAL"
 
-    # ✅ remove helper column
-    export_df = export_df.drop(columns=["Month_Num"])
+# ✅ LAST COLUMN (RIGHT)
+last_col = export_df.columns[-1]
+summary_row[last_col] = float(total)
 
-    # ✅ write file
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        export_df.to_excel(writer, index=False)
+summary_row_df = pd.DataFrame([summary_row])
 
-    # ✅ download button
-    st.download_button(
-        "Download Summary",
-        output.getvalue(),
-        "summary.xlsx"
-    )
+# ✅ append to dataset
+export_df = pd.concat([export_df, summary_row_df], ignore_index=True)
