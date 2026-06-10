@@ -276,16 +276,17 @@ if len(st.session_state.history) > 0:
     # ✅ write file
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         export_df.to_excel(writer, index=False)
+        
+ # ✅ ✅ SHOW TOTAL ON SCREEN
+    st.subheader("Total Overpayment / Underpayment")
+
+    label = "Overpayment" if total > 0 else "Underpayment"
+    st.metric(label, f"${total:,.2f}")
 
     # ✅ download
     st.download_button(
         "Download Summary",
         output.getvalue(),
-        "summary.xlsx"
-    )
+        "summary.xlsx")
 
-    # ✅ ✅ SHOW TOTAL ON SCREEN
-    st.subheader("Total Overpayment / Underpayment")
-
-    label = "Overpayment" if total > 0 else "Underpayment"
-    st.metric(label, f"${total:,.2f}")
+   
