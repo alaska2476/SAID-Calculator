@@ -263,47 +263,49 @@ if len(st.session_state.history) > 0:
 
     export_df = st.session_state.history.copy()
 
-    # ✅ TOTAL SUM
+    # TOTAL SUM
     total = export_df["Overpayment"].sum()
 
-    # ✅ FINAL RULE (NO "NO CHANGE")
+    #  DYNAMIC TOTAL LABEL
     if total > 0:
         total_text = "TOTAL OVERPAYMENT"
-    else:
+    elif total < 0:
         total_text = "TOTAL UNDERPAYMENT"
+    else:
+        total_text = "TOTAL NO CHANGE"
 
-    # ✅ CREATE TOTAL ROW
+    #  CREATE TOTAL ROW
     summary_row = {col: None for col in export_df.columns}
 
-    # ✅ LEFT COLUMN LABEL
+    #  LEFT COLUMN LABEL
     first_col = export_df.columns[0]
     summary_row[first_col] = total_text
 
-    # ✅ VALUE IN OVERPAYMENT COLUMN
+    #  VALUE IN OVERPAYMENT COLUMN
     summary_row["Overpayment"] = float(total)
 
     summary_row_df = pd.DataFrame([summary_row])
 
-    # ✅ APPEND
+    #  APPEND
     export_df = pd.concat([export_df, summary_row_df], ignore_index=True)
 
-    # ✅ WRITE FILE
+    #  WRITE FILE
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         export_df.to_excel(writer, index=False)
 
-    # ✅ FILE NAME
+    #  FILE NAME
     safe_client = client.strip().replace(" ", "_") if client else "Client"
     safe_case = case.strip().replace(" ", "_") if case else "Case"
 
     file_name = f"{safe_client}_{safe_case}_summary.xlsx"
 
-    # ✅ DOWNLOAD BUTTON
+    #  DOWNLOAD BUTTON
     st.download_button(
         "Download Summary",
         output.getvalue(),
         file_name
     )
 
-    # ✅ SHOW TOTAL ON SCREEN
+    #  SHOW TOTAL ON SCREEN
     st.subheader(total_text)
     st.metric("", f"${total:,.2f}")
