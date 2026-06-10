@@ -294,9 +294,10 @@ if len(st.session_state.history) > 0:
     # ✅ ✅ CREATE TOTAL ROW
     summary_row = {col: None for col in export_df.columns}
 
-    # ✅ leftmost column
-    first_col = export_df.columns[0]
-    summary_row[first_col] = "TOTAL"
+  # ✅ leftmost column (MATCH SCREEN TEXT)
+first_col = export_df.columns[0]
+summary_row[first_col] = "Total Overpayment / Underpayment"
+
 
     # ✅ Overpayment column gets total
     summary_row["Overpayment"] = float(total)
