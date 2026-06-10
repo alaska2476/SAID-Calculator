@@ -286,10 +286,16 @@ if len(st.session_state.history) > 0:
         export_df.to_excel(writer, index=False)
         
  #  SHOW TOTAL ON SCREEN
-    st.subheader("Total Overpayment / Underpayment")
+    if total > 0:
+    total_label = "TOTAL OVERPAYMENT"
+elif total < 0:
+    total_label = "TOTAL UNDERPAYMENT"
+else:
+    total_label = "TOTAL NO CHANGE"
 
-    label = "Overpayment" if total > 0 else "Underpayment"
-    st.metric(label, f"${total:,.2f}")
+st.subheader(total_label)
+
+st.metric("", f"${total:,.2f}")
 
     #  download
 
