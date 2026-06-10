@@ -197,10 +197,8 @@ issued = st.number_input("Benefits Issued ($)",0.0)
 overpayment = issued - actual_budget
 if overpayment > 0:
     label = "OVERPAYMENT"
-elif overpayment < 0:
-    label = "UNDERPAYMENT"
 else:
-    label = "NO CHANGE"
+    label = "UNDERPAYMENT"
 
 st.markdown(f"### {label}: ${overpayment:,.2f}")
 
@@ -267,12 +265,11 @@ if len(st.session_state.history) > 0:
     total = export_df["Overpayment"].sum()
 
     #  DYNAMIC TOTAL LABEL
+   
     if total > 0:
-        total_text = "TOTAL OVERPAYMENT"
-    elif total < 0:
-        total_text = "TOTAL UNDERPAYMENT"
+    total_text = "TOTAL OVERPAYMENT"
     else:
-        total_text = "TOTAL NO CHANGE"
+    total_text = "TOTAL UNDERPAYMENT"
 
     #  CREATE TOTAL ROW
     summary_row = {col: None for col in export_df.columns}
