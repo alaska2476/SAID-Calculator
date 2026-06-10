@@ -281,31 +281,34 @@ if st.button("Save Month Calculation"):
 # =========================
 if len(st.session_state.history) > 0:
 
+    # ✅ show original table (unchanged)
     st.dataframe(st.session_state.history)
 
     # ✅ CREATE EXCEL OUTPUT
     output = io.BytesIO()
 
-    # ✅ work on a copy
+    # ✅ copy data
     export_df = st.session_state.history.copy()
 
-    # ✅ sort correctly
+    # ✅ sort correctly by date
     export_df["Month_Num"] = pd.to_datetime(export_df["Month"], format="%B").dt.month
     export_df = export_df.sort_values(["Client","Case","Year","Month_Num"])
 
-    # ✅ calculate cumulative
+    # ✅ cumulative column (ADDED)
     export_df["Cumulative Overpayment"] = export_df["Overpayment"].cumsum()
 
-    # ✅ get total
+    # ✅ final total
     total = export_df["Cumulative Overpayment"].iloc[-1]
 
-    # ✅ create TOTAL row
-    summary_row = pd.DataFrame([{col: "" for col in export_df.columns}])
-    summary_row.loc[0, "Month"] = "TOTAL"
-    summary_row.loc[0, "Cumulative Overpayment"] = total
+    # ✅ ✅ SAFE TOTAL ROW (FIXED)
+    summary_row = {col: None for col in export_df.columns}
+    summary_row["Month"] = "TOTAL"
+    summary_row["Cumulative Overpayment"] = float(total)
 
-    # ✅ append
-    export_df = pd.concat([export_df, summary_row], ignore_index=True)
+    summary_row_df = pd.DataFrame([summary_row])
+
+    # ✅ append total row
+    export_df = pd.concat([export_df, summary_row_df], ignore_index=True)
 
     # ✅ remove helper column
     export_df = export_df.drop(columns=["Month_Num"])
@@ -315,4 +318,8 @@ if len(st.session_state.history) > 0:
         export_df.to_excel(writer, index=False)
 
     # ✅ download button
-    st.download_button("Download Summary", output.getvalue(), "summary.xlsx")
+    st.download_button(
+        "Download Summary",
+        output.getvalue(),
+        "summary.xlsx"
+    )
