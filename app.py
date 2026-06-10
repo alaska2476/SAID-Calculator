@@ -195,7 +195,15 @@ st.markdown(f"### Benefit: ${declared_benefit:,.2f}")
 
 issued = st.number_input("Benefits Issued ($)",0.0)
 overpayment = issued - actual_budget
-st.markdown(f"### OVERPAYMENT: ${overpayment:,.2f}")
+if overpayment > 0:
+    label = "OVERPAYMENT"
+elif overpayment < 0:
+    label = "UNDERPAYMENT"
+else:
+    label = "NO CHANGE"
+
+st.markdown(f"### {label}: ${overpayment:,.2f}")
+
 
 # =========================
 # SAVE
