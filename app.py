@@ -288,9 +288,9 @@ if len(st.session_state.history) > 0:
  #  SHOW TOTAL ON SCREEN
     if total > 0:
     total_label = "TOTAL OVERPAYMENT"
-elif total < 0:
+    elif total < 0:
     total_label = "TOTAL UNDERPAYMENT"
-else:
+    else:
     total_label = "TOTAL NO CHANGE"
 
 st.subheader(total_label)
