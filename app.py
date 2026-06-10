@@ -225,7 +225,7 @@ if st.button("Save Month Calculation"):
         "Year": year,
         "Declared_Total_Needs": declared_total,
         "Declared_Net_Income": declared_net_total,
-        "Declared_Other_Income": (0 if same_income else other_income_total),
+        "Declared_Other_Income": "New Income",
         "Declared_Total_Income": declared_total_income,
         "Declared_Benefit": declared_benefit,
         "Actual_Total_Needs": actual_total,
