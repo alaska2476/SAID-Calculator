@@ -280,37 +280,39 @@ if st.button("Save Month Calculation"):
 # DISPLAY
 # =========================
 if len(st.session_state.history) > 0:
+
     st.dataframe(st.session_state.history)
 
-   output = io.BytesIO()
+    # ✅ CREATE EXCEL OUTPUT
+    output = io.BytesIO()
 
-# ✅ work on a copy
-export_df = st.session_state.history.copy()
+    # ✅ work on a copy
+    export_df = st.session_state.history.copy()
 
-# ✅ sort (important for correct cumulative)
-export_df["Month_Num"] = pd.to_datetime(export_df["Month"], format="%B").dt.month
-export_df = export_df.sort_values(["Client","Case","Year","Month_Num"])
+    # ✅ sort correctly
+    export_df["Month_Num"] = pd.to_datetime(export_df["Month"], format="%B").dt.month
+    export_df = export_df.sort_values(["Client","Case","Year","Month_Num"])
 
-# ✅ calculate cumulative
-export_df["Cumulative Overpayment"] = export_df["Overpayment"].cumsum()
+    # ✅ calculate cumulative
+    export_df["Cumulative Overpayment"] = export_df["Overpayment"].cumsum()
 
-# ✅ get final total
-total = export_df["Cumulative Overpayment"].iloc[-1]
+    # ✅ get total
+    total = export_df["Cumulative Overpayment"].iloc[-1]
 
-# ✅ create TOTAL row
-summary_row = pd.DataFrame([{col: "" for col in export_df.columns}])
-summary_row.loc[0, "Month"] = "TOTAL"
-summary_row.loc[0, "Cumulative Overpayment"] = total
+    # ✅ create TOTAL row
+    summary_row = pd.DataFrame([{col: "" for col in export_df.columns}])
+    summary_row.loc[0, "Month"] = "TOTAL"
+    summary_row.loc[0, "Cumulative Overpayment"] = total
 
-# ✅ append
-export_df = pd.concat([export_df, summary_row], ignore_index=True)
+    # ✅ append
+    export_df = pd.concat([export_df, summary_row], ignore_index=True)
 
-# ✅ remove helper column before export
-export_df = export_df.drop(columns=["Month_Num"])
+    # ✅ remove helper column
+    export_df = export_df.drop(columns=["Month_Num"])
 
-# ✅ write file
-with pd.ExcelWriter(output, engine='openpyxl') as writer:
-    export_df.to_excel(writer, index=False)
+    # ✅ write file
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        export_df.to_excel(writer, index=False)
 
-st.download_button("Download Summary", output.getvalue(), "summary.xlsx")
-
+    # ✅ download button
+    st.download_button("Download Summary", output.getvalue(), "summary.xlsx")
