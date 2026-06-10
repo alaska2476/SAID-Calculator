@@ -32,56 +32,23 @@ Reference["Amount"] = Reference["Amount"].astype(float)
 # =========================
 def assign_group(b):
 
-    if "LIVING" in b:
-        return "LIVING"
-
-    if "APPROVED HOME" in b:
-        return "APPROVED HOME"
-
-    if "CLOTHING" in b:
-        return "CLOTHING"
-
-    if "SPECIAL CARE" in b:
-        return "S/C/H"
-
-    if "ROOM" in b:
-        return "BOARD & ROOM"
-
-    if "TRUST" in b or "SN/TRUS" in b:
-        return "SN/TRUS"
-
-    if "CHILD BENEFIT" in b:
-        return "CHILD BENEFIT"
-
-    if "DISABILITY ALLOWANCE" in b:
-        return "DIS/ALL"
-
-    if "FAMILY HOMES" in b:
-        return "FAMILY HOMES"
-
-    if "EDUCATION" in b:
-        return "EDUCATION"
-
-    if "HOUSEHOLD ALLOWANCE" in b:
-        return "HOUSEHOLD ALLOWANCE"
-
-    if "LAUNDRY" in b:
-        return "LAUNDRY"
-        
-    if "MEALS" in b:
-        return "MEALS"
-
-    if "TRAINING" in b:
-        return "TRAINING"
-
-    if "SINGLE PARENT HOME" in b:
-        return "SINGLE PARENT"
-
-    if "PERSONAL CARE" in b:
-        return "PERSONAL CARE HOME"
-
-    if "YWCA" in b:
-        return "YWCA"
+   if "LIVING" in b: return "LIVING"
+    if "APPROVED HOME" in b: return "APPROVED HOME"
+    if "CLOTHING" in b: return "CLOTHING"
+    if "SPECIAL CARE" in b: return "S/C/H"
+    if "ROOM" in b: return "BOARD & ROOM"
+    if "TRUST" in b or "SN/TRUS" in b: return "SN/TRUS"
+    if "CHILD BENEFIT" in b: return "CHILD BENEFIT"
+    if "DISABILITY ALLOWANCE" in b: return "DIS/ALL"
+    if "FAMILY HOMES" in b: return "FAMILY HOMES"
+    if "EDUCATION" in b: return "EDUCATION"
+    if "HOUSEHOLD ALLOWANCE" in b: return "HOUSEHOLD ALLOWANCE"
+    if "LAUNDRY" in b: return "LAUNDRY"
+    if "MEALS" in b: return "MEALS"
+    if "TRAINING" in b: return "TRAINING"
+    if "SINGLE PARENT HOME" in b: return "SINGLE PARENT"
+    if "PERSONAL CARE" in b: return "PERSONAL CARE HOME"
+    if "YWCA" in b: return "YWCA"
     return b
 
 Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
