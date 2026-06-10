@@ -265,7 +265,6 @@ if len(st.session_state.history) > 0:
     total = export_df["Overpayment"].sum()
 
     #  DYNAMIC TOTAL LABEL
-   
     if total > 0:
     total_text = "TOTAL OVERPAYMENT"
     else:
