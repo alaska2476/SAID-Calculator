@@ -239,8 +239,8 @@ if st.button("Save Month Calculation"):
         "Net Income": declared_net_total,
         "New Income": (0 if same_income else other_income_total),
         "Total Income": declared_total_income,
-        "Benefit": declared_benefit,
         "Total Actual": actual_total,
+        "Benefit": declared_benefit,
         "Benefits Issued": issued,
         "Overpayment / Underpayment": overpayment
     }])
