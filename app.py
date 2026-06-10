@@ -208,12 +208,22 @@ st.markdown(f"### {label}: ${overpayment:,.2f}")
 # =========================
 if "history" not in st.session_state:
     st.session_state.history = pd.DataFrame(columns=[
-        "Client","Case","Month","Year",
-        "Declared_Total_Needs","Declared_Net_Income",
-        "Declared_Other_Income","Declared_Total_Income",
-        "Declared_Benefit","Actual_Total_Needs",
-        "Actual_Total_Income","Budget_Deficit_Surplus",
-        "Benefits_Issued","Overpayment"
+        "Client",
+        "Case",
+        "Month",
+        "Year",
+
+        # ✅ MATCH SCREEN NAMES EXACTLY
+        "Total Declared",
+        "Net Income",
+        "New Income",
+        "Total Income",
+        "Benefit",
+        "Total Actual",
+        "Actual Income",
+        "Budget Deficit / Surplus",
+        "Benefits Issued",
+        "Overpayment / Underpayment"
     ])
 
 if st.button("Save Month Calculation"):
@@ -223,16 +233,18 @@ if st.button("Save Month Calculation"):
         "Case": case,
         "Month": month,
         "Year": year,
-        "Declared_Total_Needs": declared_total,
-        "Declared_Net_Income": declared_net_total,
-        "Declared_Other_Income": (0 if same_income else other_income_total),
-        "Declared_Total_Income": declared_total_income,
-        "Declared_Benefit": declared_benefit,
-        "Actual_Total_Needs": actual_total,
-        "Actual_Total_Income": declared_total_income,
-        "Budget_Deficit_Surplus": actual_budget,
-        "Benefits_Issued": issued,
-        "Overpayment": overpayment
+
+        # ✅ VALUES MATCH SCREEN
+        "Total Declared": declared_total,
+        "Net Income": declared_net_total,
+        "New Income": (0 if same_income else other_income_total),
+        "Total Income": declared_total_income,
+        "Benefit": declared_benefit,
+        "Total Actual": actual_total,
+        "Actual Income": declared_total_income,
+        "Budget Deficit / Surplus": actual_budget,
+        "Benefits Issued": issued,
+        "Overpayment / Underpayment": overpayment
     }])
 
     hist = st.session_state.history.copy()
@@ -247,7 +259,9 @@ if st.button("Save Month Calculation"):
         hist = hist[~mask]
 
     st.session_state.history = pd.concat([hist, new_row], ignore_index=True)
-    st.success(" Saved (auto overwrite)")
+
+    st.success("Saved (auto overwrite)")
+
 
 # =========================
 # DISPLAY
