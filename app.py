@@ -212,7 +212,6 @@ if "history" not in st.session_state:
         "Declared_Total_Needs","Declared_Net_Income",
         "Declared_Other_Income","Declared_Total_Income",
         "Declared_Benefit","Actual_Total_Needs",
-        "Actual_Total_Income","Budget_Deficit_Surplus",
         "Benefits_Issued","Overpayment"
     ])
 
@@ -230,7 +229,6 @@ if st.button("Save Month Calculation"):
         "Declared_Benefit": declared_benefit,
         "Actual_Total_Needs": actual_total,
         "Actual_Total_Income": declared_total_income,
-        "Budget_Deficit_Surplus": actual_budget,
         "Benefits_Issued": issued,
         "Overpayment": overpayment
     }])
