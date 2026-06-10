@@ -280,10 +280,45 @@ if st.button("Save Month Calculation"):
 # DISPLAY
 # =========================
 if len(st.session_state.history) > 0:
+
     st.dataframe(st.session_state.history)
 
+    # ✅ CREATE EXCEL OUTPUT
     output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        st.session_state.history.to_excel(writer, index=False)
 
-    st.download_button("Download Summary", output.getvalue(), "summary.xlsx")
+    export_df = st.session_state.history.copy()
+
+    # ✅ ✅ TOTAL (SUM of Overpayment column)
+    total = export_df["Overpayment"].sum()
+
+    # ✅ ✅ CREATE TOTAL ROW
+    summary_row = {col: None for col in export_df.columns}
+
+    # ✅ leftmost column
+    first_col = export_df.columns[0]
+    summary_row[first_col] = "TOTAL"
+
+    # ✅ Overpayment column gets total
+    summary_row["Overpayment"] = float(total)
+
+    summary_row_df = pd.DataFrame([summary_row])
+
+    # ✅ append
+    export_df = pd.concat([export_df, summary_row_df], ignore_index=True)
+
+    # ✅ write file
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        export_df.to_excel(writer, index=False)
+
+    # ✅ download
+    st.download_button(
+        "Download Summary",
+        output.getvalue(),
+        "summary.xlsx"
+    )
+
+    # ✅ ✅ SHOW TOTAL ON SCREEN
+    st.subheader("Total Overpayment / Underpayment")
+
+    label = "Overpayment" if total > 0 else "Underpayment"
+    st.metric(label, f"${total:,.2f}")
