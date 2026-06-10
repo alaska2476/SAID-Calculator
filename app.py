@@ -212,11 +212,11 @@ required_columns = [
     "Month",
     "Year",
     "Total Declared",
+    "Total Actual",
     "Net Income",
     "New Income",
     "Total Income",
     "Benefit",
-    "Total Actual",
     "Benefits Issued",
     "Overpayment / Underpayment"
 ]
