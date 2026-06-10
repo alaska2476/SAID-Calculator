@@ -206,8 +206,6 @@ st.markdown(f"### {label}: ${overpayment:,.2f}")
 # =========================
 # SAVE
 # =========================
-
-# ✅ REQUIRED FINAL COLUMN STRUCTURE
 required_columns = [
     "Client",
     "Case",
@@ -222,16 +220,14 @@ required_columns = [
     "Benefits Issued",
     "Overpayment / Underpayment"
 ]
-
-# ✅ INITIALIZE OR CLEAN STRUCTURE
+#
 if "history" not in st.session_state:
     st.session_state.history = pd.DataFrame(columns=required_columns)
 else:
-    # ✅ FORCE REMOVE OLD COLUMNS (THIS FIXES YOUR YELLOW ISSUE)
     st.session_state.history = st.session_state.history.reindex(columns=required_columns)
 
 
-# ✅ SAVE BUTTON
+#  SAVE BUTTON
 if st.button("Save Month Calculation"):
 
     new_row = pd.DataFrame([{
@@ -239,8 +235,6 @@ if st.button("Save Month Calculation"):
         "Case": case,
         "Month": month,
         "Year": year,
-
-        # ✅ EXACT MATCH TO SCREEN
         "Total Declared": declared_total,
         "Net Income": declared_net_total,
         "New Income": (0 if same_income else other_income_total),
@@ -264,7 +258,8 @@ if st.button("Save Month Calculation"):
 
     st.session_state.history = pd.concat([hist, new_row], ignore_index=True)
 
-    st.success("Saved (auto overwrite)")
+    st.success("Saved")
+    
 # =========================
 # DISPLAY
 # =========================
