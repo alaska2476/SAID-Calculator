@@ -293,9 +293,8 @@ if len(st.session_state.history) > 0:
     else:
     total_label = "TOTAL NO CHANGE"
 
-st.subheader(total_label)
-
-st.metric("", f"${total:,.2f}")
+    st.subheader(total_label)
+    st.metric("", f"${total:,.2f}")
 
     #  download
 
