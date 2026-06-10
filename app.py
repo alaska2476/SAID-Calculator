@@ -213,15 +213,13 @@ if "history" not in st.session_state:
         "Month",
         "Year",
 
-        # ✅ MATCH SCREEN NAMES EXACTLY
+        #  MATCH SCREEN NAMES EXACTLY
         "Total Declared",
         "Net Income",
         "New Income",
         "Total Income",
         "Benefit",
         "Total Actual",
-        "Actual Income",
-        "Budget Deficit / Surplus",
         "Benefits Issued",
         "Overpayment / Underpayment"
     ])
@@ -234,15 +232,13 @@ if st.button("Save Month Calculation"):
         "Month": month,
         "Year": year,
 
-        # ✅ VALUES MATCH SCREEN
+        #  VALUES MATCH SCREEN
         "Total Declared": declared_total,
         "Net Income": declared_net_total,
         "New Income": (0 if same_income else other_income_total),
         "Total Income": declared_total_income,
         "Benefit": declared_benefit,
-        "Total Actual": actual_total,
-        "Actual Income": declared_total_income,
-        "Budget Deficit / Surplus": actual_budget,
+        "Total Actual": actual_total,    
         "Benefits Issued": issued,
         "Overpayment / Underpayment": overpayment
     }])
@@ -275,38 +271,38 @@ if len(st.session_state.history) > 0:
 
     export_df = st.session_state.history.copy()
 
-    # ✅ TOTAL SUM
+    #  TOTAL SUM
     total = export_df["Overpayment / Underpayment"].sum()
 
-    # ✅ LABEL
+    #  LABEL
     if total > 0:
         total_text = "TOTAL OVERPAYMENT"
     else:
         total_text = "TOTAL UNDERPAYMENT"
 
-    # ✅ GET FIRST COLUMN
+    #  GET FIRST COLUMN
     first_col = export_df.columns[0]
 
-    # ✅ CREATE TOTAL ROW
+    #  CREATE TOTAL ROW
     summary_row = {col: None for col in export_df.columns}
     summary_row[first_col] = total_text
     summary_row["Overpayment / Underpayment"] = float(total)
 
-    # ✅ APPEND TOTAL ROW
+    #  APPEND TOTAL ROW
     export_df = pd.concat([export_df, pd.DataFrame([summary_row])], ignore_index=True)
 
-    # ✅ WRITE FILE
+    #  WRITE FILE
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         export_df.to_excel(writer, index=False)
 
-    # ✅ FILE NAME
+    #  FILE NAME
     safe_client = client.strip().replace(" ", "_") if client else "Client"
     safe_case = case.strip().replace(" ", "_") if case else "Case"
     file_name = f"{safe_client}_{safe_case}_summary.xlsx"
 
-    # ✅ DOWNLOAD BUTTON
+    #  DOWNLOAD BUTTON
     st.download_button("Download Summary", output.getvalue(), file_name)
 
-    # ✅ SHOW TOTAL ON SCREEN
+    #  SHOW TOTAL ON SCREEN
     st.subheader(total_text)
     st.metric("", f"${total:,.2f}")
