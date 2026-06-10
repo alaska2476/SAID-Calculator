@@ -263,50 +263,49 @@ if len(st.session_state.history) > 0:
 
     export_df = st.session_state.history.copy()
 
-    #  TOTAL (SUM of Overpayment column)
+    # ✅ TOTAL SUM
     total = export_df["Overpayment"].sum()
 
-    #  CREATE TOTAL ROW
+    # ✅ DYNAMIC TOTAL LABEL
+    if total > 0:
+        total_text = "TOTAL OVERPAYMENT"
+    elif total < 0:
+        total_text = "TOTAL UNDERPAYMENT"
+    else:
+        total_text = "TOTAL NO CHANGE"
+
+    # ✅ CREATE TOTAL ROW
     summary_row = {col: None for col in export_df.columns}
 
-    # leftmost column
+    # ✅ LEFT COLUMN LABEL
     first_col = export_df.columns[0]
-    summary_row[first_col] = "TOTAL"
+    summary_row[first_col] = total_text
 
-    #  Overpayment column gets total
+    # ✅ VALUE IN OVERPAYMENT COLUMN
     summary_row["Overpayment"] = float(total)
 
     summary_row_df = pd.DataFrame([summary_row])
 
-    # append
+    # ✅ APPEND
     export_df = pd.concat([export_df, summary_row_df], ignore_index=True)
 
-    #  write file
+    # ✅ WRITE FILE
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         export_df.to_excel(writer, index=False)
-        
- #  SHOW TOTAL ON SCREEN
-if total > 0:
-    total_label = "TOTAL OVERPAYMENT"
-elif total < 0:
-    total_label = "TOTAL UNDERPAYMENT"
-else:
-    total_label = "TOTAL NO CHANGE"
 
-st.subheader(total_label)
-st.metric("", f"${total:,.2f}")
+    # ✅ FILE NAME
+    safe_client = client.strip().replace(" ", "_") if client else "Client"
+    safe_case = case.strip().replace(" ", "_") if case else "Case"
 
+    file_name = f"{safe_client}_{safe_case}_summary.xlsx"
 
-    #  download
+    # ✅ DOWNLOAD BUTTON
+    st.download_button(
+        "Download Summary",
+        output.getvalue(),
+        file_name
+    )
 
-safe_client = client.strip().replace(" ", "_") if client else "Client"
-safe_case = case.strip().replace(" ", "_") if case else "Case"
-
-file_name = f"{safe_client}_{safe_case}_summary.xlsx"
-
-st.download_button(
-    "Download Summary",
-    output.getvalue(),
-    file_name
-)
-   
+    # ✅ SHOW TOTAL ON SCREEN
+    st.subheader(total_text)
+    st.metric("", f"${total:,.2f}")
