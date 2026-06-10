@@ -206,24 +206,32 @@ st.markdown(f"### {label}: ${overpayment:,.2f}")
 # =========================
 # SAVE
 # =========================
+
+# ✅ REQUIRED FINAL COLUMN STRUCTURE
+required_columns = [
+    "Client",
+    "Case",
+    "Month",
+    "Year",
+    "Total Declared",
+    "Net Income",
+    "New Income",
+    "Total Income",
+    "Benefit",
+    "Total Actual",
+    "Benefits Issued",
+    "Overpayment / Underpayment"
+]
+
+# ✅ INITIALIZE OR CLEAN STRUCTURE
 if "history" not in st.session_state:
-    st.session_state.history = pd.DataFrame(columns=[
-        "Client",
-        "Case",
-        "Month",
-        "Year",
+    st.session_state.history = pd.DataFrame(columns=required_columns)
+else:
+    # ✅ FORCE REMOVE OLD COLUMNS (THIS FIXES YOUR YELLOW ISSUE)
+    st.session_state.history = st.session_state.history.reindex(columns=required_columns)
 
-        #  MATCH SCREEN NAMES EXACTLY
-        "Total Declared",
-        "Net Income",
-        "New Income",
-        "Total Income",
-        "Benefit",
-        "Total Actual",
-        "Benefits Issued",
-        "Overpayment / Underpayment"
-    ])
 
+# ✅ SAVE BUTTON
 if st.button("Save Month Calculation"):
 
     new_row = pd.DataFrame([{
@@ -232,13 +240,13 @@ if st.button("Save Month Calculation"):
         "Month": month,
         "Year": year,
 
-        #  VALUES MATCH SCREEN
+        # ✅ EXACT MATCH TO SCREEN
         "Total Declared": declared_total,
         "Net Income": declared_net_total,
         "New Income": (0 if same_income else other_income_total),
         "Total Income": declared_total_income,
         "Benefit": declared_benefit,
-        "Total Actual": actual_total,    
+        "Total Actual": actual_total,
         "Benefits Issued": issued,
         "Overpayment / Underpayment": overpayment
     }])
@@ -257,8 +265,6 @@ if st.button("Save Month Calculation"):
     st.session_state.history = pd.concat([hist, new_row], ignore_index=True)
 
     st.success("Saved (auto overwrite)")
-
-
 # =========================
 # DISPLAY
 # =========================
