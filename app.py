@@ -266,7 +266,7 @@ if len(st.session_state.history) > 0:
     # ✅ TOTAL SUM
     total = export_df["Overpayment"].sum()
 
-    # ✅ UPDATED RULE (NO "NO CHANGE")
+    # ✅ FINAL RULE (NO "NO CHANGE")
     if total > 0:
         total_text = "TOTAL OVERPAYMENT"
     else:
@@ -275,7 +275,7 @@ if len(st.session_state.history) > 0:
     # ✅ CREATE TOTAL ROW
     summary_row = {col: None for col in export_df.columns}
 
-    # ✅ LABEL IN FIRST COLUMN
+    # ✅ LEFT COLUMN LABEL
     first_col = export_df.columns[0]
     summary_row[first_col] = total_text
 
@@ -284,7 +284,7 @@ if len(st.session_state.history) > 0:
 
     summary_row_df = pd.DataFrame([summary_row])
 
-    # ✅ APPEND ROW
+    # ✅ APPEND
     export_df = pd.concat([export_df, summary_row_df], ignore_index=True)
 
     # ✅ WRITE FILE
@@ -297,7 +297,7 @@ if len(st.session_state.history) > 0:
 
     file_name = f"{safe_client}_{safe_case}_summary.xlsx"
 
-    # ✅ DOWNLOAD
+    # ✅ DOWNLOAD BUTTON
     st.download_button(
         "Download Summary",
         output.getvalue(),
