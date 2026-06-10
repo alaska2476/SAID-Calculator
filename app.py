@@ -281,7 +281,7 @@ if st.button("Save Month Calculation"):
 # =========================
 if len(st.session_state.history) > 0:
 
-    # ✅ show original table (unchanged)
+    # ✅ show current table (unchanged)
     st.dataframe(st.session_state.history)
 
     # ✅ CREATE EXCEL OUTPUT
@@ -294,27 +294,38 @@ if len(st.session_state.history) > 0:
     export_df["Month_Num"] = pd.to_datetime(export_df["Month"], format="%B").dt.month
     export_df = export_df.sort_values(["Client","Case","Year","Month_Num"])
 
-    # ✅ cumulative column (ADDED)
+    # ✅ cumulative column
     export_df["Cumulative Overpayment"] = export_df["Overpayment"].cumsum()
 
-    # ✅ final total
+    # ✅ get final cumulative total
     total = export_df["Cumulative Overpayment"].iloc[-1]
 
-   # ✅ get total cumulative value
-total = export_df["Cumulative Overpayment"].iloc[-1]
+    # ✅ ✅ CREATE TOTAL ROW (CORRECT + SAFE)
+    summary_row = {col: None for col in export_df.columns}
 
-# ✅ build TOTAL row with correct placement
-summary_row = {col: None for col in export_df.columns}
+    # ✅ LEFTMOST COLUMN → "TOTAL"
+    first_col = export_df.columns[0]
+    summary_row[first_col] = "TOTAL"
 
-# ✅ FIRST COLUMN (LEFT)
-first_col = export_df.columns[0]
-summary_row[first_col] = "TOTAL"
+    # ✅ RIGHTMOST COLUMN → cumulative value
+    last_col = export_df.columns[-1]
+    summary_row[last_col] = float(total)
 
-# ✅ LAST COLUMN (RIGHT)
-last_col = export_df.columns[-1]
-summary_row[last_col] = float(total)
+    summary_row_df = pd.DataFrame([summary_row])
 
-summary_row_df = pd.DataFrame([summary_row])
+    # ✅ append total row
+    export_df = pd.concat([export_df, summary_row_df], ignore_index=True)
 
-# ✅ append to dataset
-export_df = pd.concat([export_df, summary_row_df], ignore_index=True)
+    # ✅ remove helper column
+    export_df = export_df.drop(columns=["Month_Num"])
+
+    # ✅ write Excel file
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        export_df.to_excel(writer, index=False)
+
+    # ✅ single download button
+    st.download_button(
+        "Download Summary",
+        output.getvalue(),
+        "summary.xlsx"
+    )
