@@ -250,43 +250,44 @@ if len(st.session_state.history) > 0:
 
     st.dataframe(st.session_state.history)
 
-    # ✅ CREATE EXCEL OUTPUT
+    # CREATE EXCEL OUTPUT
     output = io.BytesIO()
 
     export_df = st.session_state.history.copy()
 
-    # ✅ ✅ TOTAL (SUM of Overpayment column)
+    #  TOTAL (SUM of Overpayment column)
     total = export_df["Overpayment"].sum()
 
-    # ✅ ✅ CREATE TOTAL ROW
+    #  CREATE TOTAL ROW
     summary_row = {col: None for col in export_df.columns}
 
-    # ✅ leftmost column
+    # leftmost column
     first_col = export_df.columns[0]
     summary_row[first_col] = "TOTAL"
 
-    # ✅ Overpayment column gets total
+    #  Overpayment column gets total
     summary_row["Overpayment"] = float(total)
 
     summary_row_df = pd.DataFrame([summary_row])
 
-    # ✅ append
+    # append
     export_df = pd.concat([export_df, summary_row_df], ignore_index=True)
 
-    # ✅ write file
+    #  write file
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         export_df.to_excel(writer, index=False)
         
- # ✅ ✅ SHOW TOTAL ON SCREEN
+ #  SHOW TOTAL ON SCREEN
     st.subheader("Total Overpayment / Underpayment")
 
     label = "Overpayment" if total > 0 else "Underpayment"
     st.metric(label, f"${total:,.2f}")
 
-    # ✅ download
-    st.download_button(
-        "Download Summary",
-        output.getvalue(),
-        "summary.xlsx")
+    #  download
+safe_client = client.strip().replace(" ", "_") if client else "Client"
+safe_case = case.strip().replace(" ", "_") if case else "Case"
+file_name = f"{safe_client}_{safe_case}_summary.xlsx"
+st.download_button("Download Summary",output.getvalue(),file_name)
+
 
    
