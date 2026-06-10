@@ -284,10 +284,15 @@ if len(st.session_state.history) > 0:
     st.metric(label, f"${total:,.2f}")
 
     #  download
+
 safe_client = client.strip().replace(" ", "_") if client else "Client"
 safe_case = case.strip().replace(" ", "_") if case else "Case"
+
 file_name = f"{safe_client}_{safe_case}_summary.xlsx"
-st.download_button("Download Summary",output.getvalue(),file_name)
 
-
+st.download_button(
+    "Download Summary",
+    output.getvalue(),
+    file_name
+)
    
