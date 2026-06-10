@@ -247,7 +247,7 @@ if st.button("Save Month Calculation"):
         hist = hist[~mask]
 
     st.session_state.history = pd.concat([hist, new_row], ignore_index=True)
-    st.success(" Saved (auto overwrite)")
+    st.success(" Saved ")
 
 # =========================
 # DISPLAY
