@@ -209,7 +209,7 @@ with col2_inc:
         total += c5.number_input("Other 1",0.0,key="o1") - c6.number_input("Less ",0.0,key="l3")
 
         c7,c8 = st.columns(2)
-       total += c7.number_input("Other 2", 0.0, key="o2") - c8.number_input("Less ", 0.0, key="l4")
+           total += c7.number_input("Other 2", 0.0, key="o2") - c8.number_input("Less ", 0.0, key="l4")
 
 ✅ SWIN auto-load  
 ✅ Declared pre-fill WORKING ✅  
