@@ -37,23 +37,12 @@ def assign_group(b):
     if "SPECIAL CARE" in b: return "S/C/H"
     if "ROOM" in b: return "BOARD & ROOM"
     if "TRUST" in b or "SN/TRUS" in b: return "SN/TRUS"
-    if "CHILD BENEFIT" in b: return "CHILD BENEFIT"
-    if "DISABILITY ALLOWANCE" in b: return "DIS/ALL"
-    if "FAMILY HOMES" in b: return "FAMILY HOMES"
-    if "EDUCATION" in b: return "EDUCATION"
-    if "HOUSEHOLD ALLOWANCE" in b: return "HOUSEHOLD ALLOWANCE"
-    if "LAUNDRY" in b: return "LAUNDRY"
-    if "MEALS" in b: return "MEALS"
-    if "TRAINING" in b: return "TRAINING"
-    if "SINGLE PARENT HOME" in b: return "SINGLE PARENT"
-    if "PERSONAL CARE" in b: return "PERSONAL CARE HOME"
-    if "YWCA" in b: return "YWCA"
     return b
 
 Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
 
 # =========================
-# SWIN LOAD (NEW)
+# ✅ SWIN LOAD
 # =========================
 def load_swin_case(case):
     base_path = r"G:\SMB\Common\EABI\Data Science\02_Projects and Working Files\42-SAID Calculator Project\SWIN DATA"
@@ -61,11 +50,14 @@ def load_swin_case(case):
     if not case:
         return None
 
-    file_path = os.path.join(base_path, f"{case}.xlsx")
+    case_clean = str(case).strip()
+    file_path = os.path.join(base_path, f"{case_clean}.xlsx")
 
     if os.path.exists(file_path):
         return pd.read_excel(file_path, engine="openpyxl")
-    return None
+    else:
+        st.warning(f"⚠️ No SWIN file found for case: {case_clean}")
+        return None
 
 # =========================
 # FUNCTIONS
@@ -101,27 +93,23 @@ adults = cols[5].selectbox("Adults", list(range(1,6)))
 children = cols[6].selectbox("Children", list(range(1,27)))
 
 # =========================
-# LOAD SWIN DATA (NEW)
+# LOAD SWIN DATA
 # =========================
 swin_data = load_swin_case(case)
 
 declared_dict = {}
-income_df = pd.DataFrame()
-summary_df = pd.DataFrame()
 
 if swin_data is not None:
-    st.success("✅ SWIN data loaded")
+    case_clean = str(case).strip()
+    swin_data["Case"] = swin_data["Case"].astype(str).str.strip()
 
-    case_data = swin_data[swin_data["Case"].astype(str) == str(case)]
+    case_data = swin_data[swin_data["Case"] == case_clean]
 
-    needs_df = case_data[case_data["Field_Group"] == "NEEDS"]
-    income_df = case_data[case_data["Field_Group"] == "INCOME"]
-    summary_df = case_data[case_data["Field_Group"] == "SUMMARY"]
+    if not case_data.empty:
+        needs_df = case_data[case_data["Field_Group"] == "NEEDS"]
+        declared_dict = dict(zip(needs_df["Field_Name"], needs_df["Value"]))
 
-    declared_dict = dict(zip(needs_df["Field_Name"], needs_df["Value"]))
-else:
-    if case:
-        st.warning("⚠️ No SWIN file found")
+        st.success("✅ SWIN data loaded successfully")
 
 # =========================
 # TABLE BUILDER
@@ -130,27 +118,30 @@ def build_table(prefix):
     total = 0
     benefits = sorted(Reference["Group"].unique())
 
-    for i in range(6):
-        c1,c2 = st.columns(2)
-        b = c1.selectbox("", [""] + benefits + ["OTHER"], key=f"{prefix}_b_{i}")
+    excel_items = list(declared_dict.items()) if prefix == "d" else []
 
-        if b == "OTHER":
-            for j in range(5):
-                c3,c4 = st.columns(2)
-                name = c3.text_input("", key=f"{prefix}_name_{i}_{j}")
-                val = c4.number_input("Amount", 0.0, key=f"{prefix}_val_{i}_{j}")
-                if name.strip():
-                    total += val
+    for i in range(6):
+        c1, c2 = st.columns(2)
+
+        options = [""] + benefits + ["OTHER"]
+
+        # ✅ AUTO SELECT FROM EXCEL
+        if prefix == "d" and i < len(excel_items):
+            benefit_name = excel_items[i][0]
+            default_index = options.index(benefit_name) if benefit_name in options else 0
+        else:
+            default_index = 0
+
+        b = c1.selectbox("", options, index=default_index, key=f"{prefix}_b_{i}")
+
+        if prefix == "d" and b in declared_dict:
+            val = float(declared_dict[b])
+            c2.number_input("Amount", value=val, key=f"{prefix}_auto_{i}", disabled=True)
         else:
             opts = get_amounts(community, b, year, month)
+            val = c2.selectbox("", opts, key=f"{prefix}_amt_{i}") if opts else c2.number_input("Amount", 0.0, key=f"{prefix}_num_{i}")
 
-            if prefix == "d" and b in declared_dict:
-                val = declared_dict[b]
-                c2.number_input("Amount", value=float(val), key=f"{prefix}_auto_{i}", disabled=True)
-            else:
-                val = c2.selectbox("", opts, key=f"{prefix}_amt_{i}") if opts else c2.number_input("Amount", 0.0, key=f"{prefix}_num_{i}")
-
-            total += float(val)
+        total += float(val)
 
     return total
 
@@ -178,82 +169,60 @@ with col2:
     st.markdown(f"### Total Actual: ${actual_total:,.2f}")
 
 # =========================
-# INCOME
-# =========================
-st.divider()
-st.subheader("INCOME")
-
-h1, _, h2 = st.columns([1,0.3,1])
-with h1: st.markdown("**Declared Income**")
-with h2: st.markdown("**New Income**")
-
-_, _, cb2 = st.columns([1,0.3,1])
-with cb2:
-    same_income = st.checkbox("Same as Declared Income", True)
-
-col1_inc,_,col2_inc = st.columns([1,0.3,1])
-
-# Declared Income
-with col1_inc:
-    if not income_df.empty:
-        declared_net_total = income_df["Value"].sum()
-        c1,c2 = st.columns(2)
-        c1.number_input("Net 0", value=float(declared_net_total), disabled=True)
-        c2.number_input("Less", value=0.0, disabled=True)
-    else:
-        declared_net_total = 0
-        for i in range(4):
-            c1,c2 = st.columns(2)
-            net = c1.number_input(f"Net {i}",0.0,key=f"net{i}")
-            less = c2.number_input("Less",0.0,key=f"less{i}")
-            declared_net_total += (net - less)
-
-    st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
-
-# New Income (UNCHANGED)
-with col2_inc:
-    if same_income:
-        other_income_total = 0
-        st.info("No additional income")
-    else:
-        total = 0
-
-        c1,c2 = st.columns(2)
-        total += c1.number_input("Surplus",0.0,key="s1") - c2.number_input("Less",0.0,key="l1")
-
-        c3,c4 = st.columns(2)
-        total += c3.number_input("Interest",0.0,key="i1") - c4.number_input("Less ",0.0,key="l2")
-
-        c5,c6 = st.columns(2)
-        total += c5.number_input("Other 1",0.0,key="o1") - c6.number_input("Less ",0.0,key="l3")
-
-        c7,c8 = st.columns(2)
-        total += c7.number_input("Other 2",0.0,key="o2") - c8.number_input("Less ",0.0,key="l4")
-
-        other_income_total = total
-        st.markdown(f"**Total New Income: ${other_income_total:,.2f}**")
-
-# =========================
 # FINAL
 # =========================
-declared_total_income = declared_net_total + (0 if same_income else other_income_total)
-declared_benefit = declared_total - declared_net_total
-actual_budget = actual_total - declared_total_income
+issued = st.number_input("Benefits Issued ($)",0.0)
 
-st.markdown(f"### Benefit: ${declared_benefit:,.2f}")
-
-# ✅ AUTO-FILL ISSUED
-if not summary_df.empty and "Issued" in summary_df["Field_Name"].values:
-    issued_val = summary_df[summary_df["Field_Name"] == "Issued"]["Value"].values[0]
-    issued = st.number_input("Benefits Issued ($)", value=float(issued_val), disabled=True)
-else:
-    issued = st.number_input("Benefits Issued ($)",0.0)
-
-overpayment = issued - actual_budget
+overpayment = issued - actual_total
 label = "OVERPAYMENT" if overpayment > 0 else "UNDERPAYMENT"
+
 st.markdown(f"### {label}: ${overpayment:,.2f}")
 
 # =========================
-# SAVE + DISPLAY (UNCHANGED)
+# SAVE + DOWNLOAD
 # =========================
-# (your full save + export logic remains exactly the same)
+required_columns = [
+    "Client","Case","Month","Year",
+    "Total Declared","Total Actual",
+    "Benefit","Benefits Issued",
+    "Overpayment / Underpayment"
+]
+
+if "history" not in st.session_state:
+    st.session_state.history = pd.DataFrame(columns=required_columns)
+
+if st.button("Save Month Calculation"):
+    new_row = pd.DataFrame([{
+        "Client": client,
+        "Case": case,
+        "Month": month,
+        "Year": year,
+        "Total Declared": declared_total,
+        "Total Actual": actual_total,
+        "Benefit": declared_total,
+        "Benefits Issued": issued,
+        "Overpayment / Underpayment": overpayment
+    }])
+
+    st.session_state.history = pd.concat([st.session_state.history, new_row], ignore_index=True)
+    st.success("✅ Saved")
+
+if len(st.session_state.history) > 0:
+    st.dataframe(st.session_state.history)
+
+    output = io.BytesIO()
+
+    export_df = st.session_state.history.copy()
+    total = export_df["Overpayment / Underpayment"].sum()
+
+    summary_row = {col: None for col in export_df.columns}
+    summary_row["Client"] = "TOTAL"
+    summary_row["Overpayment / Underpayment"] = total
+
+    export_df = pd.concat([export_df, pd.DataFrame([summary_row])], ignore_index=True)
+
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        export_df.to_excel(writer, index=False)
+
+    file_name = f"{client}_{case}_summary.xlsx"
+    st.download_button("Download Summary", output.getvalue(), file_name)
