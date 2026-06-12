@@ -199,17 +199,18 @@ with col2_inc:
     else:
         total = 0
 
-        c1,c2 = st.columns(2)
-        total += c1.number_input("Surplus",0.0,key="s1") - c2.number_input("Less",0.0,key="l1")
+        c1, c2 = st.columns(2)
+        total += c1.number_input("Surplus", 0.0, key="s1") - c2.number_input("Less", 0.0, key="l1")
 
-        c3,c4 = st.columns(2)
-        total += c3.number_input("Interest",0.0,key="i1") - c4.number_input("Less ",0.0,key="l2")
+        c3, c4 = st.columns(2)
+        total += c3.number_input("Interest", 0.0, key="i1") - c4.number_input("Less ", 0.0, key="l2")
 
-        c5,c6 = st.columns(2)
-        total += c5.number_input("Other 1",0.0,key="o1") - c6.number_input("Less ",0.0,key="l3")
+        c5, c6 = st.columns(2)
+        total += c5.number_input("Other 1", 0.0, key="o1") - c6.number_input("Less ", 0.0, key="l3")
 
-        c7,c8 = st.columns(2)
-           total += c7.number_input("Other 2", 0.0, key="o2") - c8.number_input("Less ", 0.0, key="l4")
+        c7, c8 = st.columns(2)
+        total += c7.number_input("Other 2", 0.0, key="o2") - c8.number_input("Less ", 0.0, key="l4")
+
 
 ✅ SWIN auto-load  
 ✅ Declared pre-fill WORKING ✅  
