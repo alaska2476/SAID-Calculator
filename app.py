@@ -79,6 +79,17 @@ def get_amounts(comm, group, year, month):
         (Reference["End_Date"] >= date)
     ]
     return sorted(df["Amount"].dropna().unique())
+def get_filtered_benefits(comm, year, month):
+    tier = get_tier(comm)
+    date = pd.to_datetime(f"{year} {month} 01")
+
+    df = Reference[
+        ((Reference["Tier"] == tier) | (Reference["Tier"] == "ALL")) &
+        (Reference["Start_Date"] <= date) &
+        (Reference["End_Date"] >= date)
+    ]
+
+    return sorted(df["Group"].dropna().unique())
 
 # =========================
 # HEADER
@@ -99,7 +110,7 @@ children = cols[6].selectbox("Children", list(range(0,27)))
 # =========================
 def build_table(prefix):
     total = 0
-    benefits = sorted(Reference["Group"].unique())
+    benefits = get_filtered_benefits(community, year, month)
 
     for i in range(6):
         c1,c2 = st.columns(2)
