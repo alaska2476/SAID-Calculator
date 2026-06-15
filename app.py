@@ -30,8 +30,6 @@ Reference["Amount"] = Reference["Amount"].astype(float)
 # =========================
 #  GROUPING 
 # =========================
-#  GROUPING 
-# =========================
 def assign_group(b):
     if "ADULTS VISITING" in b: return "F/ADULT"
     if "APPROVED HOME" in b: return "AP/HOME"
