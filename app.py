@@ -46,7 +46,7 @@ def assign_group(b):
     if "TRUST" in b or "SN/TRUS" in b: return "SN/TRUS"
     if "EDUCATION AND TRAINING " in b: return "EDUC-TI"
     if "EDUCATION EXPENSES AGE" in b: return "SN/EDUC"    
-    if "FAMILY HOMES" in b: return "FAMILY HOMES"
+    if "FAMILY HOMES" in b: return "FA HOME"
     if "EDUCATION" in b: return "EDUCATION"
     if "HOUSEHOLD ALLOWANCE" in b: return "HOUSEHOLD ALLOWANCE"
     if "LAUNDRY" in b: return "LAUNDRY"
