@@ -245,14 +245,18 @@ actual_budget = actual_total - declared_total_income
 
 st.markdown(f"### Benefit: ${declared_benefit:,.2f}")
 
-issued = st.number_input("Benefits Issued ($)",0.0)
-overpayment = issued - actual_budget
-if overpayment > 0:
+issued = st.number_input("Benefits Issued ($)", 0.0)
+
+difference = issued - actual_budget
+
+# ✅ YOUR BUSINESS RULE
+if difference < 0:
     label = "OVERPAYMENT"
 else:
     label = "UNDERPAYMENT"
 
-st.markdown(f"### {label}: ${overpayment:,.2f}")
+# ✅ SHOW POSITIVE VALUE
+st.markdown(f"### {label}: ${abs(difference):,.2f}")
 
 
 # =========================
@@ -294,7 +298,7 @@ if st.button("Save Month Calculation"):
         "Total Income": declared_total_income,
         "Benefit": declared_benefit,
         "Benefits Issued": issued,
-        "Overpayment / Underpayment": overpayment
+        "Overpayment / Underpayment": difference
     }])
 
     hist = st.session_state.history.copy()
