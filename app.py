@@ -81,7 +81,7 @@ def get_filtered_benefits(comm, year, month, adults, children):
         (Reference["End_Date"] >= date)
     ]
 
-    # ✅ Filter by Adults/Children (if applicable)
+    # Filter by Adults/Children (if applicable)
     df = df[
         ((df["Adults"].isna()) | (df["Adults"] == adults)) &
         ((df["Children"].isna()) | (df["Children"] == children))
