@@ -52,16 +52,11 @@ def assign_group(b):
     if "PERSONAL CARE" in b: return "P/C HOME" 
     if "SALVATION" in b: return "S/A-A/R"
     if "SANCTUARY " in b: return "B&R/SH"  
-    if "SHELTER AWAY" in b: return "SH/AWAY"  
     if "SHELTER" in b: return "SHELTER"    
     if "SPECIAL CARE" in b: return "S/C/H"
-    if "TRUST" in b or "SN/TRUS" in b: return "SN/TRUS"
-    
-   
-    if "TRAINING" in b: return "TRAINING"
-    if "SINGLE PARENT HOME" in b: return "SINGLE PARENT"
-   
-    if "YWCA" in b: return "YWCA"
+    if "SINGLE PARENT HOME" in b: return "SP/RES"
+    if "TRAINING" in b: return "SN/TRAL"
+    if "YWCA" in b: return "YWCA PA" 
     return b
 
 Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
