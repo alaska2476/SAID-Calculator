@@ -32,14 +32,20 @@ Reference["Amount"] = Reference["Amount"].astype(float)
 # =========================
 def assign_group(b):
     if "ADULTS VISITING" in b: return "F/ADULT"
-    if "APPROVED HOME" in b: return "AP/HOME"   
-    if "LIVING" in b: return "LIVING"
-   
+    if "APPROVED HOME" in b: return "AP/HOME"
+    if "BASIC ALLOWANCE" in b: return "BASC/AL"
+    if "BOARD & ROOM" in b: return "B+C/+CC"
+    if "BOARD & ROOM/FAMILY" or "BOARD&ROOM/CHILDREN" in b: return "BR CHILD"
+    if "CHILD BENEFIT" in b: return "SN/CHILD"
     if "CLOTHING" in b: return "CLOTHING"
+    if "DISABILITY ALLOWANCE" in b: return "DIS/ALL"
+        
+    if "LIVING" in b: return "LIVING"
     if "SPECIAL CARE" in b: return "S/C/H"
     if "TRUST" in b or "SN/TRUS" in b: return "SN/TRUS"
-    if "CHILD BENEFIT" in b: return "CHILD BENEFIT"
-    if "DISABILITY ALLOWANCE" in b: return "DIS/ALL"
+    if "EDUCATION AND TRAINING " in b: return "EDUC-TI"
+    if "EDUCATION EXPENSES AGE" in b: return "SN/EDUC"
+         
     if "FAMILY HOMES" in b: return "FAMILY HOMES"
     if "EDUCATION" in b: return "EDUCATION"
     if "HOUSEHOLD ALLOWANCE" in b: return "HOUSEHOLD ALLOWANCE"
