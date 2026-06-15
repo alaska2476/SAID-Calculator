@@ -47,14 +47,20 @@ def assign_group(b):
     if "FAMILY HOMES" in b: return "FA HOME"
     if "EDUCATION" in b: return "EDUCATION"
     if "LAUNDRY" in b: return "SN/LAUD"
-        
+    if "MEALS AT HOME" in b: return "MEAL/HO" 
+    if "MEALS AWAY" in b: return "MEAL/AW"
+    if "PERSONAL CARE" in b: return "P/C HOME" 
+    if "SALVATION" in b: return "S/A-A/R"
+    if "SANCTUARY " in b: return "B&R/SH"  
+    if "SHELTER AWAY" in b: return "SH/AWAY"  
+    if "SHELTER" in b: return "SHELTER"    
     if "SPECIAL CARE" in b: return "S/C/H"
     if "TRUST" in b or "SN/TRUS" in b: return "SN/TRUS"
     
-    if "MEALS" in b: return "MEALS"
+   
     if "TRAINING" in b: return "TRAINING"
     if "SINGLE PARENT HOME" in b: return "SINGLE PARENT"
-    if "PERSONAL CARE" in b: return "PERSONAL CARE HOME"
+   
     if "YWCA" in b: return "YWCA"
     return b
 
