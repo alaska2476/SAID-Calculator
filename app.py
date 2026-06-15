@@ -57,6 +57,7 @@ def assign_group(b):
     if "SINGLE PARENT HOME" in b: return "SP/RES"
     if "TRAINING" in b: return "SN/TRAL"
     if "YWCA" in b: return "YWCA PA" 
+    if "GROUP HOME TH-INTERVAL-SKN" in b: return "P/C HOME" 
     return b
 
 Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
