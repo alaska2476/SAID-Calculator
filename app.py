@@ -35,6 +35,7 @@ def assign_group(b):
     if "LIVING" in b: return "LIVING"
     if "APPROVED HOME" in b: return "AP/HOME"
     if "BASIC ALLOWANCE" in b: return "BASC/AL"
+    if "BOARD & ROOM" in b: return "B+C/+CC"
         
     if "CLOTHING" in b: return "CLOTHING"
     if "SPECIAL CARE" in b: return "S/C/H"
