@@ -83,7 +83,7 @@ case = cols[1].text_input("Case #")
 community = cols[2].selectbox("Community", Community["Community"].unique())
 month = cols[3].selectbox("Month", ["January","February","March","April","May","June","July","August","September","October","November","December"])
 year = cols[4].selectbox("Year", list(range(2020, 2027)))
-adults = cols[5].selectbox("Adults", list(range(1,6)))
+adults = cols[5].selectbox("Adults", list(range(0,6)))
 children = cols[6].selectbox("Children", list(range(0,27)))
 
 # =========================
