@@ -55,32 +55,22 @@ Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
 
 # =========================
 # FUNCTIONS
-def get_filtered_benefits(comm, year, month, adults, children):
+# =========================
+def get_tier(comm):
+    t = Community.loc[Community["Community"] == comm, "Tier"]
+    return t.values[0] if len(t) > 0 else "D"
+
+def get_amounts(comm, group, year, month):
     tier = get_tier(comm)
     date = pd.to_datetime(f"{year} {month} 01")
 
     df = Reference[
+        (Reference["Group"] == group) &
         ((Reference["Tier"] == tier) | (Reference["Tier"] == "ALL")) &
         (Reference["Start_Date"] <= date) &
         (Reference["End_Date"] >= date)
     ]
-
-    # ✅ STRICT FILTER
-    if "Adults" in df.columns:
-        df = df[(df["Adults"].isna()) | (df["Adults"] == adults)]
-
-    if "Children" in df.columns:
-        df = df[(df["Children"].isna()) | (df["Children"] == children)]
-
-    # ✅ ONLY GROUPS THAT HAVE DATA
-    valid_groups = []
-
-    for grp in df["Group"].dropna().unique():
-        sub = df[df["Group"] == grp]
-        if not sub["Amount"].dropna().empty:
-            valid_groups.append(grp)
-
-    return sorted(valid_groups)
+    return sorted(df["Amount"].dropna().unique())
 
 # =========================
 # HEADER
@@ -93,7 +83,7 @@ case = cols[1].text_input("Case #")
 community = cols[2].selectbox("Community", Community["Community"].unique())
 month = cols[3].selectbox("Month", ["January","February","March","April","May","June","July","August","September","October","November","December"])
 year = cols[4].selectbox("Year", list(range(2020, 2027)))
-adults = cols[5].selectbox("Adults", list(range(0,6)))
+adults = cols[5].selectbox("Adults", list(range(1,6)))
 children = cols[6].selectbox("Children", list(range(0,27)))
 
 # =========================
@@ -115,7 +105,7 @@ def build_table(prefix):
                 if name.strip():
                     total += val
         else:
-           opts = get_amounts(community, b, year, month, adults, children)
+            opts = get_amounts(community, b, year, month)
             val = c2.selectbox("", opts, key=f"{prefix}_amt_{i}") if opts else c2.number_input("Amount", 0.0, key=f"{prefix}_num_{i}")
             total += float(val)
 
