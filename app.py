@@ -37,19 +37,20 @@ def assign_group(b):
     if "BOARD & ROOM" in b: return "B+C/+CC"   
 
     if "EXCESS" in b: return "C.T.R."
-    
     if "CHILD BENEFIT" in b: return "SN/CHILD"
     if "CLOTHING" in b: return "CLOTHING"
     if "DISABILITY ALLOWANCE" in b: return "DIS/ALL"     
     if "LIVING" in b: return "LIVING"
-    if "SPECIAL CARE" in b: return "S/C/H"
-    if "TRUST" in b or "SN/TRUS" in b: return "SN/TRUS"
+    if "HOME HEATING/ENERGY" in b: return "ENERGY"
     if "EDUCATION AND TRAINING " in b: return "EDUC-TI"
     if "EDUCATION EXPENSES AGE" in b: return "SN/EDUC"    
     if "FAMILY HOMES" in b: return "FA HOME"
     if "EDUCATION" in b: return "EDUCATION"
-    if "HOUSEHOLD ALLOWANCE" in b: return "HOUSEHOLD ALLOWANCE"
-    if "LAUNDRY" in b: return "LAUNDRY"
+    if "LAUNDRY" in b: return "SN/LAUD"
+        
+    if "SPECIAL CARE" in b: return "S/C/H"
+    if "TRUST" in b or "SN/TRUS" in b: return "SN/TRUS"
+    
     if "MEALS" in b: return "MEALS"
     if "TRAINING" in b: return "TRAINING"
     if "SINGLE PARENT HOME" in b: return "SINGLE PARENT"
