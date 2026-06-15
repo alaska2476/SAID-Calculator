@@ -34,9 +34,7 @@ def assign_group(b):
     if "ADULTS VISITING" in b: return "F/ADULT"
     if "APPROVED HOME" in b: return "AP/HOME"
     if "BASIC ALLOWANCE" in b: return "BASC/AL"
-    if "BOARD & ROOM" in b: return "B+C/+CC"
-    if "BOARD & ROOM/FAMILY" in b: return "BR CHILD"
-        
+    if "BOARD & ROOM" in b: return "B+C/+CC"    
     if "CHILD BENEFIT" in b: return "SN/CHILD"
     if "CLOTHING" in b: return "CLOTHING"
     if "DISABILITY ALLOWANCE" in b: return "DIS/ALL"     
