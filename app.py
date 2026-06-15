@@ -77,8 +77,10 @@ def get_amounts(comm, group, year, month):
         (Reference["Start_Date"] <= date) &
         (Reference["End_Date"] >= date)
     ]
+
     return sorted(df["Amount"].dropna().unique())
 
+# ✅ FINAL FIXED FILTER FUNCTION
 def get_filtered_benefits(comm, year, month):
     tier = get_tier(comm)
     date = pd.to_datetime(f"{year} {month} 01")
@@ -89,7 +91,15 @@ def get_filtered_benefits(comm, year, month):
         (Reference["End_Date"] >= date)
     ]
 
-    return sorted(df["Group"].dropna().unique())
+    # ✅ ONLY keep groups that actually exist AFTER filtering AND have amounts
+    valid_groups = []
+
+    for grp in df["Group"].dropna().unique():
+        sub = df[df["Group"] == grp]
+        if not sub["Amount"].dropna().empty:
+            valid_groups.append(grp)
+
+    return sorted(valid_groups)
 
 # =========================
 # HEADER
@@ -106,16 +116,17 @@ adults = cols[5].selectbox("Adults", list(range(1,6)))
 children = cols[6].selectbox("Children", list(range(0,27)))
 
 # =========================
-# TABLE BUILDER (FIXED ONLY HERE)
+# TABLE BUILDER (CORRECTED)
 # =========================
 def build_table(prefix):
     total = 0
+
+    # ✅ FILTERED BENEFITS BASED ON COMMUNITY + MONTH + YEAR
     benefits = get_filtered_benefits(community, year, month)
 
     for i in range(6):
-        c1,c2 = st.columns(2)
+        c1, c2 = st.columns(2)
 
-        # ✅ Force dropdown refresh
         b = c1.selectbox(
             "",
             [""] + benefits + ["OTHER"],
@@ -123,13 +134,13 @@ def build_table(prefix):
             index=0
         )
 
-        # ✅ Clear invalid old selections
+        # ✅ Prevent stale selections
         if b not in benefits + ["", "OTHER"]:
             b = ""
 
         if b == "OTHER":
             for j in range(5):
-                c3,c4 = st.columns(2)
+                c3, c4 = st.columns(2)
                 name = c3.text_input("", key=f"{prefix}_name_{i}_{j}")
                 val = c4.number_input("Amount", 0.0, key=f"{prefix}_val_{i}_{j}")
                 if name.strip():
@@ -137,7 +148,6 @@ def build_table(prefix):
         else:
             opts = get_amounts(community, b, year, month)
 
-            # ✅ Refresh amounts correctly
             if opts:
                 val = c2.selectbox("", opts, key=f"{prefix}_amt_{i}", index=0)
             else:
