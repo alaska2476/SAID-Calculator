@@ -131,8 +131,8 @@ month = cols[3].selectbox("Month", [
 year = cols[4].selectbox("Year", list(range(2020, 2027)), key="year")
 adults = cols[5].selectbox(
     "Adults",
-    [0, 1, 2, 3, 4],               # hard-coded values
-    key="adults_2026_FINAL"        # brand new unique key
+    [0, 1, 2, 3, 4,5],              
+    key="adults_2026_FINAL"       
 )
 
 children = cols[6].selectbox("Children", list(range(0,27)), key="children")
