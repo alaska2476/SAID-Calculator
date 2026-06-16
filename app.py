@@ -67,7 +67,7 @@ def assign_group(b):
     "LIVING INCOME LIGHT HOUSE/LT",
     "LIVING INCOME RESIDENTIAL",
     "LIVING INCOME SALVTN ARMY/LT"
-    ]:
+ ]:
     return "LIVING"
 
 Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
