@@ -19,6 +19,9 @@ def load_excel_safe(path):
 Reference = load_excel_safe("Reference.xlsx")
 Community = load_excel_safe("Community.xlsx")
 
+Reference["Adults"] = Reference["Adults"].astype(int)
+Reference["Children"] = Reference["Children"].astype(int)
+
 # =========================
 # CLEAN DATA
 # =========================
