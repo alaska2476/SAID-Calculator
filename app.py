@@ -45,7 +45,7 @@ def assign_group(b):
     if "CLOTHING" in b: return "CLOTHING"
     if "DISABILITY ALLOWANCE" in b: return "DIS/ALL"
 
-    # ✅ FIXED LIVING GROUP (EXACT MATCH)
+    # FIXED LIVING GROUP (EXACT MATCH)
     if b in [
         "LIVING INCOME ALLOWANCE",
         "LIVING INCOME BOARD AND RM",
@@ -150,7 +150,7 @@ adults = cols[5].selectbox(
 
 children = cols[6].selectbox(
     "Children",
-    [ 1, 2, 3, 4, 5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,22,23,24,25,26],       
+    [ 1, 2, 3, 4, 5,6,7,8,9,10,11,12,13,14,15,16,17,18,19, 20,21,22,23,24,25,26],       
     key="children_FINAL_2026"
 )
 
