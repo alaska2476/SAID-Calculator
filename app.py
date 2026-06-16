@@ -43,7 +43,14 @@ def assign_group(b):
     if "CLOTHING" in b: return "CLOTHING"
     if "DISABILITY ALLOWANCE" in b: return "DIS/ALL"
         
-    if "LIVING INCOME" in b: return "LIVING"
+    if b in [
+    "LIVING INCOME ALLOWANCE",
+    "LIVING INCOME BOARD AND RM",
+    "LIVING INCOME LIGHT HOUSE/LT",
+    "LIVING INCOME RESIDENTIAL",
+    "LIVING INCOME SALVTN ARMY/LT"
+]:
+    return "LIVING"
         
     if "HOME HEATING/ENERGY" in b: return "ENERGY"
     if "EDUCATION AND TRAINING " in b: return "EDUC-TI"
