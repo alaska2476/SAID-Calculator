@@ -97,12 +97,6 @@ def get_filtered_benefits(comm, year, month, adults, children):
     return sorted(valid_groups)
 
 def get_amounts(comm, group, year, month, adults, children):
-
-    # ✅ HARD OVERRIDE FIRST (BEFORE ANY FILTERING)
-    if group == "DIS/ALL":
-        return [70.0]
-
-    # ✅ NORMAL LOGIC AFTER
     tier = get_tier(comm)
     date = pd.to_datetime(f"{year} {month} 01")
 
@@ -119,8 +113,6 @@ def get_amounts(comm, group, year, month, adults, children):
     ]
 
     return sorted(df["Amount"].dropna().unique())
-
-
 
 # =========================
 # HEADER
