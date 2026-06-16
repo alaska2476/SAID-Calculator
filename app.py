@@ -62,14 +62,7 @@ def assign_group(b):
     if "YWCA" in b: return "YWCA PA" 
     if "TRUST" in b or "SN/TRUS" in b: return "SN/TRUS"
     return b
-if b in [
-    "LIVING INCOME ALLOWANCE",
-    "LIVING INCOME BOARD AND RM",
-    "LIVING INCOME LIGHT HOUSE/LT",
-    "LIVING INCOME RESIDENTIAL",
-    "LIVING INCOME SALVTN ARMY/LT"
-]:
-    return "LIVING"
+
     
 Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
 
