@@ -36,42 +36,34 @@ def assign_group(b):
     if "ADULTS VISITING" in b: return "F/ADULT"
     if "APPROVED HOME" in b: return "AP/HOME"
     if "BASIC ALLOWANCE" in b: return "BASC/AL"
-    if "BOARD & ROOM" in b: return "B+C/+CC"
+    if "BOARD & ROOM" in b: return "B+C/+CC"   
 
     if "EXCESS" in b: return "C.T.R."
     if "CHILD BENEFIT" in b: return "SN/CHILD"
     if "CLOTHING" in b: return "CLOTHING"
-    if "DISABILITY ALLOWANCE" in b: return "DIS/ALL"
-
-    # ✅ FIXED LIVING GROUP (INSIDE FUNCTION)
-    if b in [
-        "LIVING INCOME ALLOWANCE",
-        "LIVING INCOME BOARD AND RM",
-        "LIVING INCOME LIGHT HOUSE/LT",
-        "LIVING INCOME RESIDENTIAL",
-        "LIVING INCOME SALVTN ARMY/LT"
-    ]:
-        return "LIVING"
-
+    if "DISABILITY ALLOWANCE" in b: return "DIS/ALL"     
+    if "LIVING" in b: return "LIVING"
     if "HOME HEATING/ENERGY" in b: return "ENERGY"
-    if "EDUCATION AND TRAINING" in b: return "EDUC-TI"
-    if "EDUCATION EXPENSES AGE" in b: return "SN/EDUC"
+    if "EDUCATION AND TRAINING " in b: return "EDUC-TI"
+    if "EDUCATION EXPENSES AGE" in b: return "SN/EDUC"    
     if "FAMILY HOMES" in b: return "FA HOME"
     if "EDUCATION" in b: return "EDUCATION"
     if "LAUNDRY" in b: return "SN/LAUD"
-    if "MEALS AT HOME" in b: return "MEAL/HO"
+    if "MEALS AT HOME" in b: return "MEAL/HO" 
     if "MEALS AWAY" in b: return "MEAL/AW"
-    if "PERSONAL CARE" in b: return "P/C HOME"
+    if "PERSONAL CARE" in b: return "P/C HOME" 
     if "SALVATION" in b: return "S/A-A/R"
-    if "SANCTUARY" in b: return "B&R/SH"
-    if "SHELTER" in b: return "SHELTER"
+    if "SANCTUARY " in b: return "B&R/SH"  
+    if "SHELTER" in b: return "SHELTER"    
     if "SPECIAL CARE" in b: return "S/C/H"
     if "SINGLE PARENT HOME" in b: return "SP/RES"
     if "TRAINING" in b: return "SN/TRAL"
-    if "YWCA" in b: return "YWCA PA"
+    if "YWCA" in b: return "YWCA PA" 
     if "TRUST" in b or "SN/TRUS" in b: return "SN/TRUS"
-
     return b
+
+Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
+
 
 # =========================
 # FUNCTIONS
