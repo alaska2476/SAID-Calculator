@@ -135,7 +135,7 @@ adults = cols[5].selectbox(
     key="adults_2026_FINAL"       
 )
 
-children = cols[6].selectbox("Children", list(range(0,27)), key="children")
+children = cols[6].selectbox("Children", list(range(1,27)), key="children")
 
 # =========================
 # TABLE BUILDER
