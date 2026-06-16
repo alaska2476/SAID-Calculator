@@ -98,11 +98,11 @@ def get_filtered_benefits(comm, year, month, adults, children):
 
 def get_amounts(comm, group, year, month, adults, children):
 
-    # SPECIAL RULE FOR DISABILITY ALLOWANCE
+    # ✅ FORCE VALUE
     if group == "DIS/ALL":
         return [70.0]
 
-    # NORMAL LOGIC FOR EVERYTHING ELSE
+    # ✅ NORMAL LOGIC
     tier = get_tier(comm)
     date = pd.to_datetime(f"{year} {month} 01")
 
@@ -119,6 +119,7 @@ def get_amounts(comm, group, year, month, adults, children):
     ]
 
     return sorted(df["Amount"].dropna().unique())
+
 
 
 # =========================
