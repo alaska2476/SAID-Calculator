@@ -358,6 +358,7 @@ if len(st.session_state.history) > 0:
     safe_client = client.strip().replace(" ", "_") if client else "Client"
     safe_case = case.strip().replace(" ", "_") if case else "Case"
     file_name = f"{safe_client}_{safe_case}_summary.xlsx"
+st.write(df[df["Group"] == "DIS/ALL"][["Benefit", "Adults", "Amount"]].head(20))
 
     #  DOWNLOAD BUTTON
     st.download_button("Download Summary", output.getvalue(), file_name)
