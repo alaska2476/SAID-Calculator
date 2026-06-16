@@ -259,15 +259,13 @@ issued = st.number_input("Benefits Issued ($)", 0.0)
 
 difference = issued - actual_budget
 
-# YOUR BUSINESS RULE
-if difference < 0:
-    label = "OVERPAYMENT"
-else:
+# ✅ NEW BUSINESS RULE
+if difference <= 0:
     label = "UNDERPAYMENT"
-
+else:
+    label = "OVERPAYMENT"
 #  SHOW POSITIVE VALUE
 st.markdown(f"### {label}: ${abs(difference):,.2f}")
-
 
 # =========================
 # SAVE
