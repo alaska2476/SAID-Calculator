@@ -4,10 +4,6 @@ import pandas as pd
 import os
 import io
 
-if "reset_done" not in st.session_state:
-    st.session_state.clear()
-    st.session_state["reset_done"] = True
-
 st.set_page_config(layout="wide")
 
 # =========================
