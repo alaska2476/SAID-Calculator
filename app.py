@@ -48,7 +48,7 @@ def assign_group(b):
     "LIVING INCOME LIGHT HOUSE/LT",
     "LIVING INCOME RESIDENTIAL",
     "LIVING INCOME SALVTN ARMY/LT"
-    ]:
+]:
     return "LIVING"
     
     if "HOME HEATING/ENERGY" in b: return "ENERGY"
