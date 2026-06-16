@@ -106,7 +106,24 @@ def get_filtered_benefits(comm, year, month, adults, children):
             valid_groups.append(grp)
 
     return sorted(valid_groups)
+def get_amounts(comm, group, year, month, adults, children):
+    tier = get_tier(comm)
+    date = pd.to_datetime(f"{year} {month} 01")
 
+    df = Reference[
+        (Reference["Group"] == group) &
+        ((Reference["Tier"] == tier) | (Reference["Tier"] == "ALL")) &
+        (Reference["Start_Date"] <= date) &
+        (Reference["End_Date"] >= date)
+    ]
+
+    # ✅ SAME FIXED FILTER (IMPORTANT)
+    df = df[
+        ((df["Adults"].isna()) | (df["Adults"] >= adults)) &
+        ((df["Children"].isna()) | (df["Children"] >= children))
+    ]
+
+    return sorted(df["Amount"].dropna().unique())
 # =========================
 # HEADER
 # =========================
