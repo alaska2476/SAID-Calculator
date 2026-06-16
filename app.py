@@ -1,6 +1,4 @@
-if "reset_done" not in st.session_state:
-    st.session_state.clear()
-    st.session_state["reset_done"] = True
+
     
 import streamlit as st
 import pandas as pd
