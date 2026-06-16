@@ -41,8 +41,10 @@ def assign_group(b):
     if "EXCESS" in b: return "C.T.R."
     if "CHILD BENEFIT" in b: return "SN/CHILD"
     if "CLOTHING" in b: return "CLOTHING"
-    if "DISABILITY ALLOWANCE" in b: return "DIS/ALL"     
-    if "LIVING" in b: return "LIVING"
+    if "DISABILITY ALLOWANCE" in b: return "DIS/ALL"
+        
+    if "LIVING INCOME" in b: return "LIVING"
+        
     if "HOME HEATING/ENERGY" in b: return "ENERGY"
     if "EDUCATION AND TRAINING " in b: return "EDUC-TI"
     if "EDUCATION EXPENSES AGE" in b: return "SN/EDUC"    
