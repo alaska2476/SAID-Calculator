@@ -98,11 +98,11 @@ def get_filtered_benefits(comm, year, month, adults, children):
 
 def get_amounts(comm, group, year, month, adults, children):
 
-    # ✅ FORCE VALUE
+    # ✅ HARD OVERRIDE FIRST (BEFORE ANY FILTERING)
     if group == "DIS/ALL":
         return [70.0]
 
-    # ✅ NORMAL LOGIC
+    # ✅ NORMAL LOGIC AFTER
     tier = get_tier(comm)
     date = pd.to_datetime(f"{year} {month} 01")
 
