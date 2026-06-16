@@ -4,6 +4,10 @@ import pandas as pd
 import os
 import io
 
+if "reset_done" not in st.session_state:
+    st.session_state.clear()
+    st.session_state["reset_done"] = True
+
 st.set_page_config(layout="wide")
 
 # =========================
@@ -129,7 +133,7 @@ month = cols[3].selectbox("Month", [
     "July","August","September","October","November","December"
 ], key="month")
 year = cols[4].selectbox("Year", list(range(2020, 2027)), key="year")
-adults = cols[5].selectbox("Adults", list(range(0,5)), key="adults")
+adults = cols[5].selectbox("Adults", list(range(0,5)), key="adults_FIX_1")
 children = cols[6].selectbox("Children", list(range(0,27)), key="children")
 
 # =========================
