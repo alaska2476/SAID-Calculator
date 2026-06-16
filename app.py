@@ -19,9 +19,6 @@ def load_excel_safe(path):
 Reference = load_excel_safe("Reference.xlsx")
 Community = load_excel_safe("Community.xlsx")
 
-Reference["Adults"] = pd.to_numeric(Reference["Adults"], errors="coerce").fillna(0).astype(int)
-Reference["Children"] = pd.to_numeric(Reference["Children"], errors="coerce").fillna(0).astype(int)
-
 # =========================
 # CLEAN DATA
 # =========================
@@ -39,41 +36,30 @@ def assign_group(b):
     if "ADULTS VISITING" in b: return "F/ADULT"
     if "APPROVED HOME" in b: return "AP/HOME"
     if "BASIC ALLOWANCE" in b: return "BASC/AL"
-    if "BOARD & ROOM" in b: return "B+C/+CC"
+    if "BOARD & ROOM" in b: return "B+C/+CC"   
 
     if "EXCESS" in b: return "C.T.R."
     if "CHILD BENEFIT" in b: return "SN/CHILD"
     if "CLOTHING" in b: return "CLOTHING"
-    if "DISABILITY ALLOWANCE" in b: return "DIS/ALL"
-
-    # FIXED LIVING GROUP (EXACT MATCH)
-    if b in [
-        "LIVING INCOME ALLOWANCE",
-        "LIVING INCOME BOARD AND RM",
-        "LIVING INCOME LIGHT HOUSE/LT",
-        "LIVING INCOME RESIDENTIAL",
-        "LIVING INCOME SALVTN ARMY/LT"
-    ]:
-        return "LIVING"
-
+    if "DISABILITY ALLOWANCE" in b: return "DIS/ALL"     
+    if "LIVING" in b: return "LIVING"
     if "HOME HEATING/ENERGY" in b: return "ENERGY"
-    if "EDUCATION AND TRAINING" in b: return "EDUC-TI"
-    if "EDUCATION EXPENSES AGE" in b: return "SN/EDUC"
+    if "EDUCATION AND TRAINING " in b: return "EDUC-TI"
+    if "EDUCATION EXPENSES AGE" in b: return "SN/EDUC"    
     if "FAMILY HOMES" in b: return "FA HOME"
     if "EDUCATION" in b: return "EDUCATION"
     if "LAUNDRY" in b: return "SN/LAUD"
-    if "MEALS AT HOME" in b: return "MEAL/HO"
+    if "MEALS AT HOME" in b: return "MEAL/HO" 
     if "MEALS AWAY" in b: return "MEAL/AW"
-    if "PERSONAL CARE" in b: return "P/C HOME"
+    if "PERSONAL CARE" in b: return "P/C HOME" 
     if "SALVATION" in b: return "S/A-A/R"
-    if "SANCTUARY" in b: return "B&R/SH"
-    if "SHELTER" in b: return "SHELTER"
+    if "SANCTUARY " in b: return "B&R/SH"  
+    if "SHELTER" in b: return "SHELTER"    
     if "SPECIAL CARE" in b: return "S/C/H"
     if "SINGLE PARENT HOME" in b: return "SP/RES"
     if "TRAINING" in b: return "SN/TRAL"
-    if "YWCA" in b: return "YWCA PA"
+    if "YWCA" in b: return "YWCA PA" 
     if "TRUST" in b or "SN/TRUS" in b: return "SN/TRUS"
-
     return b
 
 Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
@@ -82,6 +68,10 @@ Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
 # =========================
 # FUNCTIONS
 # =========================
+def get_tier(comm):
+    t = Community.loc[Community["Community"] == comm, "Tier"]
+    return t.values[0] if len(t) > 0 else "D"
+
 def get_filtered_benefits(comm, year, month, adults, children):
     tier = get_tier(comm)
     date = pd.to_datetime(f"{year} {month} 01")
@@ -92,10 +82,10 @@ def get_filtered_benefits(comm, year, month, adults, children):
         (Reference["End_Date"] >= date)
     ]
 
-    # ✅ FIXED FILTER (ALL PROPERLY INDENTED)
+    # Filter by Adults/Children (if applicable)
     df = df[
-        ((df["Adults"].isna()) | (df["Adults"] >= adults)) &
-        ((df["Children"].isna()) | (df["Children"] >= children))
+        ((df["Adults"].isna()) | (df["Adults"] == adults)) &
+        ((df["Children"].isna()) | (df["Children"] == children))
     ]
 
     valid_groups = []
@@ -106,6 +96,7 @@ def get_filtered_benefits(comm, year, month, adults, children):
             valid_groups.append(grp)
 
     return sorted(valid_groups)
+
 def get_amounts(comm, group, year, month, adults, children):
     tier = get_tier(comm)
     date = pd.to_datetime(f"{year} {month} 01")
@@ -117,13 +108,13 @@ def get_amounts(comm, group, year, month, adults, children):
         (Reference["End_Date"] >= date)
     ]
 
-    # ✅ SAME FIXED FILTER (IMPORTANT)
     df = df[
-        ((df["Adults"].isna()) | (df["Adults"] >= adults)) &
-        ((df["Children"].isna()) | (df["Children"] >= children))
+        ((df["Adults"].isna()) | (df["Adults"] == adults)) &
+        ((df["Children"].isna()) | (df["Children"] == children))
     ]
 
     return sorted(df["Amount"].dropna().unique())
+
 # =========================
 # HEADER
 # =========================
@@ -146,7 +137,7 @@ adults = cols[5].selectbox(
 
 children = cols[6].selectbox(
     "Children",
-    [ 1, 2, 3, 4, 5,6,7,8,9,10,11,12,13,14,15,16,17,18,19, 20,21,22,23,24,25,26],       
+    [ 1, 2, 3, 4, 5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,22,23,24,25,26],       
     key="children_FINAL_2026"
 )
 
