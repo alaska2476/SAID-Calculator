@@ -98,12 +98,6 @@ def get_filtered_benefits(comm, year, month, adults, children):
 
 def get_amounts(comm, group, year, month, adults, children):
 
-    # ✅ STRICT FILTER FOR DIS/ALL
-    if group == "DIS/ALL":
-        df = Reference[Reference["Benefit"].str.contains("SAID-BA/T", case=False, na=False)]
-        return [70.0] if not df.empty else []
-
-    # ✅ NORMAL LOGIC
     tier = get_tier(comm)
     date = pd.to_datetime(f"{year} {month} 01")
 
