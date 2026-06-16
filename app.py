@@ -19,7 +19,8 @@ def load_excel_safe(path):
 Reference = load_excel_safe("Reference.xlsx")
 Community = load_excel_safe("Community.xlsx")
 
-
+Reference["Adults"] = pd.to_numeric(Reference["Adults"], errors="coerce").fillna(0).astype(int)
+Reference["Children"] = pd.to_numeric(Reference["Children"], errors="coerce").fillna(0).astype(int)
 
 # =========================
 # CLEAN DATA
