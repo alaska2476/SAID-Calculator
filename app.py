@@ -79,10 +79,6 @@ Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
 # =========================
 # FUNCTIONS
 # =========================
-def get_tier(comm):
-    t = Community.loc[Community["Community"] == comm, "Tier"]
-    return t.values[0] if len(t) > 0 else "D"
-
 def get_filtered_benefits(comm, year, month, adults, children):
     tier = get_tier(comm)
     date = pd.to_datetime(f"{year} {month} 01")
@@ -93,12 +89,13 @@ def get_filtered_benefits(comm, year, month, adults, children):
         (Reference["End_Date"] >= date)
     ]
 
-    # Filter by Adults/Children (if applicable)
-df = df[
-    ((df["Adults"].isna()) | (df["Adults"] >= adults)) &
-    ((df["Children"].isna()) | (df["Children"] >= children))
-]
+    # FILTER (CORRECT INDENT)
+    df = df[
+        ((df["Adults"].isna()) | (df["Adults"] >= adults)) &
+        ((df["Children"].isna()) | (df["Children"] >= children))
+    ]
 
+    #  THIS MUST ALIGN WITH df = df
     valid_groups = []
 
     for grp in df["Group"].dropna().unique():
@@ -107,24 +104,6 @@ df = df[
             valid_groups.append(grp)
 
     return sorted(valid_groups)
-
-def get_amounts(comm, group, year, month, adults, children):
-    tier = get_tier(comm)
-    date = pd.to_datetime(f"{year} {month} 01")
-
-    df = Reference[
-        (Reference["Group"] == group) &
-        ((Reference["Tier"] == tier) | (Reference["Tier"] == "ALL")) &
-        (Reference["Start_Date"] <= date) &
-        (Reference["End_Date"] >= date)
-    ]
-
-    df = df[
-    ((df["Adults"].isna()) | (df["Adults"] >= adults)) &
-    ((df["Children"].isna()) | (df["Children"] >= children))
-]
-    return sorted(df["Amount"].dropna().unique())
-
 # =========================
 # HEADER
 # =========================
