@@ -274,10 +274,8 @@ issued = st.number_input("Benefits Issued ($)", 0.0)
 # Scenario 1: Unreported income removes eligibility
 if not same_income and other_income_total >= declared_total:
     actual_budget = 0
-    difference = issued  # FULL overpayment
+    difference = issued  
     
-    st.warning("Unreported income exceeds declared needs → Full benefit is overpayment")
-
 # Scenario 2 + normal cases
 else:
     actual_budget = actual_total - declared_total_income
