@@ -377,7 +377,7 @@ if len(st.session_state.history) > 0:
     total = export_df["Overpayment / Underpayment"].sum()
 
     #  LABEL
-   if total > 0:
+if total > 0:
     total_text = "TOTAL OVERPAYMENT"
 elif total < 0:
     total_text = "TOTAL UNDERPAYMENT"
