@@ -266,15 +266,13 @@ declared_benefit = declared_total - declared_net_total
 st.markdown(f"### Benefit: ${declared_benefit:,.2f}")
 
 
-col_label, col_input = st.columns([2, 1])
+#  Benefit Issued label (match same style)
+st.markdown("### Benefit Issued ($)")
 
-with col_label:
-    st.markdown("### Benefit Issued ($)")
-
-with col_input:
+#  small compact input
+col_issued, _ = st.columns([1, 4])
+with col_issued:
     issued = st.number_input("", format="%.2f")
-
-
 
 # =========================
 #   BUSINESS RULE
