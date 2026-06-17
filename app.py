@@ -263,12 +263,10 @@ with col2_inc:
 declared_total_income = declared_net_total + (0 if same_income else other_income_total)
 declared_benefit = declared_total - declared_net_total
 
-st.markdown("**Benefits Issued ($)**")
-
 col_issued, _ = st.columns([1, 4])
 with col_issued:
-    issued = st.number_input("", 0.0)
-
+    issued = st.number_input("Benefit Issued", 0.0)
+ 
 
 # =========================
 #   BUSINESS RULE
