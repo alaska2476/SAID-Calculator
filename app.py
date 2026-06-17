@@ -258,22 +258,19 @@ with col2_inc:
         st.markdown(f"**Total New Income: ${other_income_total:,.2f}**")
 
 # =========================
-# FINAL BUSINESS RULE 
+# FINAL BUSINESS RULE (CORRECTED)
 # =========================
 
-# total actual income (declared + new)
-total_actual_income = declared_net_total + (0 if same_income else other_income_total)
-
-# Scenario 1: would not qualify at all
-if total_actual_income >= declared_total:
+# If TOTAL ACTUAL income covers ALL needs → no eligibility
+if declared_total_income >= actual_total:
     actual_budget = 0
     difference = issued
 
-    st.info("Full overpayment (income exceeds needs)")
+    st.info("Income exceeds needs → Full overpayment")
 
-# Scenario 2: partial adjustment
+# Otherwise → normal calculation
 else:
-    actual_budget = actual_total - total_actual_income
+    actual_budget = actual_total - declared_total_income
     difference = issued - actual_budget
 
 #  NEW BUSINESS RULE
