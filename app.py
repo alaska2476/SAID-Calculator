@@ -43,7 +43,7 @@ def assign_group(b):
     if "CLOTHING" in b: return "CLOTHING"
     if "DISABILITY ALLOWANCE" in b: return "DIS/ALL"
 
-    # ✅ FIXED LIVING GROUP (MUST BE INDENTED HERE)
+    # FIXED LIVING GROUP
     if b in [
         "LIVING INCOME ALLOWANCE",
         "LIVING INCOME BOARD AND RM",
@@ -263,7 +263,8 @@ with col2_inc:
 declared_total_income = declared_net_total + (0 if same_income else other_income_total)
 declared_benefit = declared_total - declared_net_total
 
-st.markdown(f"**Benefit: ${declared_benefit:,.2f}**")
+st.markdown(f"### Benefit: ${declared_benefit:,.2f}")
+
 col_issued, _ = st.columns([1, 4])
 with col_issued:
     issued = st.number_input("Benefit Issued", 0.0)
