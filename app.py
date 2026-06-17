@@ -258,28 +258,24 @@ with col2_inc:
         st.markdown(f"**Total New Income: ${other_income_total:,.2f}**")
 
 # =========================
-# FINAL
-# =========================
-declared_total_income = declared_net_total + (0 if same_income else other_income_total)
-declared_benefit = declared_total - declared_net_total
-
-st.markdown(f"### Benefit: ${declared_benefit:,.2f}")
-
-issued = st.number_input("Benefits Issued ($)", 0.0)
-
-# =========================
-#  NEW BUSINESS RULE 
+# FINAL BUSINESS RULE 
 # =========================
 
-# Scenario 1: Unreported income removes eligibility
-if not same_income and other_income_total >= declared_total:
+# total actual income (declared + new)
+total_actual_income = declared_net_total + (0 if same_income else other_income_total)
+
+# Scenario 1: would not qualify at all
+if total_actual_income >= declared_total:
     actual_budget = 0
-    difference = issued  
-    
-# Scenario 2 + normal cases
+    difference = issued
+
+    st.info("Full overpayment (income exceeds needs)")
+
+# Scenario 2: partial adjustment
 else:
-    actual_budget = actual_total - declared_total_income
+    actual_budget = actual_total - total_actual_income
     difference = issued - actual_budget
+
 #  NEW BUSINESS RULE
 if difference <= 0:
     label = "UNDERPAYMENT"
