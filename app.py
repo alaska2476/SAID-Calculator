@@ -268,7 +268,7 @@ st.markdown(f"### Benefit: ${declared_benefit:,.2f}")
 issued = st.number_input("Benefits Issued ($)", 0.0)
 
 # =========================
-# ✅ NEW BUSINESS RULE (CRITICAL FIX)
+#  NEW BUSINESS RULE 
 # =========================
 
 # Scenario 1: Unreported income removes eligibility
