@@ -405,5 +405,4 @@ if len(st.session_state.history) > 0:
     st.download_button("Download Summary", output.getvalue(), file_name)
 
     #  SHOW TOTAL ON SCREEN
-    st.subheader(total_text)
-    st.metric("", f"${total:,.2f}")
+    st.markdown(f"**{total_text}: ${total:,.2f}**")
