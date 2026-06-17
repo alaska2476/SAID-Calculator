@@ -300,7 +300,8 @@ elif difference < 0:
 else:
     label = "NO DIFFERENCE"
 
-st.markdown(f"**{label}: ${difference:,.2f}**")
+st.markdown(f"### {label}: ${difference:,.2f}")
+
 
 
 # =========================
@@ -405,4 +406,5 @@ if len(st.session_state.history) > 0:
     st.download_button("Download Summary", output.getvalue(), file_name)
 
     #  SHOW TOTAL ON SCREEN
-    st.markdown(f"**{total_text}: ${total:,.2f}**")
+    st.markdown(f"### {total_text}: ${total:,.2f}")
+
