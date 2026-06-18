@@ -237,7 +237,7 @@ with col1_inc:
 
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
-# New Income
+# Actual Income
 with col2_inc:
     if same_income:
         other_income_total = 0
@@ -245,11 +245,11 @@ with col2_inc:
     else:
         total = 0
 
-        for i in range(5):   # increase number if needed
-            c1, c2 = st.columns(2)
+       for i in range(5):   # increase number if needed
+    c1, c2 = st.columns(2)
 
-            val = c1.number_input(f"Other {i}", 0.0, key=f"other_{i}")
-            less = c2.number_input("Less", 0.0, key=f"other_less_{i}")
+    val = c1.number_input(f"Other {i}", 0.0, key=f"other_{i}")
+    less = c2.number_input("Less", 0.0, key=f"other_less_{i}")
 
             total += (val - less)
 
