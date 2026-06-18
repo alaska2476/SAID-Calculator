@@ -215,7 +215,7 @@ st.subheader("INCOME")
 
 h1, _, h2 = st.columns([1,0.3,1])
 with h1: st.markdown("**Declared Income**")
-with h2: st.markdown("**New Income**")
+with h2: st.markdown("**Actual Income**")
 
 _, _, cb2 = st.columns([1,0.3,1])
 with cb2:
@@ -226,15 +226,19 @@ col1_inc,_,col2_inc = st.columns([1,0.3,1])
 # Declared
 with col1_inc:
     declared_net_total = 0
-    for i in range(4):
-        c1,c2 = st.columns(2)
-        net = c1.number_input(f"Net {i}",0.0,key=f"net{i}")
-        less = c2.number_input("Less",0.0,key=f"less{i}")
-        declared_net_total += (net - less)
+
+    for i in range(5):
+        c1, c2 = st.columns(2)
+
+        val = c1.number_input(f"Net {i}", 0.0, key=f"net_{i}")
+        less = c2.number_input("Less", 0.0, key=f"net_less_{i}")
+
+        declared_net_total += (val - less)
 
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
 
-# New Income
+
+# Actual Income
 with col2_inc:
     if same_income:
         other_income_total = 0
@@ -242,21 +246,19 @@ with col2_inc:
     else:
         total = 0
 
-        c1,c2 = st.columns(2)
-        total += c1.number_input("Surplus",0.0,key="s1") - c2.number_input("Less",0.0,key="l1")
+        for i in range(5):
+            c1, c2 = st.columns(2)
 
-        c3,c4 = st.columns(2)
-        total += c3.number_input("Interest",0.0,key="i1") - c4.number_input("Less ",0.0,key="l2")
+            label = f"A{i+1}"   # A1, A2, A3...
 
-        c5,c6 = st.columns(2)
-        total += c5.number_input("Other 1",0.0,key="o1") - c6.number_input("Less ",0.0,key="l3")
+            val = c1.number_input(label, 0.0, key=f"a_{i}")
+            less = c2.number_input("Less", 0.0, key=f"a_less_{i}")
 
-        c7,c8 = st.columns(2)
-        total += c7.number_input("Other 2",0.0,key="o2") - c8.number_input("Less ",0.0,key="l4")
+            total += (val - less)
 
         other_income_total = total
-        st.markdown(f"**Total New Income: ${other_income_total:,.2f}**")
-
+        st.markdown(f"**Total Actual Income: ${other_income_total:,.2f}**")
+        
 # =========================
 # FINAL
 # =========================
