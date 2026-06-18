@@ -215,7 +215,7 @@ st.subheader("INCOME")
 
 h1, _, h2 = st.columns([1,0.3,1])
 with h1: st.markdown("**Declared Income**")
-with h2: st.markdown("**New Income**")
+with h2: st.markdown("**Actual Income**")
 
 _, _, cb2 = st.columns([1,0.3,1])
 with cb2:
