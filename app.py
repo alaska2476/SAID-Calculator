@@ -224,16 +224,16 @@ with cb2:
 col1_inc,_,col2_inc = st.columns([1,0.3,1])
 
 # Declared
-for i in range(5):
-    c1, c2 = st.columns(2)
-
-    label = f"N{i+1}"   
-    val = c1.number_input(label, 0.0, key=f"n_{i}")
-    less = c2.number_input("Less", 0.0, key=f"n_less_{i}")
-
-    declared_net_total += (val - less)
+with col1_inc:
+    declared_net_total = 0
+    for i in range(5):
+        c1,c2 = st.columns(2)
+        net = c1.number_input(f"Net {i}",0.0,key=f"net{i}")
+        less = c2.number_input("Less",0.0,key=f"less{i}")
+        declared_net_total += (net - less)
 
     st.markdown(f"**Net Income: ${declared_net_total:,.2f}**")
+
 
 # Actual Income
 with col2_inc:
