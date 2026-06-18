@@ -153,7 +153,7 @@ children = cols[6].selectbox(
 )
 
 # =========================
-# TABLE BUILDER
+# TABLE BUILDER 
 # =========================
 def build_table(prefix):
     total = 0
