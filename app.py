@@ -275,24 +275,23 @@ with col_issued:
     issued = st.number_input("", format="%.2f")
 
 # =========================
-#   BUSINESS RULE
+#   BUSINESS RULE (UPDATED)
 # =========================
 
-total_actual_income = declared_net_total + (0 if same_income else other_income_total)
+#  ONLY NEW INCOME (NOT NET)
+total_actual_income = (0 if same_income else other_income_total)
 
-# FULL OVERPAYMENT (
-needs_compare = actual_total
-if total_actual_income >= needs_compare:
+# FULL OVERPAYMENT
+if total_actual_income >= actual_total:
     actual_budget = 0
-    difference = issued
+    difference = declared_benefit
 
-
-#  PARTIAL / NORMAL CASE
+# NORMAL CASE
 else:
     actual_budget = actual_total - total_actual_income
-    difference = issued - actual_budget
+    difference = declared_benefit - actual_budget
 
-#  FINAL RESULT LABEL
+#  RESULT LABEL
 if difference > 0:
     label = "OVERPAYMENT"
 elif difference < 0:
@@ -300,9 +299,7 @@ elif difference < 0:
 else:
     label = "NO DIFFERENCE"
 
-st.markdown(f"### {label}: ${difference:,.2f}")
-
-
+st.markdown(f"### {label}: ${abs(difference):,.2f}")
 
 # =========================
 # SAVE
