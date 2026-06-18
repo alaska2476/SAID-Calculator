@@ -242,17 +242,13 @@ with col2_inc:
     else:
         total = 0
 
-        c1,c2 = st.columns(2)
-        total += c1.number_input("Surplus",0.0,key="s1") - c2.number_input("Less",0.0,key="l1")
+        for i in range(5):   # increase number if needed
+            c1, c2 = st.columns(2)
 
-        c3,c4 = st.columns(2)
-        total += c3.number_input("Interest",0.0,key="i1") - c4.number_input("Less ",0.0,key="l2")
+            val = c1.number_input(f"Other {i}", 0.0, key=f"other_{i}")
+            less = c2.number_input("Less", 0.0, key=f"other_less_{i}")
 
-        c5,c6 = st.columns(2)
-        total += c5.number_input("Other 1",0.0,key="o1") - c6.number_input("Less ",0.0,key="l3")
-
-        c7,c8 = st.columns(2)
-        total += c7.number_input("Other 2",0.0,key="o2") - c8.number_input("Less ",0.0,key="l4")
+            total += (val - less)
 
         other_income_total = total
         st.markdown(f"**Total New Income: ${other_income_total:,.2f}**")
