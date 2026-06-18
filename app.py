@@ -245,7 +245,7 @@ with col2_inc:
     else:
         total = 0
 
-       for i in range(5):   # increase number if needed
+ for i in range(5):   # increase number if needed
     c1, c2 = st.columns(2)
 
     val = c1.number_input(f"Other {i}", 0.0, key=f"other_{i}")
