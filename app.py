@@ -232,7 +232,7 @@ for i in range(5):
     val = c1.number_input(label, 0.0, key=f"n_{i}")
     less = c2.number_input("Less", 0.0, key=f"n_less_{i}")
 
-    declared_net_total += (val - less)
+
 
 # Actual Income
 with col2_inc:
