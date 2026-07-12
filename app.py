@@ -6,7 +6,7 @@ import io
 
 st.set_page_config(layout="wide")
 
-# =========================
+# ========================
 # LOAD DATA
 # =========================
 def load_excel_safe(path):
