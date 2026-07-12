@@ -263,38 +263,54 @@ with col2_inc:
 # =========================
 # FINAL
 # =========================
-declared_total_income = declared_net_total + (0 if same_income else other_income_total)
+declared_total_income = declared_net_total + (
+    0 if same_income else other_income_total
+)
+
 declared_benefit = declared_total - declared_net_total
 
 st.markdown(f"### Benefit: ${declared_benefit:,.2f}")
 
-
-#  Benefit Issued label (match same style)
+# Benefit Issued
 st.markdown("### Benefit Issued ($)")
 
-#  small compact input
 col_issued, _ = st.columns([1, 4])
+
 with col_issued:
-    issued = st.number_input("", format="%.2f")
+    issued = st.number_input(
+        "Benefit Issued",
+        min_value=0.0,
+        format="%.2f",
+        label_visibility="collapsed"
+    )
 
 # =========================
-#   BUSINESS RULE (UPDATED)
+# BUSINESS RULE
 # =========================
 
-#  ONLY NEW INCOME (NOT NET)
-total_actual_income = (0 if same_income else other_income_total)
+# Declared income + new income
+total_actual_income = declared_net_total + (
+    0 if same_income else other_income_total
+)
 
-# FULL OVERPAYMENT
+# Not eligible -> full overpayment
 if total_actual_income >= actual_total:
+
     actual_budget = 0
-    difference = declared_benefit
 
-# NORMAL CASE
+    # everything issued becomes overpayment
+    difference = issued
+
+# Still eligible -> recalculate benefit
 else:
-    actual_budget = actual_total - total_actual_income
-    difference = declared_benefit - actual_budget
 
-#  RESULT LABEL
+    actual_budget = actual_total - total_actual_income
+
+    recalculated_benefit = max(actual_budget, 0)
+
+    difference = issued - recalculated_benefit
+
+# Result label
 if difference > 0:
     label = "OVERPAYMENT"
 elif difference < 0:
@@ -303,6 +319,7 @@ else:
     label = "NO DIFFERENCE"
 
 st.markdown(f"### {label}: ${abs(difference):,.2f}")
+
 
 # =========================
 # SAVE
