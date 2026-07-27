@@ -132,7 +132,7 @@ def get_amounts(comm, group, year, month, adults, children):
 st.title("SAID TRANSITION CALCULATOR")
 
 cols = st.columns(7)
-client = cols[0].text_input("Client", key="client")
+client = cols[0].text_input("Client #", key="client")
 case = cols[1].text_input("Case #", key="case")
 community = cols[2].selectbox("Community", Community["Community"].unique(), key="community")
 month = cols[3].selectbox("Month", [
