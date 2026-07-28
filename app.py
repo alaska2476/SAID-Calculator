@@ -124,9 +124,6 @@ def get_amounts(comm, group, year, month, adults, children):
         ((df["Children"].isna()) | (df["Children"] >= children))
     ]
 
-    if group == "AP/HOME":
-        st.write(df[["Benefit","Adults","Children","Amount"]])
-
     return sorted(df["Amount"].dropna().unique())
     
 # =========================
