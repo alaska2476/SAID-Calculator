@@ -97,7 +97,8 @@ def get_filtered_benefits(comm, year, month, adults, children):
    df = df[
     ((df["Adults"].isna()) | (df["Adults"] == adults)) &
     ((df["Children"].isna()) | (df["Children"] == children))
-]
+    
+    ]
 
     valid_groups = []
 
