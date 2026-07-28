@@ -95,10 +95,9 @@ def get_filtered_benefits(comm, year, month, adults, children):
 
     # Filter by Adults/Children (if applicable)
     df = df[
-        ((df["Adults"].isna()) | (df["Adults"] >= adults)) &
-        ((df["Children"].isna()) | (df["Children"] >= children))
+        (df["Adults"].fillna(adults) == adults) &
+        (df["Children"].fillna(children) == children)
     ]
-
     valid_groups = []
 
     for grp in df["Group"].dropna().unique():
@@ -120,9 +119,10 @@ def get_amounts(comm, group, year, month, adults, children):
     ]
 
     df = df[
-        ((df["Adults"].isna()) | (df["Adults"] >= adults)) &
-        ((df["Children"].isna()) | (df["Children"] >= children))
-    ]
+        (df["Adults"].fillna(adults) == adults) &
+        (df["Children"].fillna(children) == children)
+
+        ]
 
     return sorted(df["Amount"].dropna().unique())
 
