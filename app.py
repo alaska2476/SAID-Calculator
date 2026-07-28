@@ -95,8 +95,8 @@ def get_filtered_benefits(comm, year, month, adults, children):
 
     # Filter by Adults/Children (if applicable)
     df = df[
-    ((df["Adults"].isna()) | (df["Adults"] >= adults)) &
-    ((df["Children"].isna()) | (df["Children"] >= children))
+        ((df["Adults"].isna()) | (df["Adults"] >= adults)) &
+        ((df["Children"].isna()) | (df["Children"] >= children))
     ]
 
     valid_groups = []
@@ -120,19 +120,19 @@ def get_amounts(comm, group, year, month, adults, children):
     ]
 
     df = df[
-    ((df["Adults"].isna()) | (df["Adults"] >= adults)) &
-    ((df["Children"].isna()) | (df["Children"] >= children))
+        ((df["Adults"].isna()) | (df["Adults"] >= adults)) &
+        ((df["Children"].isna()) | (df["Children"] >= children))
     ]
 
     return sorted(df["Amount"].dropna().unique())
-    
+
 # =========================
 # HEADER
 # =========================
 st.title("SAID TRANSITION CALCULATOR")
 
 cols = st.columns(7)
-client = cols[0].text_input("Client #", key="client")
+client = cols[0].text_input("Client", key="client")
 case = cols[1].text_input("Case #", key="case")
 community = cols[2].selectbox("Community", Community["Community"].unique(), key="community")
 month = cols[3].selectbox("Month", [
@@ -142,13 +142,13 @@ month = cols[3].selectbox("Month", [
 year = cols[4].selectbox("Year", list(range(2020, 2027)), key="year")
 adults = cols[5].selectbox(
     "Adults",
-    [ 1, 2, 3, 4,5],              
+    [0, 1, 2, 3, 4,5],              
     key="adults_2026_FINAL"       
 )
 
 children = cols[6].selectbox(
     "Children",
-    [ 0,1, 2, 3, 4, 5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26],       
+    [ 1, 2, 3, 4, 5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26],       
     key="children_FINAL_2026"
 )
 
