@@ -124,7 +124,7 @@ def get_amounts(comm, group, year, month, adults, children):
         ((df["Children"].isna()) | (df["Children"] >= children))
     ]
 
-   st.dataframe(
+st.dataframe(
     df[
         [
             "Benefit",
