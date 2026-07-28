@@ -75,7 +75,6 @@ def assign_group(b):
     
 Reference["Group"] = Reference["Benefit Type"].apply(assign_group)
 
-
 # =========================
 # FUNCTIONS
 # =========================
@@ -129,8 +128,14 @@ def get_amounts(comm, group, year, month, adults, children):
 # =========================
 # HEADER
 # =========================
-st.title("SAID TRANSITION CALCULATOR")
-
+st.markdown(
+    """
+    <h1 style='text-align: center;'>
+        SAID TRANSITION CALCULATOR
+    </h1>
+    """,
+    unsafe_allow_html=True
+)
 cols = st.columns(7)
 client = cols[0].text_input("Client", key="client")
 case = cols[1].text_input("Case #", key="case")
