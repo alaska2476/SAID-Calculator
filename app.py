@@ -121,8 +121,8 @@ def get_amounts(comm, group, year, month, adults, children):
     ]
 
      df = df[
-    ((df["Adults"].isna()) | (df["Adults"] == adults)) &
-    ((df["Children"].isna()) | (df["Children"] == children))
+        ((df["Adults"].isna()) | (df["Adults"] == adults)) &
+        ((df["Children"].isna()) | (df["Children"] == children))
     
     ]
 
