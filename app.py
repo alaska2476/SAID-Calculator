@@ -124,7 +124,21 @@ def get_amounts(comm, group, year, month, adults, children):
         ((df["Children"].isna()) | (df["Children"] >= children))
     ]
 
-    return sorted(df["Amount"].dropna().unique())
+   st.dataframe(
+    df[
+        [
+            "Benefit",
+            "Tier",
+            "Adults",
+            "Children",
+            "Start_Date",
+            "End_Date",
+            "Amount"
+        ]
+    ]
+)
+
+return sorted(df["Amount"].dropna().unique())
 
 # =========================
 # HEADER
