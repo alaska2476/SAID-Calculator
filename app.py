@@ -142,13 +142,13 @@ month = cols[3].selectbox("Month", [
 year = cols[4].selectbox("Year", list(range(2020, 2027)), key="year")
 adults = cols[5].selectbox(
     "Adults",
-    [0, 1, 2, 3, 4,5],              
+    [1, 2, 3, 4,5],              
     key="adults_2026_FINAL"       
 )
 
 children = cols[6].selectbox(
     "Children",
-    [ 1, 2, 3, 4, 5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26],       
+    [0, 1, 2, 3, 4, 5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26],       
     key="children_FINAL_2026"
 )
 
