@@ -138,7 +138,7 @@ st.dataframe(
     ]
 )
 
-        return sorted(df["Amount"].dropna().unique())
+return sorted(df["Amount"].dropna().unique())
 
 # =========================
 # HEADER
