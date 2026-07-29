@@ -228,11 +228,11 @@ st.subheader("INCOME")
 
 h1, _, h2 = st.columns([1,0.3,1])
 with h1: st.markdown("**Declared Income**")
-with h2: st.markdown("**Actual Income**")
+with h2: st.markdown("**Additional Income**")
 
 _, _, cb2 = st.columns([1,0.3,1])
 with cb2:
-    same_income = st.checkbox("Same as Declared Income", True)
+    same_income = st.checkbox("No Additional Income", True)
 
 col1_inc,_,col2_inc = st.columns([1,0.3,1])
 
@@ -252,10 +252,10 @@ with col1_inc:
 
     st.markdown(f"**Total Declared Income: ${declared_net_total:,.2f}**")
 
-# Actual Income
+# Additional Income
 with col2_inc:
     if same_income:
-        other_income_total = 0
+        additional_income_total = 0
         st.info("No additional income")
     else:
         total = 0
@@ -269,15 +269,15 @@ with col2_inc:
 
             total += (val - less)
 
-        other_income_total = total
-        st.markdown(f"**Total Actual Income: ${other_income_total:,.2f}**")
+        additional_income_total = total
+        st.markdown(f"**Total Additional Income: ${additional_income_total:,.2f}**")
 
 
 # =========================
 # FINAL
 # =========================
-declared_total_income = declared_net_total + (
-    0 if same_income else other_income_total
+total_income_considered = declared_net_total + (
+    0 if same_income else additional_income_total
 )
 
 declared_benefit = declared_total - declared_net_total
@@ -301,13 +301,8 @@ with col_issued:
 # BUSINESS RULE
 # =========================
 
-# Declared income + new income
-total_actual_income = declared_net_total + (
-    0 if same_income else other_income_total
-)
-
 # Not eligible -> full overpayment
-if total_actual_income >= actual_total:
+if total_income_considered >= actual_total:
 
     actual_budget = 0
 
@@ -317,8 +312,7 @@ if total_actual_income >= actual_total:
 # Still eligible -> recalculate benefit
 else:
 
-    actual_budget = actual_total - total_actual_income
-
+    actual_budget = actual_total - total_income_considered
     recalculated_benefit = max(actual_budget, 0)
 
     difference = issued - recalculated_benefit
@@ -344,9 +338,9 @@ required_columns = [
     "Year",
     "Total Declared",
     "Total Actual",
-    "Net Income",
-    "New Income",
-    "Total Income",
+    "Declared Income",
+    "Additional Income",
+    "Total Income Considered",
     "Benefit",
     "Benefits Issued",
     "Overpayment / Underpayment"
@@ -368,9 +362,9 @@ if st.button("Save Month Calculation"):
         "Year": year,
         "Total Declared": declared_total,
         "Total Actual": actual_total,
-        "Net Income": declared_net_total,
-        "New Income": (0 if same_income else other_income_total),
-        "Total Income": declared_total_income,
+        "Declared Income": declared_net_total,
+        "Additional Income": (0 if same_income else additional_income_total),
+        "Total Income Considered": total_income_considered,
         "Benefit": declared_benefit,
         "Benefits Issued": issued,
         "Overpayment / Underpayment": difference
