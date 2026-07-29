@@ -226,10 +226,8 @@ with col2:
 st.divider()
 st.info(
     """
-    Declared Income = income used in the original assessment.
-
-    Additional Income = income identified after the original
-    assessment and included during reassessment.
+    Declared Income = Income used in the original assessment.
+    Additional Income =  New income identified after the original assessment that was not included in the original calculation.
     """
 )
 st.subheader("INCOME")
@@ -364,8 +362,8 @@ else:
 if st.button("Save Month Calculation"):
 
     new_row = pd.DataFrame([{
-        "Client #": client,
-        "Case #": case,
+        "Client#": client,
+        "Case": case,
         "Month": month,
         "Year": year,
         "Total Declared": declared_total,
