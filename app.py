@@ -179,7 +179,7 @@ def build_table(prefix):
         b = c1.selectbox("", [""] + benefits + ["OTHER"], key=f"{prefix}_b_{i}")
 
         if b == "OTHER":
-            for j in range(5):
+            for j in range(7):
                 c3, c4 = st.columns(2)
                 name = c3.text_input("", key=f"{prefix}_name_{i}_{j}")
                 val = c4.number_input("Amount", 0.0, key=f"{prefix}_val_{i}_{j}")
