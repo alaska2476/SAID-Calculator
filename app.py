@@ -364,8 +364,8 @@ else:
 if st.button("Save Month Calculation"):
 
     new_row = pd.DataFrame([{
-        "Client": client,
-        "Case": case,
+        "Client #": client,
+        "Case #": case,
         "Month": month,
         "Year": year,
         "Total Declared": declared_total,
