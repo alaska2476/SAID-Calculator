@@ -227,6 +227,7 @@ st.divider()
 st.info(
     """
     Declared Income = Income used in the original assessment.
+    
     Additional Income =  New income identified after the original assessment 
     that was not included in the original calculation.
     """
