@@ -224,6 +224,14 @@ with col2:
 # INCOME
 # =========================
 st.divider()
+st.info(
+    """
+    Declared Income = income used in the original assessment.
+
+    Additional Income = income identified after the original
+    assessment and included during reassessment.
+    """
+)
 st.subheader("INCOME")
 
 h1, _, h2 = st.columns([1,0.3,1])
