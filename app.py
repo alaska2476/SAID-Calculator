@@ -458,5 +458,29 @@ if len(st.session_state.history) > 0:
     st.download_button("Download Summary", output.getvalue(), file_name)
 
     #  SHOW TOTAL
-    st.subheader(total_text)
-    st.metric("", f"${abs(total):,.2f}")
+    # SHOW TOTAL
+
+if total > 0:
+    total_color = "#C62828"      # Dark Red
+elif total < 0:
+    total_color = "#0078D4"      # Microsoft Blue
+else:
+    total_color = "#2E7D32"      # Dark Green
+
+st.markdown(
+    f"""
+    <h2 style="color:{total_color};">
+        {total_text}
+    </h2>
+    """,
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    f"""
+    <h3 style="color:{total_color};">
+        ${abs(total):,.2f}
+    </h3>
+    """,
+    unsafe_allow_html=True
+)
