@@ -292,6 +292,7 @@ declared_benefit = declared_total - declared_net_total
 
 budget_deficit = max(actual_total - total_income_considered, 0)
 
+
 c1, c2, c3, c4 = st.columns([1, 1, 2, 2])
 
 with c1:
