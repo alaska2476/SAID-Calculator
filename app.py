@@ -463,11 +463,15 @@ if len(st.session_state.history) > 0:
         unsafe_allow_html=True
     )
 
-    st.markdown(
-        f"""
-        <h3 style="color:{total_color};">
-            ${abs(total):,.2f}
-        </h3>
-        """,
-        unsafe_allow_html=True
-    )
+   st.markdown(
+    f"""
+    <h3 style="
+        color:{total_color};
+        white-space: nowrap;
+        margin-top:0px;
+    ">
+        ${abs(total):,.2f}
+    </h3>
+    """,
+    unsafe_allow_html=True
+)
