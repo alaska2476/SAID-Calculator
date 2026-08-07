@@ -306,7 +306,7 @@ with col_a:
         st.markdown("### Benefit Issued:")
 with col_b:
     st.markdown(
-        "<div style='padding-top:6px;'></div>",
+        "<div style='padding-top:2px;'></div>",
         unsafe_allow_html=True
     )
 
