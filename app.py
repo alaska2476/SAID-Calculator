@@ -349,6 +349,7 @@ required_columns = [
     "Declared Income",
     "Additional Income",
     "Total Income Considered",
+    "Budget Deficit",
     "Benefit",
     "Benefits Issued",
     "Overpayment / Underpayment"
