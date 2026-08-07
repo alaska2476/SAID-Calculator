@@ -426,61 +426,36 @@ if len(st.session_state.history) > 0:
 
     st.dataframe(st.session_state.history)
 
-    # CREATE EXCEL OUTPUT
     output = io.BytesIO()
     export_df = st.session_state.history.copy()
 
-    # DEFINE TOTAL
     total = export_df["Overpayment / Underpayment"].sum()
 
-    #  LABEL (FIXED INDENTATION)
     if total > 0:
         total_text = "TOTAL OVERPAYMENT"
+        total_color = "#C62828"      # Dark Red
     elif total < 0:
         total_text = "TOTAL UNDERPAYMENT"
+        total_color = "#0078D4"      # Microsoft Blue
     else:
         total_text = "TOTAL NO DIFFERENCE"
+        total_color = "#2E7D32"      # Dark Green
 
-    #  SUMMARY ROW
-    first_col = export_df.columns[0]
-    summary_row = {col: None for col in export_df.columns}
-    summary_row[first_col] = total_text
-    summary_row["Overpayment / Underpayment"] = float(total)
-
-    export_df = pd.concat([export_df, pd.DataFrame([summary_row])], ignore_index=True)
-
-    #  WRITE FILE
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        export_df.to_excel(writer, index=False)
-
-    #  DOWNLOAD
-    file_name = f"{client}_{case}_summary.xlsx"
-    st.download_button("Download Summary", output.getvalue(), file_name)
-
-    #  SHOW TOTAL
     # SHOW TOTAL
+    st.markdown(
+        f"""
+        <h2 style="color:{total_color};">
+            {total_text}
+        </h2>
+        """,
+        unsafe_allow_html=True
+    )
 
-if total > 0:
-    total_color = "#C62828"      # Dark Red
-elif total < 0:
-    total_color = "#0078D4"      # Microsoft Blue
-else:
-    total_color = "#2E7D32"      # Dark Green
-
-st.markdown(
-    f"""
-    <h2 style="color:{total_color};">
-        {total_text}
-    </h2>
-    """,
-    unsafe_allow_html=True
-)
-
-st.markdown(
-    f"""
-    <h3 style="color:{total_color};">
-        ${abs(total):,.2f}
-    </h3>
-    """,
-    unsafe_allow_html=True
-)
+    st.markdown(
+        f"""
+        <h3 style="color:{total_color};">
+            ${abs(total):,.2f}
+        </h3>
+        """,
+        unsafe_allow_html=True
+    )
