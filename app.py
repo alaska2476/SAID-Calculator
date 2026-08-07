@@ -450,7 +450,7 @@ if len(st.session_state.history) > 0:
         total_text = "TOTAL UNDERPAYMENT"
         total_color = "#0078D4"      # Microsoft Blue
     else:
-        total_text = "TOTAL NO DIFFERENCE"
+        total_text = " NO Net DIFFERENCE"
         total_color = "#2E7D32"      # Dark Green
 
 # SHOW TOTAL
