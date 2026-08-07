@@ -292,13 +292,15 @@ declared_benefit = declared_total - declared_net_total
 
 budget_deficit = max(actual_total - total_income_considered, 0)
 
-c1, c2, c3, c4 = st.columns([2, 3, 2, 2])
+c1, c2, spacer, c3 = st.columns([1, 1, 1, 2])
 
 with c1:
-    st.markdown(f"### Benefit: ${declared_benefit:,.2f}")
+    st.markdown(
+        f"### Benefit: ${declared_benefit:,.2f}"
+    )
 
 with c2:
-    col_a, col_b = st.columns([5, 2])
+    col_a, col_b = st.columns([5, 4])
 
     with col_a:
         st.markdown("### Benefit Issued:")
@@ -312,8 +314,9 @@ with c2:
         )
 
 with c3:
-    st.markdown(f"### Budget Deficit: ${budget_deficit:,.2f}")
-
+    st.markdown(
+        f"### Budget Deficit: ${budget_deficit:,.2f}"
+    )
     
 # =========================
 # BUSINESS RULE
@@ -343,30 +346,7 @@ elif difference < 0:
 else:
     label = "NO DIFFERENCE"
 
-c1, c2, c3, c4 = st.columns([2, 3, 2, 2])
-
-with c1:
-    st.markdown(f"### Benefit: ${declared_benefit:,.2f}")
-
-with c2:
-    col_a, col_b = st.columns([5, 2])
-
-    with col_a:
-        st.markdown("### Benefit Issued:")
-
-    with col_b:
-        issued = st.number_input(
-            "Benefit Issued",
-            min_value=0.0,
-            format="%.2f",
-            label_visibility="collapsed"
-        )
-
-with c3:
-    st.markdown(f"### Budget Deficit: ${budget_deficit:,.2f}")
-
-with c4:
-    st.markdown(f"### {label}: ${abs(difference):,.2f}")
+st.markdown(f"### {label}: ${abs(difference):,.2f}")
 
 
 # =========================
