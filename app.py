@@ -305,7 +305,7 @@ with c2:
     with col_a:
         st.markdown("### Benefit Issued:")
 
-   with col_b:
+with col_b:
     issued = st.number_input(
         "Benefit Issued",
         min_value=0.0,
