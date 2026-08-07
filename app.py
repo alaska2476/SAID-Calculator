@@ -303,7 +303,7 @@ with c2:
     col_a, col_b = st.columns([1.7, 3])
 with col_a:
     st.markdown(
-        "<div style='padding-top:-8px;'><h3>Benefit Issued:</h3></div>",
+        "<div style='padding-top:8px;'><h3>Benefit Issued:</h3></div>",
         unsafe_allow_html=True
     )
 with col_b:
