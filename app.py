@@ -305,13 +305,24 @@ with c2:
     with col_a:
         st.markdown("### Benefit Issued:")
 
-    with col_b:
-        issued = st.number_input(
-            "Benefit Issued",
-            min_value=0.0,
-            format="%.2f",
-            label_visibility="collapsed"
-        )
+   with col_b:
+    issued = st.number_input(
+        "Benefit Issued",
+        min_value=0.0,
+        format="%.2f",
+        label_visibility="collapsed"
+    )
+
+    st.markdown(
+        """
+        <style>
+        div[data-testid="stNumberInput"] {
+            max-width: 120px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
 with c3:
     st.markdown(
