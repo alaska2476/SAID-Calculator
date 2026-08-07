@@ -364,23 +364,25 @@ else:
     st.session_state.history = st.session_state.history.reindex(columns=required_columns)
 
 
-#  SAVE BUTTON
+# SAVE BUTTON
 if st.button("Save Month Calculation"):
 
-   new_row = pd.DataFrame([{
-    "Client": client,
-    "Case": case,
-    "Month": month,
-    "Year": year,
-    "Total Declared": declared_total,
-    "Total Actual": actual_total,
-    "Declared Income": declared_net_total,
-    "Additional Income": (0 if same_income else additional_income_total),
-    "Total Income Considered": total_income_considered,
-    "Budget Deficit": budget_deficit,
-    "Benefit": declared_benefit,
-    "Benefits Issued": issued,
-    "Overpayment / Underpayment": difference
+    new_row = pd.DataFrame([{
+        "Client": client,
+        "Case": case,
+        "Month": month,
+        "Year": year,
+        "Total Declared": declared_total,
+        "Total Actual": actual_total,
+        "Declared Income": declared_net_total,
+        "Additional Income": (
+            0 if same_income else additional_income_total
+        ),
+        "Total Income Considered": total_income_considered,
+        "Budget Deficit": budget_deficit,
+        "Benefit": declared_benefit,
+        "Benefits Issued": issued,
+        "Overpayment / Underpayment": difference
     }])
 
     hist = st.session_state.history.copy()
@@ -394,7 +396,10 @@ if st.button("Save Month Calculation"):
         )
         hist = hist[~mask]
 
-    st.session_state.history = pd.concat([hist, new_row], ignore_index=True)
+    st.session_state.history = pd.concat(
+        [hist, new_row],
+        ignore_index=True
+    )
 
     st.success("Saved")
     
