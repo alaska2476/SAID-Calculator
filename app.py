@@ -350,11 +350,22 @@ elif difference < 0:
 else:
     label = "NO DIFFERENCE"
 
+if label == "OVERPAYMENT":
+    color = "red"
+elif label == "UNDERPAYMENT":
+    color = "orange"
+else:
+    color = "green"
+
 with c4:
     st.markdown(
-        f"### {label}: ${abs(difference):,.2f}"
+        f"""
+        <h3 style="color:{color};">
+            {label}: ${abs(difference):,.2f}
+        </h3>
+        """,
+        unsafe_allow_html=True
     )
-
 # =========================
 # SAVE
 # =========================
