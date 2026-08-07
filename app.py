@@ -301,12 +301,11 @@ with c1:
 
 with c2:
     col_a, col_b = st.columns([1.7, 3])
-with col_a:
-    st.markdown(
-        "<div style='padding-top:15px;'><h3>Benefit Issued:</h3></div>",
-        unsafe_allow_html=True
-    )
-with col_b:
+
+    with col_a:
+        st.markdown("### Benefit Issued:")
+
+    with col_b:
         issued = st.number_input(
             "Benefit Issued",
             min_value=0.0,
