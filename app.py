@@ -306,7 +306,7 @@ with col_a:
         st.markdown("### Benefit Issued:")
 with col_b:
     st.markdown(
-        "<div style='padding-top:8px;'></div>",
+        "<div style='padding-top:12px;'></div>",
         unsafe_allow_html=True
     )
 
@@ -350,22 +350,11 @@ elif difference < 0:
 else:
     label = "NO DIFFERENCE"
 
-if label == "OVERPAYMENT":
-    color = "Dark Red"
-elif label == "UNDERPAYMENT":
-    color = "Microsoft Blue"
-else:
-    color = "Dark Green"
-
 with c4:
     st.markdown(
-        f"""
-        <h3 style="color:{color};">
-            {label}: ${abs(difference):,.2f}
-        </h3>
-        """,
-        unsafe_allow_html=True
+        f"### {label}: ${abs(difference):,.2f}"
     )
+
 # =========================
 # SAVE
 # =========================
@@ -468,28 +457,6 @@ if len(st.session_state.history) > 0:
     file_name = f"{client}_{case}_summary.xlsx"
     st.download_button("Download Summary", output.getvalue(), file_name)
 
-    # SHOW TOTAL
-if total > 0:
-    total_color = "#C62828"      # Dark Red
-elif total < 0:
-    total_color = "#0078D4"      # Microsoft Blue
-else:
-    total_color = "#2E7D32"      # Dark Green
-
-st.markdown(
-    f"""
-    <h2 style="color:{total_color};">
-        {total_text}
-    </h2>
-    """,
-    unsafe_allow_html=True
-)
-
-st.markdown(
-    f"""
-    <h3 style="color:{total_color};">
-        ${abs(total):,.2f}
-    </h3>
-    """,
-    unsafe_allow_html=True
-)
+    #  SHOW TOTAL
+    st.subheader(total_text)
+    st.metric("", f"${abs(total):,.2f}")
