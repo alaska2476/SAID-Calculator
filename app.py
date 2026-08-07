@@ -293,7 +293,7 @@ declared_benefit = declared_total - declared_net_total
 budget_deficit = max(actual_total - total_income_considered, 0)
 
 st.markdown("<br>", unsafe_allow_html=True)
-c1, c2, c3, c4 = st.columns([0.6, 0.9, 0.8, 2.7])
+c1, c2, c3, c4 = st.columns([0.6, 0.9, 0.8, 2])
 
 with c1:
     st.markdown(
