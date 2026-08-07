@@ -292,13 +292,13 @@ declared_benefit = declared_total - declared_net_total
 
 budget_deficit = max(actual_total - total_income_considered, 0)
 
-col1, col2, col3 = st.columns(3)
+c1, c2, c3 = st.columns(3)
 
-with col1:
-    st.markdown(f"### Benefit")
+with c1:
+    st.markdown("### Benefit")
     st.markdown(f"## ${declared_benefit:,.2f}")
 
-with col2:
+with c2:
     st.markdown("### Benefit Issued ($)")
     issued = st.number_input(
         "Benefit Issued",
@@ -307,10 +307,10 @@ with col2:
         label_visibility="collapsed"
     )
 
-with col3:
+with c3:
     st.markdown("### Budget Deficit")
     st.markdown(f"## ${budget_deficit:,.2f}")
-
+    
 # =========================
 # BUSINESS RULE
 # =========================
