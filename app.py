@@ -304,6 +304,9 @@ with col_issued:
         format="%.2f",
         label_visibility="collapsed"
     )
+# Budget Deficit
+budget_deficit = max(actual_total - total_income_considered, 0)
+st.markdown(f"### Budget Deficit: ${budget_deficit:,.2f}")
 
 # =========================
 # BUSINESS RULE
@@ -364,20 +367,21 @@ else:
 #  SAVE BUTTON
 if st.button("Save Month Calculation"):
 
-    new_row = pd.DataFrame([{
-        "Client": client,
-        "Case": case,
-        "Month": month,
-        "Year": year,
-        "Total Declared": declared_total,
-        "Total Actual": actual_total,
-        "Declared Income": declared_net_total,
-        "Additional Income": (0 if same_income else additional_income_total),
-        "Total Income Considered": total_income_considered,
-        "Benefit": declared_benefit,
-        "Benefits Issued": issued,
-        "Overpayment / Underpayment": difference
-    }])
+   new_row = pd.DataFrame([{
+    "Client": client,
+    "Case": case,
+    "Month": month,
+    "Year": year,
+    "Total Declared": declared_total,
+    "Total Actual": actual_total,
+    "Declared Income": declared_net_total,
+    "Additional Income": (0 if same_income else additional_income_total),
+    "Total Income Considered": total_income_considered,
+    "Budget Deficit": budget_deficit,
+    "Benefit": declared_benefit,
+    "Benefits Issued": issued,
+    "Overpayment / Underpayment": difference
+}])
 
     hist = st.session_state.history.copy()
 
