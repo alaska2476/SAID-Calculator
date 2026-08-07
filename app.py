@@ -301,7 +301,7 @@ with c1:
     )
 
 with c2:
-    col_a, col_b = st.columns([8, 3])
+    col_a, col_b = st.columns([6, 4])
 
     with col_a:
         st.markdown("### Benefit Issued:")
