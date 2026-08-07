@@ -381,7 +381,7 @@ if st.button("Save Month Calculation"):
     "Benefit": declared_benefit,
     "Benefits Issued": issued,
     "Overpayment / Underpayment": difference
-}])
+    }])
 
     hist = st.session_state.history.copy()
 
