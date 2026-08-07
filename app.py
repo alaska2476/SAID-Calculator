@@ -292,7 +292,7 @@ declared_benefit = declared_total - declared_net_total
 
 budget_deficit = max(actual_total - total_income_considered, 0)
 
-c1, c2, spacer, c3 = st.columns([1, 1, 1, 2])
+c1, c2, c3, c4 = st.columns([1, 1, 2, 2])
 
 with c1:
     st.markdown(
@@ -346,8 +346,10 @@ elif difference < 0:
 else:
     label = "NO DIFFERENCE"
 
-st.markdown(f"### {label}: ${abs(difference):,.2f}")
-
+with c4:
+    st.markdown(
+        f"### {label}: ${abs(difference):,.2f}"
+    )
 
 # =========================
 # SAVE
