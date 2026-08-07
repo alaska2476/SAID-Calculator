@@ -454,24 +454,14 @@ if len(st.session_state.history) > 0:
         total_color = "#2E7D32"      # Dark Green
 
 # SHOW TOTAL
-    st.markdown(
+st.markdown(
     f"""
-    <h2 style="color:{total_color};">
-        {total_text}
-    </h2>
-    """,
-    unsafe_allow_html=True
-)
-
-    st.markdown(
-    f"""
-    <h3 style="
+    <h2 style="
         color:{total_color};
-        white-space: nowrap;
-        margin-top: 0px;
+        margin:0;
     ">
-        ${abs(total):,.2f}
-    </h3>
+        {total_text}: ${abs(total):,.2f}
+    </h2>
     """,
     unsafe_allow_html=True
 )
