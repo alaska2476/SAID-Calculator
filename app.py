@@ -302,10 +302,9 @@ with c1:
 with c2:
     col_a, col_b = st.columns([1.7, 3])
 
-    with col_a:
+with col_a:
         st.markdown("### Benefit Issued:")
-
-  with col_b:
+with col_b:
     st.markdown(
         "<div style='padding-top:8px;'></div>",
         unsafe_allow_html=True
