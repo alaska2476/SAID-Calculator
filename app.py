@@ -350,9 +350,21 @@ elif difference < 0:
 else:
     label = "NO DIFFERENCE"
 
+if label == "OVERPAYMENT":
+    result_color = "#C62828"      # Dark Red
+elif label == "UNDERPAYMENT":
+    result_color = "#0078D4"      # Microsoft Blue
+else:
+    result_color = "#2E7D32"      # Dark Green
+
 with c4:
     st.markdown(
-        f"### {label}: ${abs(difference):,.2f}"
+        f"""
+        <h3 style="color:{result_color};">
+            {label}: ${abs(difference):,.2f}
+        </h3>
+        """,
+        unsafe_allow_html=True
     )
 
 # =========================
