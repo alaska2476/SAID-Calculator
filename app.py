@@ -353,7 +353,7 @@ else:
 if label == "OVERPAYMENT":
     color = "red"
 elif label == "UNDERPAYMENT":
-    color = "orange"
+    color = "blue"
 else:
     color = "green"
 
