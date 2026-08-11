@@ -456,13 +456,48 @@ if len(st.session_state.history) > 0:
         total_color = "#2E7D32"      # Dark Green
 
     st.markdown(
-        f"""
-        <h2 style="
-            color:{total_color};
-            margin:0;
-        ">
-            {total_text}
-        </h2>
-        """,
-        unsafe_allow_html=True
+    f"""
+    <h2 style="
+        color:{total_color};
+        margin:0;
+    ">
+        {total_text}: ${abs(total):,.2f}
+    </h2>
+    """,
+    unsafe_allow_html=True
+)
+
+# =========================
+# EXPORT
+# =========================
+
+output = io.BytesIO()
+
+with pd.ExcelWriter(output, engine="openpyxl") as writer:
+
+    export_df = st.session_state.history.copy()
+
+    # Monthly tabs
+    for (yr, mon), df_month in export_df.groupby(["Year", "Month"]):
+        sheet_name = f"{mon} {yr}"[:31]
+        df_month.to_excel(
+            writer,
+            sheet_name=sheet_name,
+            index=False
+        )
+
+    # Summary tab
+    export_df.to_excel(
+        writer,
+        sheet_name="Summary",
+        index=False
     )
+
+output.seek(0)
+
+st.download_button(
+    label="Download Excel Report",
+    data=output,
+    file_name="SAID_Transition_Report.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
