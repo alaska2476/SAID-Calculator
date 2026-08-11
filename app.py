@@ -466,4 +466,44 @@ if len(st.session_state.history) > 0:
     """,
     unsafe_allow_html=True
 )
+# =========================
+# DOWNLOAD SUMMARY
+# =========================
 
+output = io.BytesIO()
+
+summary_df = st.session_state.history.copy()
+
+total_value = summary_df["Overpayment / Underpayment"].sum()
+
+total_row = {col: "" for col in summary_df.columns}
+
+if total_value > 0:
+    total_row["Client"] = "TOTAL OVERPAYMENT"
+elif total_value < 0:
+    total_row["Client"] = "TOTAL UNDERPAYMENT"
+else:
+    total_row["Client"] = "NO NET DIFFERENCE"
+
+total_row["Overpayment / Underpayment"] = abs(total_value)
+
+summary_df = pd.concat(
+    [summary_df, pd.DataFrame([total_row])],
+    ignore_index=True
+)
+
+with pd.ExcelWriter(output, engine="openpyxl") as writer:
+    summary_df.to_excel(
+        writer,
+        sheet_name="Summary",
+        index=False
+    )
+
+output.seek(0)
+
+st.download_button(
+    label="Download Summary",
+    data=output,
+    file_name="SAID_Summary.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
