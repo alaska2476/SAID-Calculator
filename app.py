@@ -468,25 +468,26 @@ if len(st.session_state.history) > 0:
 )
 
 # =========================
-# EXPORT
+# SUMMARY EXPORT
 # =========================
 
 output = io.BytesIO()
 
+export_df = st.session_state.history.copy()
+
+total_value = export_df["Overpayment / Underpayment"].sum()
+
+# Add total row
+total_row = {col: "" for col in export_df.columns}
+total_row["Client"] = total_text
+total_row["Overpayment / Underpayment"] = total_value
+
+export_df = pd.concat(
+    [export_df, pd.DataFrame([total_row])],
+    ignore_index=True
+)
+
 with pd.ExcelWriter(output, engine="openpyxl") as writer:
-
-    export_df = st.session_state.history.copy()
-
-    # Monthly tabs
-    for (yr, mon), df_month in export_df.groupby(["Year", "Month"]):
-        sheet_name = f"{mon} {yr}"[:31]
-        df_month.to_excel(
-            writer,
-            sheet_name=sheet_name,
-            index=False
-        )
-
-    # Summary tab
     export_df.to_excel(
         writer,
         sheet_name="Summary",
@@ -496,8 +497,8 @@ with pd.ExcelWriter(output, engine="openpyxl") as writer:
 output.seek(0)
 
 st.download_button(
-    label="Download Excel Report",
+    "Download Summary",
     data=output,
-    file_name="SAID_Transition_Report.xlsx",
+    file_name="SAID_Summary.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 )
