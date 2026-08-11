@@ -269,13 +269,25 @@ with col2_inc:
         total = 0
 
         for i in range(5):
-            c1, c2 = st.columns(2)
+    c1, c2 = st.columns(2)
 
-            label = f"A{i+1}"   
-            val = c1.number_input(label, 0.0, key=f"a_{i}")
-            less = c2.number_input("Less", 0.0, key=f"a_less_{i}")
+    label = f"A{i+1}"
 
-            total += (val - less)
+    val = c1.number_input(
+        label,
+        value=0.0,
+        min_value=-1000000.0,
+        max_value=1000000.0,
+        key=f"a_{i}"
+    )
+
+    less = c2.number_input(
+        "Less",
+        0.0,
+        key=f"a_less_{i}"
+    )
+
+    total += (val - less)
 
         additional_income_total = total
         st.markdown(f"**Total Additional Income: ${additional_income_total:,.2f}**")
