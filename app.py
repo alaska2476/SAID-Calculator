@@ -284,10 +284,12 @@ with col2_inc:
 # =========================
 # FINAL
 # =========================
-total_income_considered = declared_net_total + (
-    0 if same_income else additional_income_total
-)
+# FINAL
 
+if same_income:
+    total_income_considered = declared_net_total
+else:
+    total_income_considered = additional_income_total
 declared_benefit = declared_total - declared_net_total
 
 budget_deficit = max(actual_total - total_income_considered, 0)
