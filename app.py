@@ -504,6 +504,6 @@ output.seek(0)
 st.download_button(
     label="Download Summary",
     data=output,
-    file_name="SAID_Summary.xlsx",
+    file_name=f"{client}-{case}.xlsx"
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 )
