@@ -444,11 +444,11 @@ if len(st.session_state.history) > 0:
     total = export_df["Overpayment / Underpayment"].sum()
 
     if total > 0:
-        total_text = f"TOTAL OVERPAYMENT: ${abs(total):,.2f}"
+        total_text = f"TOTAL OVERPAYMENT
         total_color = "#C62828"      # Dark Red
 
     elif total < 0:
-        total_text = f"TOTAL UNDERPAYMENT: ${abs(total):,.2f}"
+        total_text = f"TOTAL UNDERPAYMENT
         total_color = "#0078D4"      # Microsoft Blue
 
     else:
