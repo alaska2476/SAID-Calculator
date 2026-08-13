@@ -407,8 +407,8 @@ if st.button("Save Month Calculation"):
         "Total Declared": declared_total,
         "Total Actual": actual_total,
         "Declared Income": declared_net_total,
-        "Additional Income": (
-            0 if same_income else additional_income_total
+        "Actual Income": (
+            0 if same_income else actual_income_total
         ),
         "Total Income Considered": total_income_considered,
         "Budget Deficit": budget_deficit,
