@@ -383,7 +383,6 @@ required_columns = [
     "Total Actual",
     "Declared Income",
     "Actual Income",
-    "Total Income Considered",
     "Benefit",
     "Benefits Issued",
     "Budget Deficit",
