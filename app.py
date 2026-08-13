@@ -260,25 +260,29 @@ with col1_inc:
 
     st.markdown(f"**Total Declared Income: ${declared_net_total:,.2f}**")
 
-# Additional Income
+# Actual Income
 with col2_inc:
     if same_income:
-        additional_income_total = 0
-        st.info("No additional income")
+        actual_income_total = declared_net_total
+        st.info("Using declared income")
     else:
         total = 0
 
         for i in range(5):
             c1, c2 = st.columns(2)
 
-            label = f"A{i+1}"   
+            label = f"A{i+1}"
+
             val = c1.number_input(label, 0.0, key=f"a_{i}")
             less = c2.number_input("Less", 0.0, key=f"a_less_{i}")
 
             total += (val - less)
 
-        additional_income_total = total
-        st.markdown(f"**Total Additional Income: ${additional_income_total:,.2f}**")
+        actual_income_total = total
+
+        st.markdown(
+            f"**Total Actual Income: ${actual_income_total:,.2f}**"
+        )
 
 
 # =========================
