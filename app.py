@@ -240,7 +240,7 @@ with h2: st.markdown("**Actual Income**")
 
 _, _, cb2 = st.columns([1,0.3,1])
 with cb2:
-    same_income = st.checkbox("Same as Declared", True)
+    same_income = st.checkbox("Same as Declared Income", True)
 
 col1_inc,_,col2_inc = st.columns([1,0.3,1])
 
