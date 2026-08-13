@@ -227,9 +227,9 @@ st.divider()
 st.info(
     """
     Declared Income = Income used in the original assessment.
-    
+
     Actual Income = Income that should have been used based on the
-investigation and verified information.
+    investigation and verified information.
     """
 )
 st.subheader("INCOME")
