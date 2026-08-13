@@ -228,15 +228,15 @@ st.info(
     """
     Declared Income = Income used in the original assessment.
     
-    Additional Income =  New income identified after the original assessment 
-    that was not included in the original calculation.
+    Actual Income = Income that should have been used based on the
+investigation and verified information.
     """
 )
 st.subheader("INCOME")
 
 h1, _, h2 = st.columns([1,0.3,1])
 with h1: st.markdown("**Declared Income**")
-with h2: st.markdown("**Additional Income**")
+with h2: st.markdown("**Actual Income**")
 
 _, _, cb2 = st.columns([1,0.3,1])
 with cb2:
