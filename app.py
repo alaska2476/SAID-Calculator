@@ -295,6 +295,7 @@ else:
 declared_benefit = declared_total - declared_net_total
 
 budget_deficit = max(actual_total - total_income_considered, 0)
+budget_surplus = max(total_income_considered - actual_total, 0)
 
 st.markdown("<br>", unsafe_allow_html=True)
 c1, c2, spacer, c3, c4 = st.columns([1, 2.5, 0.5, 2, 2])
@@ -322,10 +323,14 @@ with col_b:
     )
 
 with c3:
-    st.markdown(
-        f"### Budget Deficit: ${budget_deficit:,.2f}"
-    )
-    
+    if budget_surplus > 0:
+        st.markdown(
+            f"### Budget Surplus: ${budget_surplus:,.2f}"
+        )
+    else:
+        st.markdown(
+            f"### Budget Deficit: ${budget_deficit:,.2f}"
+        )
 # =========================
 # BUSINESS RULE
 # =========================
@@ -385,7 +390,7 @@ required_columns = [
     "Actual Income",
     "Benefit",
     "Benefits Issued",
-    "Budget Deficit",
+    "Budget Deficit/Surplus",
     "Overpayment / Underpayment"
 ]
 #
@@ -406,10 +411,10 @@ if st.button("Save Month Calculation"):
         "Total Declared": declared_total,
         "Total Actual": actual_total,
         "Declared Income": declared_net_total,
-        "Actual Income": (
-            0 if same_income else actual_income_total
+       "Actual Income": actual_income_total,
+        "Budget Deficit/Surplus": (
+        budget_surplus if budget_surplus > 0 else budget_deficit
         ),
-        "Budget Deficit": budget_deficit,
         "Benefit": declared_benefit,
         "Benefits Issued": issued,
         "Overpayment / Underpayment": difference
