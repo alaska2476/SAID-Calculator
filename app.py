@@ -351,7 +351,6 @@ else:
 
     difference = issued - recalculated_benefit
     
-st.write("Difference =", difference)
 # Result label
 if abs(difference) < 0.01:
     label = "NO DIFFERENCE"
