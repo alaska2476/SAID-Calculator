@@ -350,7 +350,8 @@ else:
     recalculated_benefit = max(actual_budget, 0)
 
     difference = issued - recalculated_benefit
-
+    
+st.write("Difference =", difference)
 # Result label
 if difference > 0:
     label = "OVERPAYMENT"
