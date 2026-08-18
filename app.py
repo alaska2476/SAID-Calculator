@@ -355,7 +355,7 @@ st.write("Difference =", difference)
 # Result label
 if difference > 0:
     label = "OVERPAYMENT"
-elif difference < 0:
+elif difference < 0.01:
     label = "UNDERPAYMENT"
 else:
     label = "NO DIFFERENCE"
