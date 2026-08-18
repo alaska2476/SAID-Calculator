@@ -353,13 +353,14 @@ else:
     
 st.write("Difference =", difference)
 # Result label
-if difference > 0:
-    label = "OVERPAYMENT"
-elif difference < 0.01:
-    label = "UNDERPAYMENT"
-else:
+if abs(difference) < 0.01:
     label = "NO DIFFERENCE"
-
+    difference = 0
+elif difference > 0:
+    label = "OVERPAYMENT"
+else:
+    label = "UNDERPAYMENT"
+    
 if label == "OVERPAYMENT":
     result_color = "#C62828"      # Dark Red
 elif label == "UNDERPAYMENT":
