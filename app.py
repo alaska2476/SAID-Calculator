@@ -392,7 +392,7 @@ required_columns = [
     "Benefit",
     "Benefits Issued",
     "Budget Deficit/Surplus",
-    "Overpayment / Underpayment"
+    "Overpayment / Underpayment",
     "Assessment Result"
 ]
 #
