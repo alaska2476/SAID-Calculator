@@ -393,6 +393,7 @@ required_columns = [
     "Benefits Issued",
     "Budget Deficit/Surplus",
     "Overpayment / Underpayment"
+    "Assessment Result"
 ]
 #
 if "history" not in st.session_state:
@@ -418,7 +419,8 @@ if st.button("Save Month Calculation"):
         ),
         "Benefit": declared_benefit,
         "Benefits Issued": issued,
-        "Overpayment / Underpayment": difference
+        "Overpayment / Underpayment": difference,
+        "Assessment Result":label
     }])
 
     hist = st.session_state.history.copy()
