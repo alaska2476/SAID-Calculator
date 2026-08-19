@@ -11,7 +11,7 @@ st.markdown("""
     padding-top: 1rem;
     padding-bottom: 0rem;
 }
-</style>
+</style> 
 """, unsafe_allow_html=True)
 
 # ========================
