@@ -144,11 +144,17 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-client = st.text_input(
+top = st.columns(2)
+
+client = top[0].text_input(
     "Client #",
     key="client"
 )
 
+case = top[1].text_input(
+    "Case #",
+    key="case"
+)
 
 # =========================
 # TABLE BUILDER
