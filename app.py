@@ -153,7 +153,14 @@ client = st.text_input(
 # =========================
 # TABLE BUILDER
 # =========================
-def build_table(prefix):
+def build_table(
+    prefix,
+    community,
+    year,
+    month,
+    adults,
+    children
+):
     total = 0
 
     benefits = get_filtered_benefits(community, year, month, adults, children)
