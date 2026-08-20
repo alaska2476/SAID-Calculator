@@ -185,25 +185,102 @@ def build_table(prefix):
 # =========================
 # BENEFITS
 # =========================
-h1, _, h2 = st.columns([1,0.3,1])
-with h1: st.subheader("Declared")
-with h2: st.subheader("Actual")
 
-_, _, cb = st.columns([1,0.3,1])
-with cb:
-    same_actual = st.checkbox("Same as Declared", True)
+h1, _, h2 = st.columns([1,0.3,1])
+
+with h1:
+    st.subheader("Declared")
+
+with h2:
+    st.subheader("Actual")
 
 col1, _, col2 = st.columns([1,0.3,1])
 
 with col1:
-    declared_total = build_table("d")
-    st.markdown(f"### Total Declared: ${declared_total:,.2f}")
+
+    d_cols = st.columns(6)
+
+    d_case = d_cols[0].text_input("Case #", key="d_case")
+
+    d_community = d_cols[1].selectbox(
+        "Community",
+        Community["Community"].unique(),
+        key="d_comm"
+    )
+
+    d_month = d_cols[2].selectbox(
+        "Month",
+        [
+            "January","February","March","April","May","June",
+            "July","August","September","October","November","December"
+        ],
+        key="d_month"
+    )
+
+    d_year = d_cols[3].selectbox(
+        "Year",
+        list(range(2020,2027)),
+        key="d_year"
+    )
+
+    d_adults = d_cols[4].selectbox(
+        "Adults",
+        [1,2,3,4,5],
+        key="d_adults"
+    )
+
+    d_children = d_cols[5].selectbox(
+        "Children",
+        list(range(27)),
+        key="d_children"
+    )
 
 with col2:
-    actual_total = declared_total if same_actual else build_table("a")
-    if same_actual:
-        st.info("Using declared values")
-    st.markdown(f"### Total Actual: ${actual_total:,.2f}")
+
+    a_cols = st.columns(6)
+
+    a_case = a_cols[0].text_input("Case #", key="a_case")
+
+    a_community = a_cols[1].selectbox(
+        "Community",
+        Community["Community"].unique(),
+        key="a_comm"
+    )
+
+    a_month = a_cols[2].selectbox(
+        "Month",
+        [
+            "January","February","March","April","May","June",
+            "July","August","September","October","November","December"
+        ],
+        key="a_month"
+    )
+
+    a_year = a_cols[3].selectbox(
+        "Year",
+        list(range(2020,2027)),
+        key="a_year"
+    )
+
+    a_adults = a_cols[4].selectbox(
+        "Adults",
+        [1,2,3,4,5],
+        key="a_adults"
+    )
+
+    a_children = a_cols[5].selectbox(
+        "Children",
+        list(range(27)),
+        key="a_children"
+    )
+
+_, _, cb = st.columns([1,0.3,1])
+
+with cb:
+    same_actual = st.checkbox(
+        "Same as Declared",
+        True
+    )
     
 # =========================
 # INCOME
