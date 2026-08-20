@@ -282,7 +282,6 @@ with col2:
     )
 
 _, _, cb = st.columns([1,0.3,1])
-
 with cb:
     same_actual = st.checkbox(
         "Same as Declared",
