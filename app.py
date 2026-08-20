@@ -248,10 +248,7 @@ with col1:
     st.markdown(
         f"### Total Declared: ${declared_total:,.2f}"
     )
-    _, _, cb = st.columns([1,0.3,1])
-with cb:
-    same_actual = st.checkbox("Same as Declared", True)
-
+ 
 with col2:
 
     a_cols = st.columns(7)
@@ -292,6 +289,9 @@ with col2:
         list(range(27)),
         key="a_children"
     )
+   _, _, cb = st.columns([1,0.3,1])
+with cb:
+    same_actual = st.checkbox("Same as Declared", True)
 
     if same_actual:
         actual_total = declared_total
