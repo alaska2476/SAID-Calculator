@@ -144,27 +144,104 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-cols = st.columns(7)
-client = cols[0].text_input("Client #", key="client")
-case = cols[1].text_input("Case #", key="case")
-community = cols[2].selectbox("Community", Community["Community"].unique(), key="community")
-month = cols[3].selectbox("Month", [
-    "January","February","March","April","May","June",
-    "July","August","September","October","November","December"
-], key="month")
-year = cols[4].selectbox("Year", list(range(2020, 2027)), key="year")
-adults = cols[5].selectbox(
-    "Adults",
-    [1, 2, 3, 4,5],              
-    key="adults_2026_FINAL"       
-)
+st.subheader("Client Information")
 
-children = cols[6].selectbox(
-    "Children",
-    [0, 1, 2, 3, 4, 5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26],       
-    key="children_FINAL_2026"
-)
+client = st.text_input("Client #")
 
+dcol, acol = st.columns(2)
+with dcol:
+
+    st.markdown("### Declared Assessment")
+
+    declared_case = st.text_input("Case #", key="d_case")
+
+    declared_community = st.selectbox(
+        "Community",
+        Community["Community"].unique(),
+        key="d_comm"
+    )
+
+    declared_month = st.selectbox(
+        "Month",
+        [
+            "January","February","March","April","May","June",
+            "July","August","September","October","November","December"
+        ],
+        key="d_month"
+    )
+
+    declared_year = st.selectbox(
+        "Year",
+        list(range(2020,2027)),
+        key="d_year"
+    )
+
+    declared_adults = st.selectbox(
+        "Adults",
+        [1,2,3,4,5],
+        key="d_adults"
+    )
+
+    declared_children = st.selectbox(
+        "Children",
+        list(range(27)),
+        key="d_children"
+    )
+
+with acol:
+
+    st.markdown("### Actual Assessment")
+
+    same_assessment = st.checkbox(
+        "Same as Declared Assessment",
+        True
+    )
+
+if same_assessment:
+
+    actual_case = declared_case
+    actual_community = declared_community
+    actual_month = declared_month
+    actual_year = declared_year
+    actual_adults = declared_adults
+    actual_children = declared_children
+
+else:
+
+    actual_case = st.text_input("Case #", key="a_case")
+
+    actual_community = st.selectbox(
+        "Community",
+        Community["Community"].unique(),
+        key="a_comm"
+    )
+
+    actual_month = st.selectbox(
+        "Month",
+        [
+            "January","February","March","April","May","June",
+            "July","August","September","October","November","December"
+        ],
+        key="a_month"
+    )
+
+    actual_year = st.selectbox(
+        "Year",
+        list(range(2020,2027)),
+        key="a_year"
+    )
+
+    actual_adults = st.selectbox(
+        "Adults",
+        [1,2,3,4,5],
+        key="a_adults"
+    )
+
+    actual_children = st.selectbox(
+        "Children",
+        list(range(27)),
+        key="a_children"
+    )
 # =========================
 # TABLE BUILDER
 # =========================
