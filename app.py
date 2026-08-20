@@ -287,7 +287,8 @@ with cb:
         "Same as Declared",
         True
     )
-  col1, _, col2 = st.columns([1,0.3,1])
+
+col1, _, col2 = st.columns([1,0.3,1])
 
 with col1:
 
