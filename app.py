@@ -192,9 +192,6 @@ h1, _, h2 = st.columns([1,0.3,1])
 with h1: st.subheader("Declared")
 with h2: st.subheader("Actual")
 
-_, _, cb = st.columns([1,0.3,1])
-with cb:
-    same_actual = st.checkbox("Same as Declared", True)
 
 col1, _, col2 = st.columns([1,0.3,1])
 
@@ -309,7 +306,10 @@ with col2:
     st.markdown(
         f"### Total Actual: ${actual_total:,.2f}"
     )
-    
+_, _, cb = st.columns([1,0.3,1])
+with cb:
+    same_actual = st.checkbox("Same as Declared", True)
+
 # =========================
 # INCOME
 # =========================
