@@ -290,7 +290,7 @@ with col2:
         key="a_children"
     )
    _, _, cb = st.columns([1,0.3,1])
-with cb:
+    with cb:
     same_actual = st.checkbox("Same as Declared", True)
 
     if same_actual:
