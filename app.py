@@ -288,7 +288,44 @@ with cb:
         "Same as Declared",
         True
     )
-    
+  col1, _, col2 = st.columns([1,0.3,1])
+
+with col1:
+
+    declared_total = build_table(
+        "d",
+        d_community,
+        d_year,
+        d_month,
+        d_adults,
+        d_children
+    )
+
+    st.markdown(
+        f"### Total Declared: ${declared_total:,.2f}"
+    )
+
+with col2:
+
+    if same_actual:
+
+        actual_total = declared_total
+        st.info("Using declared values")
+
+    else:
+
+        actual_total = build_table(
+            "a",
+            a_community,
+            a_year,
+            a_month,
+            a_adults,
+            a_children
+        )
+
+    st.markdown(
+        f"### Total Actual: ${actual_total:,.2f}"
+    )  
 # =========================
 # INCOME
 # =========================
