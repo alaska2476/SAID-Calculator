@@ -514,7 +514,7 @@ if st.button("Save Month Calculation"):
 
     new_row = pd.DataFrame([{
         "Client": client,
-        "Case": d_case,
+        "Case": case,
         "Month": d_month,
         "Year": d_year,
         "Total Declared": declared_total,
@@ -535,7 +535,7 @@ if st.button("Save Month Calculation"):
     if not hist.empty:
         mask = (
             (hist["Client"] == client) &
-            (hist["Case"] == d_case) &
+            (hist["Case"] == case) &
             (hist["Month"] == d_month) &
             (hist["Year"] == d_year)
         )
@@ -622,6 +622,5 @@ output.seek(0)
 st.download_button(
     label="Download Summary",
     data=output,
-    file_name=f"{client}-{d_case}.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-)
+    file_name=f"{client}-{case}.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.
