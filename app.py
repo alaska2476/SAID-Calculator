@@ -623,4 +623,5 @@ st.download_button(
     label="Download Summary",
     data=output,
     file_name=f"{client}-{case}.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
