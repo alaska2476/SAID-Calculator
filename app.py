@@ -211,9 +211,7 @@ col1, _, col2 = st.columns([1,0.3,1])
 
 with col1:
 
-    d_cols = st.columns(6)
-
-    d_case = d_cols[0].text_input("Case #", key="d_case")
+    d_cols = st.columns(5)
 
     d_community = d_cols[1].selectbox(
         "Community",
@@ -250,9 +248,7 @@ with col1:
 
 with col2:
 
-    a_cols = st.columns(6)
-
-    a_case = a_cols[0].text_input("Case #", key="a_case")
+    a_cols = st.columns(5)
 
     a_community = a_cols[1].selectbox(
         "Community",
