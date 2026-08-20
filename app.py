@@ -144,31 +144,19 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-cols = st.columns(7)
-client = cols[0].text_input("Client #", key="client")
-case = cols[1].text_input("Case #", key="case")
-community = cols[2].selectbox("Community", Community["Community"].unique(), key="community")
-month = cols[3].selectbox("Month", [
-    "January","February","March","April","May","June",
-    "July","August","September","October","November","December"
-], key="month")
-year = cols[4].selectbox("Year", list(range(2020, 2027)), key="year")
-adults = cols[5].selectbox(
-    "Adults",
-    [1, 2, 3, 4,5],              
-    key="adults_2026_FINAL"       
-)
 
-children = cols[6].selectbox(
-    "Children",
-    [0, 1, 2, 3, 4, 5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26],       
-    key="children_FINAL_2026"
-)
 
 # =========================
 # TABLE BUILDER
 # =========================
-def build_table(prefix):
+def build_table(
+    prefix,
+    community,
+    year,
+    month,
+    adults,
+    children
+):
     total = 0
 
     benefits = get_filtered_benefits(community, year, month, adults, children)
@@ -211,14 +199,116 @@ with cb:
 col1, _, col2 = st.columns([1,0.3,1])
 
 with col1:
-    declared_total = build_table("d")
-    st.markdown(f"### Total Declared: ${declared_total:,.2f}")
 
+    d_cols = st.columns(7)
+
+    d_client = d_cols[0].text_input("Client #", key="d_client")
+
+    d_case = d_cols[1].text_input("Case #", key="d_case")
+
+    d_community = d_cols[2].selectbox(
+        "Community",
+        Community["Community"].unique(),
+        key="d_community"
+    )
+
+    d_month = d_cols[3].selectbox(
+        "Month",
+        [
+            "January","February","March","April","May","June",
+            "July","August","September","October","November","December"
+        ],
+        key="d_month"
+    )
+
+    d_year = d_cols[4].selectbox(
+        "Year",
+        list(range(2020,2027)),
+        key="d_year"
+    )
+
+    d_adults = d_cols[5].selectbox(
+        "Adults",
+        [1,2,3,4,5],
+        key="d_adults"
+    )
+
+    d_children = d_cols[6].selectbox(
+        "Children",
+        list(range(27)),
+        key="d_children"
+    )
+
+    declared_total = build_table(
+        "d",
+        d_community,
+        d_year,
+        d_month,
+        d_adults,
+        d_children
+    )
+
+    st.markdown(
+        f"### Total Declared: ${declared_total:,.2f}"
+    )
 with col2:
-    actual_total = declared_total if same_actual else build_table("a")
+
+    a_cols = st.columns(7)
+
+    a_client = a_cols[0].text_input("Client #", key="a_client")
+
+    a_case = a_cols[1].text_input("Case #", key="a_case")
+
+    a_community = a_cols[2].selectbox(
+        "Community",
+        Community["Community"].unique(),
+        key="a_community"
+    )
+
+    a_month = a_cols[3].selectbox(
+        "Month",
+        [
+            "January","February","March","April","May","June",
+            "July","August","September","October","November","December"
+        ],
+        key="a_month"
+    )
+
+    a_year = a_cols[4].selectbox(
+        "Year",
+        list(range(2020,2027)),
+        key="a_year"
+    )
+
+    a_adults = a_cols[5].selectbox(
+        "Adults",
+        [1,2,3,4,5],
+        key="a_adults"
+    )
+
+    a_children = a_cols[6].selectbox(
+        "Children",
+        list(range(27)),
+        key="a_children"
+    )
+
     if same_actual:
+        actual_total = declared_total
         st.info("Using declared values")
-    st.markdown(f"### Total Actual: ${actual_total:,.2f}")
+
+    else:
+        actual_total = build_table(
+            "a",
+            a_community,
+            a_year,
+            a_month,
+            a_adults,
+            a_children
+        )
+
+    st.markdown(
+        f"### Total Actual: ${actual_total:,.2f}"
+    )
     
 # =========================
 # INCOME
