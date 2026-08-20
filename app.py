@@ -513,20 +513,20 @@ if st.button("Save Month Calculation"):
 
     new_row = pd.DataFrame([{
         "Client": client,
-        "Case": case,
-        "Month": month,
-        "Year": year,
+        "Case": d_case,
+        "Month": d_month,
+        "Year": d_year,
         "Total Declared": declared_total,
         "Total Actual": actual_total,
         "Declared Income": declared_net_total,
-       "Actual Income": actual_income_total,
+        "Actual Income": actual_income_total,
         "Budget Deficit/Surplus": (
-        budget_surplus if budget_surplus > 0 else budget_deficit
+            budget_surplus if budget_surplus > 0 else budget_deficit
         ),
         "Benefit": declared_benefit,
         "Benefits Issued": issued,
         "Overpayment / Underpayment": difference,
-        "Assessment Result":label
+        "Assessment Result": label
     }])
 
     hist = st.session_state.history.copy()
@@ -534,10 +534,11 @@ if st.button("Save Month Calculation"):
     if not hist.empty:
         mask = (
             (hist["Client"] == client) &
-            (hist["Case"] == case) &
-            (hist["Month"] == month) &
-            (hist["Year"] == year)
+            (hist["Case"] == d_case) &
+            (hist["Month"] == d_month) &
+            (hist["Year"] == d_year)
         )
+
         hist = hist[~mask]
 
     st.session_state.history = pd.concat(
@@ -620,6 +621,6 @@ output.seek(0)
 st.download_button(
     label="Download Summary",
     data=output,
-    file_name=f"{client}-{case}.xlsx",
+    file_name=f"{client}-{d_case}.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 )
