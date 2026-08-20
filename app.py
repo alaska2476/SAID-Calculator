@@ -144,26 +144,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-cols = st.columns(7)
-client = cols[0].text_input("Client #", key="client")
-case = cols[1].text_input("Case #", key="case")
-community = cols[2].selectbox("Community", Community["Community"].unique(), key="community")
-month = cols[3].selectbox("Month", [
-    "January","February","March","April","May","June",
-    "July","August","September","October","November","December"
-], key="month")
-year = cols[4].selectbox("Year", list(range(2020, 2027)), key="year")
-adults = cols[5].selectbox(
-    "Adults",
-    [1, 2, 3, 4,5],              
-    key="adults_2026_FINAL"       
-)
 
-children = cols[6].selectbox(
-    "Children",
-    [0, 1, 2, 3, 4, 5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26],       
-    key="children_FINAL_2026"
-)
 
 # =========================
 # TABLE BUILDER
@@ -196,7 +177,43 @@ def build_table(prefix):
             total += float(val)
 
     return total
+d_hdr = st.columns(7)
 
+d_client = d_hdr[0].text_input("Client #", key="d_client")
+d_case = d_hdr[1].text_input("Case #", key="d_case")
+
+d_community = d_hdr[2].selectbox(
+    "Community",
+    Community["Community"].unique(),
+    key="d_comm"
+)
+
+d_month = d_hdr[3].selectbox(
+    "Month",
+    [
+        "January","February","March","April","May","June",
+        "July","August","September","October","November","December"
+    ],
+    key="d_month"
+)
+
+d_year = d_hdr[4].selectbox(
+    "Year",
+    list(range(2020, 2027)),
+    key="d_year"
+)
+
+d_adults = d_hdr[5].selectbox(
+    "Adults",
+    [1,2,3,4,5],
+    key="d_adults"
+)
+
+d_children = d_hdr[6].selectbox(
+    "Children",
+    list(range(27)),
+    key="d_children"
+)
 # =========================
 # BENEFITS
 # =========================
