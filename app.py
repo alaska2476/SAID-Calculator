@@ -171,7 +171,7 @@ def build_table(
 
     benefits = get_filtered_benefits(community, year, month, adults, children)
 
-    for i in range(10):
+    for i in range(5):
         c1, c2 = st.columns(2)
 
         b = c1.selectbox("", [""] + benefits + ["OTHER"], key=f"{prefix}_b_{i}")
