@@ -242,7 +242,7 @@ d_adults = d_cols[3].selectbox(
 
 d_children = d_cols[4].selectbox(
     "Children",
-    list(range(27)),
+    list(range(26)),
     key="d_children"
 )
 with col2:
