@@ -456,8 +456,7 @@ else:
     actual_budget = actual_total - total_income_considered
     recalculated_benefit = max(actual_budget, 0)
 
-   difference = round(issued - recalculated_benefit, 2) 
-    
+    difference = round(issued - recalculated_benefit, 2)
 # Result label
 # Result label
 if difference == 0:
