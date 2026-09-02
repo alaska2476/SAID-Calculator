@@ -456,12 +456,12 @@ else:
     actual_budget = actual_total - total_income_considered
     recalculated_benefit = max(actual_budget, 0)
 
-    difference = issued - recalculated_benefit
+   difference = round(issued - recalculated_benefit, 2)
     
 # Result label
-if abs(difference) < 0.01:
+# Result label
+if difference == 0:
     label = "NO DIFFERENCE"
-    difference = 0
 elif difference > 0:
     label = "OVERPAYMENT"
 else:
