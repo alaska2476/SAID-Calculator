@@ -1,4 +1,9 @@
+if "benefit_details" not in st.session_state:
+    st.session_state.benefit_details = []
 
+if "income_details" not in st.session_state:
+    st.session_state.income_details = []
+    
 import streamlit as st
 import pandas as pd
 import os
@@ -168,6 +173,7 @@ def build_table(
     children
 ):
     total = 0
+    detail_rows = []
 
     benefits = get_filtered_benefits(community, year, month, adults, children)
 
@@ -181,19 +187,25 @@ def build_table(
                 c3, c4 = st.columns(2)
                 name = c3.text_input("", key=f"{prefix}_name_{i}_{j}")
                 val = c4.number_input("Amount", 0.0, key=f"{prefix}_val_{i}_{j}")
-                if name.strip():
-                    total += val
+               if name.strip():
+    total += val
+
+    detail_rows.append({
+        "Benefit": name,
+        "Amount": float(val),
+        "Assessment": prefix
+    })
         else:
             opts = get_amounts(community, b, year, month, adults, children)
 
             if opts:
                 val = c2.selectbox("", opts, key=f"{prefix}_amt_{i}")
-            else:
-                val = c2.number_input("Amount", 0.0, key=f"{prefix}_num_{i}")
 
-            total += float(val)
-
-    return total
+detail_rows.append({
+    "Benefit": b,
+    "Amount": float(val),
+    "Assessment": prefix
+})
 
 # =========================
 # BENEFITS
@@ -293,7 +305,7 @@ col1, _, col2 = st.columns([1,0.3,1])
 
 with col1:
 
-    declared_total = build_table(
+    declared_total, declared_details = build_table(
         "d",
         d_community,
         d_year,
@@ -315,7 +327,7 @@ with col2:
 
     else:
 
-        actual_total = build_table(
+        actual_total, actual_details = build_table(
             "a",
             a_community,
             a_year,
@@ -511,23 +523,27 @@ else:
 # SAVE BUTTON
 if st.button("Save Month Calculation"):
 
-    new_row = pd.DataFrame([{
+    for row in declared_details:
+    st.session_state.benefit_details.append({
         "Client": client,
         "Case": case,
         "Month": d_month,
         "Year": d_year,
-        "Total Declared": declared_total,
-        "Total Actual": actual_total,
-        "Declared Income": declared_net_total,
-        "Actual Income": actual_income_total,
-        "Budget Deficit/Surplus": (
-            budget_surplus if budget_surplus > 0 else budget_deficit
-        ),
-        "Benefit": declared_benefit,
-        "Benefits Issued": issued,
-        "Overpayment / Underpayment": difference,
-        "Assessment Result": label
-    }])
+        "Assessment": "Declared",
+        "Benefit": row["Benefit"],
+        "Amount": row["Amount"]
+    })
+
+for row in actual_details:
+    st.session_state.benefit_details.append({
+        "Client": client,
+        "Case": case,
+        "Month": d_month,
+        "Year": d_year,
+        "Assessment": "Actual",
+        "Benefit": row["Benefit"],
+        "Amount": row["Amount"]
+    })
 
     hist = st.session_state.history.copy()
 
@@ -610,9 +626,16 @@ summary_df = pd.concat(
 )
 
 with pd.ExcelWriter(output, engine="openpyxl") as writer:
+
     summary_df.to_excel(
         writer,
         sheet_name="Summary",
+        index=False
+    )
+
+    benefit_detail_df.to_excel(
+        writer,
+        sheet_name="Benefit Details",
         index=False
     )
 
