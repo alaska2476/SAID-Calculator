@@ -373,10 +373,10 @@ with col2:
 
     if same_actual:
 
-    actual_total = declared_total
-    actual_details = declared_details
+        actual_total = declared_total
+        actual_details = declared_details
 
-    st.info("Using declared values")
+        st.info("Using declared values")
 
     else:
 
@@ -388,7 +388,6 @@ with col2:
             a_adults,
             a_children
         )
-
     st.markdown(
         f"### Total Actual: ${actual_total:,.2f}"
     )  
@@ -593,7 +592,10 @@ if st.button("Save Month Calculation"):
         "Assessment Result": label
     }])
 
+    if st.button("Save Month Calculation"):
+
     for row in declared_details:
+
         st.session_state.benefit_details.append({
             "Client": client,
             "Case": case,
@@ -603,8 +605,8 @@ if st.button("Save Month Calculation"):
             "Benefit": row["Benefit"],
             "Amount": row["Amount"]
         })
+        for row in actual_details:
 
-    for row in actual_details:
         st.session_state.benefit_details.append({
             "Client": client,
             "Case": case,
@@ -614,7 +616,23 @@ if st.button("Save Month Calculation"):
             "Benefit": row["Benefit"],
             "Amount": row["Amount"]
         })
-
+    new_row = pd.DataFrame([{
+    "Client": client,
+    "Case": case,
+    "Month": d_month,
+    "Year": d_year,
+    "Total Declared": declared_total,
+    "Total Actual": actual_total,
+    "Declared Income": declared_net_total,
+    "Actual Income": actual_income_total,
+    "Budget Deficit/Surplus": (
+        budget_surplus if budget_surplus > 0 else budget_deficit
+    ),
+    "Benefit": declared_benefit,
+    "Benefits Issued": issued,
+    "Overpayment / Underpayment": difference,
+    "Assessment Result": label
+}])
     hist = st.session_state.history.copy()
 
     if not hist.empty:
@@ -700,7 +718,9 @@ summary_df = pd.concat(
 benefit_detail_df = pd.DataFrame(
     st.session_state.benefit_details
 )
-
+benefit_detail_df = pd.DataFrame(
+    st.session_state.benefit_details
+)
 with pd.ExcelWriter(output, engine="openpyxl") as writer:
 
     summary_df.to_excel(
