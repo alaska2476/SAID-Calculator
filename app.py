@@ -547,33 +547,33 @@ with c4:
         unsafe_allow_html=True
     )
 
-# =========================
-# SAVE
-# =========================
-required_columns = [
-    "Client",
-    "Case",
-    "Month",
-    "Year",
-    "Total Declared",
-    "Total Actual",
-    "Declared Income",
-    "Actual Income",
-    "Benefit",
-    "Benefits Issued",
-    "Budget Deficit/Surplus",
-    "Overpayment / Underpayment",
-    "Assessment Result"
-]
-#
-if "history" not in st.session_state:
-    st.session_state.history = pd.DataFrame(columns=required_columns)
-else:
-    st.session_state.history = st.session_state.history.reindex(columns=required_columns)
-
-
+# SAVE BUTTON
 if st.button("Save Month Calculation"):
 
+    # Save benefit detail rows
+    for row in declared_details:
+        st.session_state.benefit_details.append({
+            "Client": client,
+            "Case": case,
+            "Month": d_month,
+            "Year": d_year,
+            "Assessment": "Declared",
+            "Benefit": row["Benefit"],
+            "Amount": row["Amount"]
+        })
+
+    for row in actual_details:
+        st.session_state.benefit_details.append({
+            "Client": client,
+            "Case": case,
+            "Month": d_month,
+            "Year": d_year,
+            "Assessment": "Actual",
+            "Benefit": row["Benefit"],
+            "Amount": row["Amount"]
+        })
+
+    # Create summary row
     new_row = pd.DataFrame([{
         "Client": client,
         "Case": case,
@@ -592,47 +592,6 @@ if st.button("Save Month Calculation"):
         "Assessment Result": label
     }])
 
-    if st.button("Save Month Calculation"):
-
-    for row in declared_details:
-
-        st.session_state.benefit_details.append({
-            "Client": client,
-            "Case": case,
-            "Month": d_month,
-            "Year": d_year,
-            "Assessment": "Declared",
-            "Benefit": row["Benefit"],
-            "Amount": row["Amount"]
-        })
-        for row in actual_details:
-
-        st.session_state.benefit_details.append({
-            "Client": client,
-            "Case": case,
-            "Month": d_month,
-            "Year": d_year,
-            "Assessment": "Actual",
-            "Benefit": row["Benefit"],
-            "Amount": row["Amount"]
-        })
-    new_row = pd.DataFrame([{
-    "Client": client,
-    "Case": case,
-    "Month": d_month,
-    "Year": d_year,
-    "Total Declared": declared_total,
-    "Total Actual": actual_total,
-    "Declared Income": declared_net_total,
-    "Actual Income": actual_income_total,
-    "Budget Deficit/Surplus": (
-        budget_surplus if budget_surplus > 0 else budget_deficit
-    ),
-    "Benefit": declared_benefit,
-    "Benefits Issued": issued,
-    "Overpayment / Underpayment": difference,
-    "Assessment Result": label
-}])
     hist = st.session_state.history.copy()
 
     if not hist.empty:
