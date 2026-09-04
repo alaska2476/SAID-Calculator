@@ -187,7 +187,7 @@ def build_table(
                 c3, c4 = st.columns(2)
                 name = c3.text_input("", key=f"{prefix}_name_{i}_{j}")
                 val = c4.number_input("Amount", 0.0, key=f"{prefix}_val_{i}_{j}")
-               if name.strip():
+    if name.strip():
     total += val
 
     detail_rows.append({
