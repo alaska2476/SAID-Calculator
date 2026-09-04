@@ -1,13 +1,15 @@
+import streamlit as st
+import pandas as pd
+import os
+import io
+
+
 if "benefit_details" not in st.session_state:
     st.session_state.benefit_details = []
 
 if "income_details" not in st.session_state:
     st.session_state.income_details = []
     
-import streamlit as st
-import pandas as pd
-import os
-import io
 
 st.set_page_config(layout="wide")
 st.markdown("""
