@@ -1,15 +1,8 @@
+
 import streamlit as st
 import pandas as pd
 import os
 import io
-
-
-if "benefit_details" not in st.session_state:
-    st.session_state.benefit_details = []
-
-if "income_details" not in st.session_state:
-    st.session_state.income_details = []
-    
 
 st.set_page_config(layout="wide")
 st.markdown("""
@@ -174,92 +167,34 @@ def build_table(
     adults,
     children
 ):
-
     total = 0
-    detail_rows = []
 
-    benefits = get_filtered_benefits(
-        community,
-        year,
-        month,
-        adults,
-        children
-    )
+    benefits = get_filtered_benefits(community, year, month, adults, children)
 
     for i in range(10):
-
         c1, c2 = st.columns(2)
 
-        b = c1.selectbox(
-            "",
-            [""] + benefits + ["OTHER"],
-            key=f"{prefix}_b_{i}"
-        )
+        b = c1.selectbox("", [""] + benefits + ["OTHER"], key=f"{prefix}_b_{i}")
 
         if b == "OTHER":
-
             for j in range(7):
-
                 c3, c4 = st.columns(2)
-
-                name = c3.text_input(
-                    "",
-                    key=f"{prefix}_name_{i}_{j}"
-                )
-
-                val = c4.number_input(
-                    "Amount",
-                    0.0,
-                    key=f"{prefix}_val_{i}_{j}"
-                )
-
+                name = c3.text_input("", key=f"{prefix}_name_{i}_{j}")
+                val = c4.number_input("Amount", 0.0, key=f"{prefix}_val_{i}_{j}")
                 if name.strip():
-
-                    total += float(val)
-
-                    detail_rows.append({
-                        "Benefit": name,
-                        "Amount": float(val),
-                        "Assessment": prefix
-                    })
-
+                    total += val
         else:
-
-            opts = get_amounts(
-                community,
-                b,
-                year,
-                month,
-                adults,
-                children
-            )
+            opts = get_amounts(community, b, year, month, adults, children)
 
             if opts:
-
-                val = c2.selectbox(
-                    "",
-                    opts,
-                    key=f"{prefix}_amt_{i}"
-                )
-
+                val = c2.selectbox("", opts, key=f"{prefix}_amt_{i}")
             else:
-
-                val = c2.number_input(
-                    "Amount",
-                    0.0,
-                    key=f"{prefix}_num_{i}"
-                )
+                val = c2.number_input("Amount", 0.0, key=f"{prefix}_num_{i}")
 
             total += float(val)
 
-            detail_rows.append({
-                "Benefit": b,
-                "Amount": float(val),
-                "Assessment": prefix
-            })
+    return total
 
-    return total, detail_rows
-    
 # =========================
 # BENEFITS
 # =========================
@@ -358,7 +293,7 @@ col1, _, col2 = st.columns([1,0.3,1])
 
 with col1:
 
-    declared_total, declared_details = build_table(
+    declared_total = build_table(
         "d",
         d_community,
         d_year,
@@ -376,13 +311,11 @@ with col2:
     if same_actual:
 
         actual_total = declared_total
-        actual_details = declared_details
-
         st.info("Using declared values")
 
     else:
 
-        actual_total, actual_details = build_table(
+        actual_total = build_table(
             "a",
             a_community,
             a_year,
@@ -390,6 +323,7 @@ with col2:
             a_adults,
             a_children
         )
+
     st.markdown(
         f"### Total Actual: ${actual_total:,.2f}"
     )  
@@ -549,33 +483,34 @@ with c4:
         unsafe_allow_html=True
     )
 
+# =========================
+# SAVE
+# =========================
+required_columns = [
+    "Client",
+    "Case",
+    "Month",
+    "Year",
+    "Total Declared",
+    "Total Actual",
+    "Declared Income",
+    "Actual Income",
+    "Benefit",
+    "Benefits Issued",
+    "Budget Deficit/Surplus",
+    "Overpayment / Underpayment",
+    "Assessment Result"
+]
+#
+if "history" not in st.session_state:
+    st.session_state.history = pd.DataFrame(columns=required_columns)
+else:
+    st.session_state.history = st.session_state.history.reindex(columns=required_columns)
+
+
 # SAVE BUTTON
 if st.button("Save Month Calculation"):
 
-    # Save benefit detail rows
-    for row in declared_details:
-        st.session_state.benefit_details.append({
-            "Client": client,
-            "Case": case,
-            "Month": d_month,
-            "Year": d_year,
-            "Assessment": "Declared",
-            "Benefit": row["Benefit"],
-            "Amount": row["Amount"]
-        })
-
-    for row in actual_details:
-        st.session_state.benefit_details.append({
-            "Client": client,
-            "Case": case,
-            "Month": d_month,
-            "Year": d_year,
-            "Assessment": "Actual",
-            "Benefit": row["Benefit"],
-            "Amount": row["Amount"]
-        })
-
-    # Create summary row
     new_row = pd.DataFrame([{
         "Client": client,
         "Case": case,
@@ -612,6 +547,7 @@ if st.button("Save Month Calculation"):
     )
 
     st.success("Saved")
+    
 # =========================
 # DISPLAY
 # =========================
@@ -619,34 +555,34 @@ if len(st.session_state.history) > 0:
 
     st.dataframe(st.session_state.history)
 
+    output = io.BytesIO()
     export_df = st.session_state.history.copy()
 
     total = export_df["Overpayment / Underpayment"].sum()
 
     if total > 0:
         total_text = "TOTAL OVERPAYMENT"
-        total_color = "#C62828"
+        total_color = "#C62828"      # Dark Red
 
     elif total < 0:
         total_text = "TOTAL UNDERPAYMENT"
-        total_color = "#0078D4"
+        total_color = "#0078D4"      # Microsoft Blue
 
     else:
         total_text = "NO NET DIFFERENCE"
-        total_color = "#2E7D32"
+        total_color = "#2E7D32"      # Dark Green
 
     st.markdown(
-        f"""
-        <h2 style="
-            color:{total_color};
-            margin:0;
-        ">
-            {total_text}: ${abs(total):,.2f}
-        </h2>
-        """,
-        unsafe_allow_html=True
-    )
-
+    f"""
+    <h2 style="
+        color:{total_color};
+        margin:0;
+    ">
+        {total_text}: ${abs(total):,.2f}
+    </h2>
+    """,
+    unsafe_allow_html=True
+)
 # =========================
 # DOWNLOAD SUMMARY
 # =========================
@@ -661,10 +597,8 @@ total_row = {col: "" for col in summary_df.columns}
 
 if total_value > 0:
     total_row["Client"] = "TOTAL OVERPAYMENT"
-
 elif total_value < 0:
     total_row["Client"] = "TOTAL UNDERPAYMENT"
-
 else:
     total_row["Client"] = "NO NET DIFFERENCE"
 
@@ -675,28 +609,12 @@ summary_df = pd.concat(
     ignore_index=True
 )
 
-# Build benefit detail dataframe
-benefit_detail_df = pd.DataFrame(
-    st.session_state.benefit_details
-)
-benefit_detail_df = pd.DataFrame(
-    st.session_state.benefit_details
-)
 with pd.ExcelWriter(output, engine="openpyxl") as writer:
-
     summary_df.to_excel(
         writer,
         sheet_name="Summary",
         index=False
     )
-
-    if not benefit_detail_df.empty:
-
-        benefit_detail_df.to_excel(
-            writer,
-            sheet_name="Benefit Details",
-            index=False
-        )
 
 output.seek(0)
 
